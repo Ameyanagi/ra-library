@@ -43,6 +43,8 @@ class RegulatoryData:
     threshold_pct: Optional[str]
     record_retention_years: int
     work_env_measurement_required: bool
+    law_name_ja: Optional[str] = None
+    law_name_en: Optional[str] = None
 
 
 class RegulatoryDatabase:
@@ -207,6 +209,8 @@ class RegulatoryDatabase:
             regulation_type=row.get("regulation_type", "") or "",
             regulation_class=safe_int(row.get("regulation_class", "")),
             regulation_label=row.get("regulation_label", "") or "",
+            law_name_ja=safe_str(row.get("law_name_ja", "")),
+            law_name_en=safe_str(row.get("law_name_en", "")),
             special_management=safe_bool(row.get("special_management", "")),
             special_organic=safe_bool(row.get("special_organic", "")),
             carcinogen=safe_bool(row.get("carcinogen", "")),
