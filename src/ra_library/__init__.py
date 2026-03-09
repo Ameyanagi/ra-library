@@ -87,6 +87,14 @@ from .data import (
     SubstanceData,
     SubstanceDatabase,
 )
+from .services import (
+    ServiceError,
+    ServiceResult,
+    lookup_substances,
+    calculate_risk,
+    explain_calculation,
+    get_recommendations,
+)
 
 __all__ = [
     # Version
@@ -156,4 +164,11 @@ __all__ = [
     "lookup_substance",
     "SubstanceData",
     "SubstanceDatabase",
+    # Services
+    "ServiceError",
+    "ServiceResult",
+    "lookup_substances",
+    "calculate_risk",
+    "explain_calculation",
+    "get_recommendations",
 ]
