@@ -19,6 +19,11 @@ v3.1.2:
   - Skin hazard: database flag + GHS classification check
   - Data columns: 93 (A-CO)
   - Added: 特化則1-3類, 有機則1-3種, 鉛則, 四アルキル鉛
+
+v3.2:
+  - Same exposure floor behavior as v3.1.2
+  - Updated workbook data (96 columns, 3417 unique CAS entries)
+  - Column 81 raw code "2" suppresses GHS-based skin hazard labeling
 """
 
 from dataclasses import dataclass, field
@@ -44,6 +49,7 @@ class CalculationVersion(Enum):
 
     V3_0_2 = "v3.0.2"  # No floor, 3 regulatory categories
     V3_1_2 = "v3.1.2"  # With floor, 11 regulatory categories + GHS
+    V3_2 = "v3.2"  # Latest workbook data with raw skin-hazard override code
 
 
 @dataclass
@@ -60,6 +66,7 @@ class VersionConfig:
     # Regulatory detection settings
     use_ghs_skin_detection: bool = True
     regulatory_categories: int = 11  # Number of regulatory categories
+    ghs_skin_override_block_codes: tuple[str, ...] = ("0",)
 
     # Cutoff thresholds
     skin_hazard_cutoff: float = CUTOFF_SKIN_HAZARD  # 1.0%
@@ -78,12 +85,23 @@ class VersionConfig:
 
     @classmethod
     def v3_1_2(cls) -> "VersionConfig":
-        """Configuration for v3.1.2 calculation (current/recommended)."""
+        """Configuration for v3.1.2 calculation (compatibility)."""
         return cls(
             version=CalculationVersion.V3_1_2,
             apply_exposure_floor=True,
             use_ghs_skin_detection=True,
             regulatory_categories=11,
+        )
+
+    @classmethod
+    def v3_2(cls) -> "VersionConfig":
+        """Configuration for v3.2 calculation (latest/recommended)."""
+        return cls(
+            version=CalculationVersion.V3_2,
+            apply_exposure_floor=True,
+            use_ghs_skin_detection=True,
+            regulatory_categories=11,
+            ghs_skin_override_block_codes=("0", "2"),
         )
 
 
@@ -362,17 +380,24 @@ class VersionCalculator:
         result.tetraalkyl_lead = substance_flags.get("tetraalkyl_lead", False)
 
         # 皮膚等障害化学物質 (Skin Hazard) - with cutoff + GHS detection
-        db_skin_flag = substance_flags.get("is_skin_hazard", False)
+        raw_skin_flag = substance_flags.get("skin_hazard_flag_code")
+        if raw_skin_flag is not None:
+            raw_skin_flag = str(raw_skin_flag).strip() or None
+
+        db_skin_flag = substance_flags.get("is_skin_hazard", False) or raw_skin_flag == "1"
         ghs_skin_flag = False
 
         if self.config.use_ghs_skin_detection and ghs_classification:
             ghs_skin_flag = self._check_ghs_skin_hazard(ghs_classification)
             result.skin_hazard_from_ghs = ghs_skin_flag
 
-        # Apply skin hazard if database says "1" OR GHS indicates hazard
-        # But NOT if database explicitly says "0" (override)
+        # Apply skin hazard if database says "1" OR GHS indicates hazard,
+        # unless the workbook raw code explicitly blocks GHS-based labeling.
         if content_percent >= skin_cutoff:
-            if db_skin_flag or (ghs_skin_flag and substance_flags.get("is_skin_hazard") != "0"):
+            ghs_allowed = True
+            if raw_skin_flag is not None:
+                ghs_allowed = raw_skin_flag not in self.config.ghs_skin_override_block_codes
+            if db_skin_flag or (ghs_skin_flag and ghs_allowed):
                 result.skin_hazard = True
 
         # がん原性物質 (Carcinogen) - no cutoff
@@ -488,7 +513,7 @@ def compare_versions(
     ghs_classification: Optional[dict] = None,
 ) -> dict:
     """
-    Compare calculation results between v3.0.2 and v3.1.2.
+    Compare calculation results between v3.0.2 and v3.2.
 
     Returns a comprehensive comparison showing differences in:
     - Exposure values (8hr and STEL)
@@ -499,7 +524,7 @@ def compare_versions(
     """
     # Create calculators
     calc_302 = VersionCalculator(VersionConfig.v3_0_2())
-    calc_312 = VersionCalculator(VersionConfig.v3_1_2())
+    calc_320 = VersionCalculator(VersionConfig.v3_2())
 
     # Calculate exposure for both versions
     exp_302 = calc_302.calculate_exposure(
@@ -515,7 +540,7 @@ def compare_versions(
         apf_coefficient=apf_coefficient,
     )
 
-    exp_312 = calc_312.calculate_exposure(
+    exp_320 = calc_320.calculate_exposure(
         property_type=property_type,
         volatility_or_dustiness=volatility_or_dustiness,
         amount_level=amount_level,
@@ -531,7 +556,7 @@ def compare_versions(
     # Calculate RCR
     evaluation_standard = oel if oel > 0 else 500.0
     rcr_302 = exp_302.exposure_8hr / evaluation_standard
-    rcr_312 = exp_312.exposure_8hr / evaluation_standard
+    rcr_320 = exp_320.exposure_8hr / evaluation_standard
 
     # Determine risk levels
     def get_risk_level(rcr: float) -> str:
@@ -547,14 +572,14 @@ def compare_versions(
             return "IV"
 
     risk_302 = get_risk_level(rcr_302)
-    risk_312 = get_risk_level(rcr_312)
+    risk_320 = get_risk_level(rcr_320)
 
     # Check regulatory if flags provided
     reg_302 = None
-    reg_312 = None
+    reg_320 = None
     if substance_flags:
         reg_302 = calc_302.check_regulatory(substance_flags, None, content_percent)
-        reg_312 = calc_312.check_regulatory(substance_flags, ghs_classification, content_percent)
+        reg_320 = calc_320.check_regulatory(substance_flags, ghs_classification, content_percent)
 
     # Build comparison result
     result = {
@@ -574,15 +599,15 @@ def compare_versions(
             ],
             "regulatory_categories": 3,
         },
-        "v3_1_2": {
-            "version": "v3.1.2 (CREATE-SIMPLE 最新版)",
-            "exposure_8hr": exp_312.exposure_8hr,
-            "exposure_stel": exp_312.exposure_stel,
-            "unit": exp_312.unit,
-            "rcr": round(rcr_312, 4),
-            "risk_level": risk_312,
-            "floor_applied": exp_312.floor_applied_8hr,
-            "floor_value": exp_312.floor_value,
+        "v3_2": {
+            "version": "v3.2 (CREATE-SIMPLE 最新版)",
+            "exposure_8hr": exp_320.exposure_8hr,
+            "exposure_stel": exp_320.exposure_stel,
+            "unit": exp_320.unit,
+            "rcr": round(rcr_320, 4),
+            "risk_level": risk_320,
+            "floor_applied": exp_320.floor_applied_8hr,
+            "floor_value": exp_320.floor_value,
             "recommended": True,
             "features": [
                 "8時間TWA",
@@ -591,30 +616,31 @@ def compare_versions(
                 "物理的危険性",
                 "ばく露下限値 (exposure floor)",
                 "GHS皮膚障害検出",
+                "v3.2更新データ",
             ],
             "regulatory_categories": 11,
         },
         "comparison": {
-            "exposure_differs": exp_302.exposure_8hr != exp_312.exposure_8hr,
+            "exposure_differs": exp_302.exposure_8hr != exp_320.exposure_8hr,
             "exposure_difference_pct": round(
-                (exp_312.exposure_8hr - exp_302.exposure_8hr) / exp_302.exposure_8hr * 100
+                (exp_320.exposure_8hr - exp_302.exposure_8hr) / exp_302.exposure_8hr * 100
                 if exp_302.exposure_8hr > 0 else 0,
                 2
             ),
-            "rcr_differs": rcr_302 != rcr_312,
-            "risk_level_differs": risk_302 != risk_312,
-            "floor_caused_difference": exp_312.floor_applied_8hr,
+            "rcr_differs": rcr_302 != rcr_320,
+            "risk_level_differs": risk_302 != risk_320,
+            "floor_caused_difference": exp_320.floor_applied_8hr,
         },
     }
 
     # Add regulatory comparison if available
-    if reg_302 and reg_312:
+    if reg_302 and reg_320:
         result["v3_0_2"]["regulatory"] = reg_302.to_list_v302()
-        result["v3_1_2"]["regulatory"] = reg_312.to_list_v312()
+        result["v3_2"]["regulatory"] = reg_320.to_list_v312()
         result["comparison"]["regulatory_differs"] = (
-            reg_302.to_list_v302() != reg_312.to_list_v312()[:4]  # Compare first 4 for v3.0.2
+            reg_302.to_list_v302() != reg_320.to_list_v312()[:4]  # Compare first 4 for v3.0.2
         )
-        if reg_312.skin_hazard_from_ghs:
+        if reg_320.skin_hazard_from_ghs:
             result["comparison"]["ghs_skin_detection"] = True
 
     return result

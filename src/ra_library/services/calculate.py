@@ -10,37 +10,64 @@ from ..calculators import (
 from ..calculators.version_comparison import compare_versions
 from ..models.risk import RiskLevel
 from .common import ServiceError, ServiceResult
-from .conditions import format_conditions_used
+from .conditions import format_conditions_used, get_gas_amount_metadata
+
+LATEST_METHODOLOGY_VERSION = "v3.2"
+FLOOR_METHODOLOGY_VERSIONS = {"v3.2", "v3.1.2"}
 
 # Version metadata
 VERSION_INFO = {
-    "v3.1.2": {
-        "name_en": "CREATE-SIMPLE v3.1.2",
-        "name_ja": "CREATE-SIMPLE v3.1.2 (2024年版)",
+    "v3.2": {
+        "name_en": "CREATE-SIMPLE v3.2",
+        "name_ja": "CREATE-SIMPLE v3.2",
         "is_recommended": True,
         "exposure_floor": {
             "enabled": True,
-            "liquid_ppm": MIN_EXPOSURE_LIQUID,  # 0.005
-            "solid_mg_m3": MIN_EXPOSURE_SOLID,  # 0.001
+            "liquid_ppm": MIN_EXPOSURE_LIQUID,
+            "solid_mg_m3": MIN_EXPOSURE_SOLID,
         },
         "features_en": [
             "Exposure floor (minimum exposure limit)",
-            "Expanded hazard-data coverage",
+            "Expanded v3.2 substance coverage",
+            "Updated workbook metadata fields",
+            "Raw-code aware skin hazard handling",
+        ],
+        "features_ja": [
+            "ばく露下限値（最小ばく露量）",
+            "v3.2の物質データ拡張",
+            "ワークブック更新メタデータ対応",
+            "rawコードを考慮した皮膚障害判定",
+        ],
+        "note_en": "Recommended latest version aligned to the CREATE-SIMPLE v3.2 workbook.",
+        "note_ja": "CREATE-SIMPLE v3.2ワークブックに合わせた推奨最新版です。",
+    },
+    "v3.1.2": {
+        "name_en": "CREATE-SIMPLE v3.1.2",
+        "name_ja": "CREATE-SIMPLE v3.1.2",
+        "is_recommended": False,
+        "exposure_floor": {
+            "enabled": True,
+            "liquid_ppm": MIN_EXPOSURE_LIQUID,
+            "solid_mg_m3": MIN_EXPOSURE_SOLID,
+        },
+        "features_en": [
+            "Exposure floor (minimum exposure limit)",
+            "Compatibility path for prior v3.1.2 results",
             "GHS-based skin hazard detection",
             "Cutoff thresholds for hazard labels",
         ],
         "features_ja": [
             "ばく露下限値（最小ばく露量）",
-            "有害性データの拡張カバレッジ",
+            "従来のv3.1.2結果との互換経路",
             "GHS分類による皮膚障害検出",
             "有害性ラベルの裾切値適用",
         ],
-        "note_en": "Recommended version. Exposure floor prevents unrealistically low estimates.",
-        "note_ja": "推奨バージョン。ばく露下限値により非現実的に低い推定値を防止。",
+        "note_en": "Compatibility version retained after v3.2. Exposure floor prevents unrealistically low estimates.",
+        "note_ja": "v3.2公開後も互換用に維持されるバージョンです。ばく露下限値により非現実的に低い推定値を防止します。",
     },
     "v3.0.2": {
         "name_en": "CREATE-SIMPLE v3.0.2",
-        "name_ja": "CREATE-SIMPLE v3.0.2 (2023年版)",
+        "name_ja": "CREATE-SIMPLE v3.0.2",
         "is_recommended": False,
         "exposure_floor": {
             "enabled": False,
@@ -95,7 +122,7 @@ def _parse_risk_level(level: str | int) -> int:
 
 def _generate_methodology_info(version: str, language: str) -> dict:
     """Generate methodology information section for output."""
-    info = VERSION_INFO.get(version, VERSION_INFO["v3.1.2"])
+    info = VERSION_INFO.get(version, VERSION_INFO[LATEST_METHODOLOGY_VERSION])
     lang_suffix = "ja" if language == "ja" else "en"
 
     return {
@@ -119,12 +146,15 @@ def _calculate_version_alternative(
     """
     Calculate what the alternative version would produce.
 
-    When using v3.1.2 and floor is applied, show what v3.0.2 would calculate.
-    When using v3.0.2, show what v3.1.2 would calculate.
-    When floor is manually disabled with v3.1.2, warn user about non-standard behavior.
+    When using a floor-enabled v3.x version and the floor is applied, show what
+    v3.0.2 would calculate. When using v3.0.2, show the latest recommended
+    version. When the floor is manually disabled, warn about non-standard behavior.
     """
     try:
-        # Check if any component has floor applied (for v3.1.2 -> v3.0.2 comparison)
+        recommended_version = LATEST_METHODOLOGY_VERSION
+        is_floor_version = current_version in FLOOR_METHODOLOGY_VERSIONS
+
+        # Check if any component has floor applied (for floor-version -> v3.0.2 comparison)
         floor_applied_any = False
         target_would_be_achieved = False
 
@@ -145,10 +175,10 @@ def _calculate_version_alternative(
                         if alt_level_int <= target_level_int:
                             target_would_be_achieved = True
 
-        # Case 1: v3.1.2 with floor manually disabled (non-standard usage)
-        if current_version == "v3.1.2" and floor_manually_disabled:
+        # Case 1: floor-enabled version with floor manually disabled (non-standard usage)
+        if is_floor_version and floor_manually_disabled:
             alt_info = {
-                "alternative_version": "v3.1.2 (標準設定)",
+                "alternative_version": f"{current_version} (standard settings)",
                 "current_behavior": "v3.0.2相当（下限値無効）",
                 "floor_manually_disabled": True,
                 "is_non_standard": True,
@@ -157,34 +187,34 @@ def _calculate_version_alternative(
             if language == "ja":
                 alt_info["warning"] = (
                     "⚠️ ばく露下限値が手動で無効化されています。"
-                    "これはv3.0.2と同等の動作であり、v3.1.2の標準動作ではありません。"
+                    f"これはv3.0.2と同等の動作であり、{current_version}の標準動作ではありません。"
                 )
                 alt_info["recommendation"] = (
                     "公式な評価には、ignore_minimum_floorを無効（false）にするか、"
                     "methodology_version='v3.0.2'を明示的に指定することを推奨します。"
                 )
                 alt_info["note"] = (
-                    "v3.1.2のばく露下限値は非現実的に低いばく露推定を防ぐために設計されています。"
+                    f"{current_version}のばく露下限値は非現実的に低いばく露推定を防ぐために設計されています。"
                     "下限値を無効にすると、特に管理の良い条件下で過度に楽観的な結果が得られる可能性があります。"
                 )
             else:
                 alt_info["warning"] = (
                     "⚠️ Exposure floor is manually disabled. "
-                    "This behaves like v3.0.2, not standard v3.1.2."
+                    f"This behaves like v3.0.2, not standard {current_version}."
                 )
                 alt_info["recommendation"] = (
                     "For official assessments, either enable the floor (ignore_minimum_floor=false) "
                     "or explicitly use methodology_version='v3.0.2'."
                 )
                 alt_info["note"] = (
-                    "The v3.1.2 exposure floor prevents unrealistically low estimates. "
+                    f"The {current_version} exposure floor prevents unrealistically low estimates. "
                     "Disabling it may give overly optimistic results in well-controlled conditions."
                 )
 
             return alt_info
 
-        # Case 2: v3.1.2 with floor applied and limiting
-        if current_version == "v3.1.2" and floor_applied_any:
+        # Case 2: floor-enabled version with floor applied and limiting
+        if is_floor_version and floor_applied_any:
             alt_info = {
                 "alternative_version": "v3.0.2",
                 "would_differ": True,
@@ -193,48 +223,48 @@ def _calculate_version_alternative(
             }
 
             if language == "ja":
-                alt_info["reason"] = "v3.1.2のばく露下限値が適用されています"
+                alt_info["reason"] = f"{current_version}のばく露下限値が適用されています"
                 if target_would_be_achieved:
                     alt_info["note"] = (
                         "v3.0.2ではばく露下限値がないため目標リスクレベルを達成できますが、"
-                        "v3.1.2の使用を推奨します（厚生労働省推奨の最新版）。"
+                        f"{recommended_version}の使用を推奨します（最新版）。"
                         "下限値は非現実的に低いばく露推定を防ぐために設定されています。"
                     )
                 else:
                     alt_info["note"] = (
-                        "v3.0.2ではより低いばく露値が計算されますが、v3.1.2の使用を推奨します。"
+                        f"v3.0.2ではより低いばく露値が計算されますが、{recommended_version}の使用を推奨します。"
                     )
             else:
-                alt_info["reason"] = "Exposure floor from v3.1.2 is applied"
+                alt_info["reason"] = f"Exposure floor from {current_version} is applied"
                 if target_would_be_achieved:
                     alt_info["note"] = (
                         "v3.0.2 (without floor) would achieve target risk level, but "
-                        "v3.1.2 is recommended (MHLW latest version). "
+                        f"{recommended_version} is the recommended latest version. "
                         "The floor prevents unrealistically low exposure estimates."
                     )
                 else:
                     alt_info["note"] = (
-                        "v3.0.2 would calculate lower exposure, but v3.1.2 is recommended."
+                        f"v3.0.2 would calculate lower exposure, but {recommended_version} is recommended."
                     )
 
             return alt_info
 
-        # Case 3: v3.0.2 -> always show v3.1.2 recommendation
+        # Case 3: v3.0.2 -> always show latest recommendation
         elif current_version == "v3.0.2":
             alt_info = {
-                "alternative_version": "v3.1.2",
+                "alternative_version": recommended_version,
                 "is_recommended_version": True,
             }
 
             if language == "ja":
                 alt_info["note"] = (
-                    "v3.1.2（推奨版）にはばく露下限値があり、より保守的な推定値を提供します。"
-                    "公式な評価にはv3.1.2の使用を推奨します。"
+                    f"{recommended_version}（推奨版）にはばく露下限値があり、より保守的な推定値を提供します。"
+                    f"公式な評価には{recommended_version}の使用を推奨します。"
                 )
             else:
                 alt_info["note"] = (
-                    "v3.1.2 (recommended) includes exposure floor for more conservative estimates. "
-                    "Use v3.1.2 for official assessments."
+                    f"{recommended_version} (recommended) includes exposure floor for more conservative estimates. "
+                    f"Use {recommended_version} for official assessments."
                 )
 
             return alt_info
@@ -269,14 +299,14 @@ def calculate_risk(
     include_recommendations: str = "auto",
     include_explanation: bool = False,
     include_v2_comparison: bool = False,
-    methodology_version: str = "v3.1.2",
+    methodology_version: str = LATEST_METHODOLOGY_VERSION,
     language: str = "en",
 ) -> ServiceResult:
     """Calculate a chemical risk assessment payload."""
     if not substances:
         raise ServiceError("MISSING_SUBSTANCES", "At least one substance is required")
 
-    valid_versions = ["v3.1.2", "v3.0.2"]
+    valid_versions = [LATEST_METHODOLOGY_VERSION, "v3.1.2", "v3.0.2"]
     if methodology_version not in valid_versions:
         raise ServiceError(
             "INVALID_METHODOLOGY_VERSION",
@@ -355,7 +385,7 @@ def calculate_risk(
         raise ServiceError("CALCULATION_FAILED", f"Calculation failed: {exc}") from exc
 
     floor_manually_disabled = (
-        methodology_version == "v3.1.2"
+        methodology_version in FLOOR_METHODOLOGY_VERSIONS
         and conditions is not None
         and conditions.get("ignore_minimum_floor") is True
     )
@@ -390,6 +420,8 @@ def _extract_conditions_info(
         volatility_source = None
         flash_point = None
         boiling_point = None
+        gas_molecular_weight = None
+        component_count = len(builder._substances) if builder else 0
 
         # Get from builder if available
         if builder:
@@ -404,6 +436,7 @@ def _extract_conditions_info(
                         # Get physical properties
                         flash_point = props.flash_point
                         boiling_point = props.boiling_point
+                        gas_molecular_weight = props.molecular_weight
 
                         # For liquids, get volatility
                         if assessment_input.product_property.value == "liquid":
@@ -425,6 +458,8 @@ def _extract_conditions_info(
             volatility_source=volatility_source,
             flash_point=flash_point,
             boiling_point=boiling_point,
+            gas_molecular_weight=gas_molecular_weight,
+            component_count=component_count,
         )
     except Exception as exc:
         # Don't fail the whole response if formatting fails
@@ -442,6 +477,41 @@ def _extract_conditions_info(
         return None
 
 
+def _format_skipped_assessment(skip: dict[str, str], language: str) -> dict[str, Any]:
+    """Format a workbook-faithful skipped assessment entry."""
+    if language == "ja":
+        reason = (
+            "CREATE-SIMPLEのワークブック準拠モードでは、RAシート/実施レポート経路で気体の健康リスク評価は行いません。"
+        )
+    else:
+        reason = skip.get("message", "")
+    return {
+        "status": skip.get("status", "not_assessed"),
+        "reason_code": skip.get("reason_code", "NOT_ASSESSED"),
+        "reason": reason,
+        "workbook_faithful": True,
+    }
+
+
+def _component_gas_quantity_estimate(
+    component,
+    amount_key: str,
+) -> dict[str, Any] | None:
+    """Build a component-level gas quantity estimate from amount band and MW."""
+    substance = getattr(component, "_substance", None)
+    if substance is None or getattr(substance, "property_type", None) is None:
+        return None
+    if substance.property_type.value != "gas":
+        return None
+
+    molecular_weight = None
+    if getattr(substance, "properties", None) is not None:
+        molecular_weight = substance.properties.molecular_weight
+
+    metadata = get_gas_amount_metadata(amount_key, molecular_weight=molecular_weight)
+    return metadata or None
+
+
 def _format_result(
     result,
     language: str,
@@ -449,7 +519,7 @@ def _format_result(
     include_explanation: bool = False,
     include_v2_comparison: bool = False,
     target_level: str = "I",
-    methodology_version: str = "v3.1.2",
+    methodology_version: str = LATEST_METHODOLOGY_VERSION,
     floor_manually_disabled: bool = False,
 ) -> dict:
     """Format AssessmentResult for MCP response."""
@@ -504,6 +574,10 @@ def _format_result(
         output["version_alternative"] = version_alt
 
     for cas, comp in result.components.items():
+        skipped_by_risk_type = {
+            skip.get("risk_type", ""): skip
+            for skip in getattr(comp, "skipped_assessments", [])
+        }
         comp_data = {
             "cas_number": comp.cas_number,
             "name": comp.name,
@@ -551,6 +625,11 @@ def _format_result(
                     comp_data["inhalation"]["explanation"] = _format_explanation(
                         explanation, language
                     )
+        elif "inhalation" in skipped_by_risk_type:
+            comp_data["inhalation"] = _format_skipped_assessment(
+                skipped_by_risk_type["inhalation"],
+                language,
+            )
 
         # Dermal results (uses simple I/II/III/IV scale per VBA)
         if comp.dermal:
@@ -559,6 +638,11 @@ def _format_result(
                 "risk_level": int(comp.dermal.risk_level),
                 "risk_label": RiskLevel.get_simple_label(comp.dermal.rcr),
             }
+        elif "dermal" in skipped_by_risk_type:
+            comp_data["dermal"] = _format_skipped_assessment(
+                skipped_by_risk_type["dermal"],
+                language,
+            )
 
         # Physical results (verbose output)
         if comp.physical:
@@ -593,6 +677,13 @@ def _format_result(
 
             comp_data["physical"] = phys_data
 
+        gas_quantity_estimate = _component_gas_quantity_estimate(
+            comp,
+            result.assessment_input.amount_level.value,
+        )
+        if gas_quantity_estimate:
+            comp_data["gas_quantity_estimate"] = gas_quantity_estimate
+
         # Add warnings based on language
         if language == "ja":
             comp_data["warnings"] = comp.warnings_ja
@@ -600,6 +691,8 @@ def _format_result(
             comp_data["warnings"] = comp.warnings
         if comp.calculation_errors:
             comp_data["calculation_errors"] = comp.calculation_errors
+        if getattr(comp, "skipped_assessments", None):
+            comp_data["skipped_assessments"] = comp.skipped_assessments
 
         output["components"][cas] = comp_data
 
@@ -642,7 +735,7 @@ def _format_result(
             }
 
         # Add version-based recommendation if floor is limiting factor
-        if methodology_version == "v3.1.2" and version_alt:
+        if methodology_version in FLOOR_METHODOLOGY_VERSIONS and version_alt:
             if version_alt.get("target_achievable_without_floor"):
                 version_rec = _create_version_recommendation(
                     target_level, result.overall_risk_level, language
@@ -670,7 +763,7 @@ def _create_version_recommendation(
             "category": "methodology",
             "action": (
                 f"参考情報: v3.0.2（ばく露下限値なし）では目標リスクレベル{target_level}を"
-                "達成可能ですが、v3.1.2の使用を推奨します"
+                f"達成可能ですが、{LATEST_METHODOLOGY_VERSION}の使用を推奨します"
             ),
             "effectiveness": "informational",
             "feasibility": "immediate",
@@ -678,9 +771,9 @@ def _create_version_recommendation(
             "predicted_level": target_level,
             "rcr_reduction_percent": 0,
             "notes": (
-                "v3.1.2のばく露下限値は、非現実的に低いばく露推定を防ぐために設定されています。"
+                f"{LATEST_METHODOLOGY_VERSION}のばく露下限値は、非現実的に低いばく露推定を防ぐために設定されています。"
                 "現在の作業条件では十分にリスクが管理されていると考えられますが、"
-                "公式な評価にはv3.1.2の結果を使用してください。"
+                f"公式な評価には{LATEST_METHODOLOGY_VERSION}の結果を使用してください。"
                 "v3.0.2での計算は参考値としてのみ使用してください。"
             ),
             "is_version_suggestion": True,
@@ -692,7 +785,7 @@ def _create_version_recommendation(
             "category": "methodology",
             "action": (
                 f"For reference: v3.0.2 (no exposure floor) would achieve target level {target_level}, "
-                "but v3.1.2 is recommended"
+                f"but {LATEST_METHODOLOGY_VERSION} is recommended"
             ),
             "effectiveness": "informational",
             "feasibility": "immediate",
@@ -700,8 +793,8 @@ def _create_version_recommendation(
             "predicted_level": target_level,
             "rcr_reduction_percent": 0,
             "notes": (
-                "The v3.1.2 exposure floor prevents unrealistically low exposure estimates. "
-                "Current conditions indicate well-controlled exposure, but use v3.1.2 results "
+                f"The {LATEST_METHODOLOGY_VERSION} exposure floor prevents unrealistically low exposure estimates. "
+                f"Current conditions indicate well-controlled exposure, but use {LATEST_METHODOLOGY_VERSION} results "
                 "for official assessments. v3.0.2 calculations are for reference only."
             ),
             "is_version_suggestion": True,
@@ -794,7 +887,11 @@ def _generate_v2_comparison(
         # Add summary
         if comparisons:
             summary = {
-                "note": "v3.1.2 is recommended (latest methodology with STEL, dermal, and physical hazard assessment)" if language == "en" else "v3.1.2を推奨 (STEL、経皮吸収、物理的危険性を含む最新の評価手法)",
+                "note": (
+                    f"{LATEST_METHODOLOGY_VERSION} is recommended (latest methodology with STEL, dermal, and physical hazard assessment)"
+                    if language == "en"
+                    else f"{LATEST_METHODOLOGY_VERSION}を推奨 (STEL、経皮吸収、物理的危険性を含む最新の評価手法)"
+                ),
                 "v3_features": ["8-hour TWA", "STEL", "Dermal absorption", "Physical hazards"] if language == "en" else ["8時間TWA", "短時間STEL", "経皮吸収", "物理的危険性"],
                 "v2_features": ["8-hour TWA only"] if language == "en" else ["8時間TWAのみ"],
             }

@@ -50,6 +50,12 @@ def explain_calculation(
         risk_result = component.physical
 
     if not risk_result:
+        for skipped in getattr(component, "skipped_assessments", []):
+            if skipped.get("risk_type") == risk_type:
+                raise ServiceError(
+                    "ASSESSMENT_NOT_APPLICABLE",
+                    skipped.get("message", f"No {risk_type} assessment available for this substance"),
+                )
         raise ServiceError(
             "ASSESSMENT_NOT_AVAILABLE",
             f"No {risk_type} assessment available for this substance",

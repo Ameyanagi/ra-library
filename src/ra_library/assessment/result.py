@@ -33,6 +33,7 @@ class ComponentResult:
     physical: PhysicalRisk | None = None
     regulatory_info: RegulatoryInfo | None = None
     calculation_errors: list[dict[str, str]] = field(default_factory=list)
+    skipped_assessments: list[dict[str, str]] = field(default_factory=list)
     _substance: Any | None = field(default=None, repr=False)  # Substance for recommendations
 
     @property
@@ -52,6 +53,12 @@ class ComponentResult:
         """Get risk level label (I, II-A, II-B, III, IV)."""
         if self.inhalation:
             return RiskLevel.get_detailed_label(self.inhalation.rcr)
+        if self.dermal:
+            return RiskLevel.get_simple_label(self.dermal.rcr)
+        if self.physical:
+            return _level_to_label(int(self.physical.risk_level))
+        if self.skipped_assessments:
+            return "not_assessed"
         return str(self.risk_level)
 
     def get_inhalation_rcr(self) -> float | None:
@@ -177,6 +184,11 @@ class ComponentResult:
     def has_calculation_errors(self) -> bool:
         """Check whether one or more risk-type calculations failed."""
         return len(self.calculation_errors) > 0
+
+    @property
+    def has_skipped_assessments(self) -> bool:
+        """Check whether one or more risk-type assessments were intentionally skipped."""
+        return len(self.skipped_assessments) > 0
 
     # =========================================================================
     # Per-risk-type minimum achievable levels
@@ -417,6 +429,10 @@ class ComponentResult:
             return self.calculation_errors
         elif key == "has_calculation_errors":
             return self.has_calculation_errors
+        elif key == "skipped_assessments":
+            return self.skipped_assessments
+        elif key == "has_skipped_assessments":
+            return self.has_skipped_assessments
         elif key == "min_achievable_level":
             return self.min_achievable_level
         elif key == "min_achievable_rcr":
@@ -504,6 +520,8 @@ class ComponentResult:
             "warnings": self.warnings,
             "calculation_errors": self.calculation_errors,
             "has_calculation_errors": self.has_calculation_errors,
+            "skipped_assessments": self.skipped_assessments,
+            "has_skipped_assessments": self.has_skipped_assessments,
             "level_one_achievable": self.level_one_achievable,
         }
         # Add achievability info if Level I is not achievable
@@ -2037,7 +2055,8 @@ class AssessmentResult:
             from ..presets import get_preset
             preset = get_preset(self.builder._preset_name)
             lines.append(f"  プリセット: {preset.description}")
-        lines.append(f"  製品形態: {'液体' if inp.product_property.value == 'liquid' else '固体'}")
+        product_form_ja = {"liquid": "液体", "solid": "固体", "gas": "気体"}.get(inp.product_property.value, inp.product_property.value)
+        lines.append(f"  製品形態: {product_form_ja}")
         lines.append(f"  取扱量: {self._amount_label_ja(inp.amount_level.value)}")
         lines.append(f"  換気条件: {self._vent_label_ja(inp.ventilation.value)}")
         if inp.control_velocity_verified:
@@ -2255,7 +2274,8 @@ class AssessmentResult:
             from ..presets import get_preset
             preset = get_preset(self.builder._preset_name)
             lines.append(f"  Preset: {preset.description_en}")
-        lines.append(f"  Product form: {'Liquid' if inp.product_property.value == 'liquid' else 'Solid'}")
+        product_form_en = {"liquid": "Liquid", "solid": "Solid", "gas": "Gas"}.get(inp.product_property.value, inp.product_property.value)
+        lines.append(f"  Product form: {product_form_en}")
         lines.append(f"  Amount: {inp.amount_level.value}")
         lines.append(f"  Ventilation: {inp.ventilation.value}")
         if inp.control_velocity_verified:

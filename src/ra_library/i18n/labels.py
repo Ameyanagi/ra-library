@@ -7,7 +7,7 @@ Based on VBA SelectList.csv and CREATE-SIMPLE Design v3.1.1.
 from typing import Optional, Literal
 
 Language = Literal["ja", "en"]
-PropertyType = Literal["liquid", "solid"]
+PropertyType = Literal["liquid", "solid", "gas"]
 
 
 # Amount level labels (Q1)
@@ -23,6 +23,11 @@ AMOUNT_LABELS = {
             "en": "Large (≥1ton)",
             "range": "≥1000kg",
         },
+        "gas": {
+            "ja": "大量 (1t以上)",
+            "en": "Large (≥1ton gas mass)",
+            "range": "≥1000kg",
+        },
     },
     "medium": {
         "liquid": {
@@ -33,6 +38,11 @@ AMOUNT_LABELS = {
         "solid": {
             "ja": "中量 (1kg～1t)",
             "en": "Medium (1kg-1ton)",
+            "range": "1-1000kg",
+        },
+        "gas": {
+            "ja": "中量 (1kg～1t)",
+            "en": "Medium (1kg-1ton gas mass)",
             "range": "1-1000kg",
         },
     },
@@ -47,6 +57,11 @@ AMOUNT_LABELS = {
             "en": "Small (100g-1kg)",
             "range": "100-1000g",
         },
+        "gas": {
+            "ja": "少量 (100g～1kg)",
+            "en": "Small (100g-1kg gas mass)",
+            "range": "100-1000g",
+        },
     },
     "minute": {
         "liquid": {
@@ -59,6 +74,11 @@ AMOUNT_LABELS = {
             "en": "Minute (10-100g)",
             "range": "10-100g",
         },
+        "gas": {
+            "ja": "微量 (10g～100g)",
+            "en": "Minute (10-100g gas mass)",
+            "range": "10-100g",
+        },
     },
     "trace": {
         "liquid": {
@@ -69,6 +89,11 @@ AMOUNT_LABELS = {
         "solid": {
             "ja": "極微量 (10g未満)",
             "en": "Trace (<10g)",
+            "range": "<10g",
+        },
+        "gas": {
+            "ja": "極微量 (10g未満)",
+            "en": "Trace (<10g gas mass)",
             "range": "<10g",
         },
     },

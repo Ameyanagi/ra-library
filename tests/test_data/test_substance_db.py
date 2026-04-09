@@ -28,8 +28,7 @@ class TestSubstanceDatabase:
     def test_database_has_many_substances(self, db):
         """Database contains a reasonable number of substances."""
         db.load()
-        # Should have over 3000 substances
-        assert db.substance_count > 3000
+        assert db.substance_count > 3400
 
     def test_lookup_platinum(self, db):
         """Look up Platinum (Pt) by CAS number."""
@@ -68,6 +67,15 @@ class TestSubstanceDatabase:
         # Formaldehyde has JSOH OEL of 0.1 ppm
         assert substance.jsoh_8hr_ppm == 0.1
         assert substance.jsoh_ceiling_ppm == 0.2
+
+    def test_formaldehyde_preserves_v32_skin_hazard_flag_code(self, db):
+        """v3.2 raw code should be preserved for downstream version logic."""
+        db.load()
+        substance = db.lookup("50-00-0")
+
+        assert substance is not None
+        assert substance.skin_hazard_flag_code == "2"
+        assert substance.is_skin_hazard is False
 
     def test_formaldehyde_has_ghs(self, db):
         """Formaldehyde has GHS classification."""
@@ -119,6 +127,16 @@ class TestSubstanceDatabase:
         assert "50-00-0" in cas_numbers
         assert "7440-06-4" in cas_numbers
 
+    def test_updated_substance_metadata_is_available(self, db):
+        """Updated workbook rows should carry v3.2 update metadata."""
+        db.load()
+        substance = db.lookup("75-21-8")
+
+        assert substance is not None
+        assert substance.update_status == "1"
+        assert substance.update_summary == "GHS（更新）"
+        assert "皮膚腐食性" in (substance.update_details or "")
+
 
 class TestGlobalDatabase:
     """Tests for global database functions."""
@@ -134,6 +152,14 @@ class TestGlobalDatabase:
         substance = lookup_substance("50-00-0")
         assert substance is not None
         assert substance.cas_number == "50-00-0"
+
+    def test_database_metadata_reports_v32(self):
+        """Bundled metadata should identify the v3.2 workbook."""
+        db = get_database()
+        metadata = db.metadata
+
+        assert metadata["methodology_version"] == "v3.2"
+        assert metadata["substance_unique_cas"] > 3400
 
 
 class TestPlatinumData:

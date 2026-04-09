@@ -1,0 +1,88 @@
+{
+  "methodology_version": "v3.2",
+  "source_workbook": "CREATE-SIMPLE_ver3.2.xlsm",
+  "workbook_sha256": "20a27ee17def0c2c6188d80a3b21af7bc2174d179b55b76c4ca6585363b41fdf",
+  "sheet_dimensions": {
+    "トップ": {
+      "max_row": 50,
+      "max_column": 5
+    },
+    "リスクアセスメントシート": {
+      "max_row": 156,
+      "max_column": 86
+    },
+    "実施レポート": {
+      "max_row": 657,
+      "max_column": 86
+    },
+    "結果一覧": {
+      "max_row": 958,
+      "max_column": 195
+    },
+    "製品DB": {
+      "max_row": 506,
+      "max_column": 48
+    },
+    "GloveData": {
+      "max_row": 1358,
+      "max_column": 28
+    },
+    "SubstanceList": {
+      "max_row": 3421,
+      "max_column": 96
+    },
+    "SelectList": {
+      "max_row": 222,
+      "max_column": 15
+    },
+    "TranslationTable": {
+      "max_row": 739,
+      "max_column": 17
+    }
+  },
+  "substance_rows_total": 3417,
+  "substance_unique_cas": 3417,
+  "duplicate_cas_count": 0,
+  "duplicate_cas_numbers": [],
+  "glove_rows_total": 1358,
+  "glove_data_rows": 1354,
+  "substance_list_column_count": 96,
+  "substance_list_skin_hazard_header": "皮膚等障害化学物質・特化則",
+  "substance_list_new_columns": [
+    "更新",
+    "更新内容",
+    "更新内容詳細"
+  ],
+  "generator_repo": "ra-law-scraper",
+  "reference_workbook": "CREATE-SIMPLE_ver3.1.2.xlsm",
+  "reference_workbook_sha256": "05c484c383be89cbd24c325d3450c7994c37cfc0d394b9b187999d63f3e3687c",
+  "cas_delta": {
+    "added_count": 42,
+    "removed_count": 1,
+    "added_sample": [
+      "10138-36-0",
+      "112-85-6",
+      "119344-86-4",
+      "124-07-2",
+      "1308-06-1",
+      "13842-46-1",
+      "140-01-2",
+      "1478-61-1",
+      "162881-26-7",
+      "16853-85-3",
+      "20109-59-5",
+      "21049-36-5",
+      "2372-82-9",
+      "2399-48-6",
+      "24304-00-5",
+      "26523-78-4",
+      "2682-20-4",
+      "2781-10-4",
+      "27813-02-1",
+      "307-24-4"
+    ],
+    "removed": [
+      "nocas-0007"
+    ]
+  }
+}

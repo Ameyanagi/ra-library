@@ -1,6 +1,6 @@
 [project]
 name = "ra-library"
-version = "0.1.0"
+version = "0.2.0"
 description = "Chemical risk assessment library based on publicly documented methodology references"
 readme = "README.md"
 requires-python = ">=3.12"

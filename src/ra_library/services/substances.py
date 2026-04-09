@@ -106,7 +106,9 @@ def _format_substance(data) -> dict:
         },
         "classifications": {
             "is_carcinogen": data.is_carcinogen,
+            "is_concentration_standard": data.is_conc_standard,
             "is_skin_hazard": data.is_skin_hazard,
+            "skin_hazard_flag_code": data.skin_hazard_flag_code,
             "ghs_carcinogenicity": data.ghs_carcinogenicity,
             "ghs_mutagenicity": data.ghs_mutagenicity,
             "ghs_reproductive": data.ghs_reproductive,
@@ -115,5 +117,10 @@ def _format_substance(data) -> dict:
             "ghs_acute_oral": data.ghs_acute_oral,
             "ghs_acute_dermal": data.ghs_acute_dermal,
             "ghs_flam_liq": data.ghs_flam_liq,
+        },
+        "source_updates": {
+            "status": data.update_status,
+            "summary": data.update_summary,
+            "details": data.update_details,
         },
     }

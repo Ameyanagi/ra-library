@@ -53,6 +53,7 @@ class RiskAssessment:
         """Initialize empty assessment builder."""
         self._substances: list[tuple[Substance, float]] = []
         self._property_type: PropertyType = PropertyType.SOLID
+        self._property_type_explicit: bool = False
         self._amount_level: AmountLevel = AmountLevel.MEDIUM
         self._ventilation: VentilationLevel = VentilationLevel.INDUSTRIAL
         self._control_velocity_verified: bool = False
@@ -147,6 +148,7 @@ class RiskAssessment:
 
         # Apply conditions
         self._property_type = _parse_property_type(preset.property_type)
+        self._property_type_explicit = True
         self._amount_level = _parse_amount_level(preset.amount)
         self._ventilation = _parse_ventilation(preset.ventilation)
         self._control_velocity_verified = preset.control_velocity_verified
@@ -211,9 +213,13 @@ class RiskAssessment:
             sub_model = db.get_as_model(substance)
             if sub_model is None:
                 raise ValueError(f"Substance not found in database: {substance}")
+            if not self._substances and not self._property_type_explicit:
+                self._property_type = sub_model.property_type
             self._substances.append((sub_model, content))
         else:
             # Custom substance object
+            if not self._substances and not self._property_type_explicit:
+                self._property_type = substance.property_type
             self._substances.append((substance, content))
 
         return self
@@ -271,6 +277,7 @@ class RiskAssessment:
                 self._property_type = _parse_property_type(property_type)
             else:
                 self._property_type = property_type
+            self._property_type_explicit = True
 
         if amount is not None:
             if isinstance(amount, str):
@@ -760,45 +767,87 @@ class RiskAssessment:
             warnings.append(warning)
             logger.warning(warning)
 
+        def _record_component_skip(
+            *,
+            skips: list[dict[str, str]],
+            risk_type: str,
+            reason_code: str,
+            message: str,
+        ) -> None:
+            """Capture workbook-faithful skipped assessments without treating them as errors."""
+            skips.append(
+                {
+                    "risk_type": risk_type,
+                    "status": "not_assessed",
+                    "reason_code": reason_code,
+                    "message": message,
+                }
+            )
+
         for substance, content in self._substances:
             inhalation_result = None
             dermal_result = None
             physical_result = None
             component_errors: list[dict[str, str]] = []
+            component_skips: list[dict[str, str]] = []
+            gas_in_workbook_mode = (
+                assessment_input.product_property == PropertyType.GAS
+                or substance.property_type == PropertyType.GAS
+            )
 
             if self._assess_inhalation:
-                try:
-                    inhalation_result = calculate_inhalation_risk(
-                        assessment_input=assessment_input,
-                        substance=substance,
-                        content_percent=content,
-                        verbose=self._verbose,
-                    )
-                except Exception as exc:
-                    _record_component_error(
-                        errors=component_errors,
-                        warnings=assessment_warnings,
+                if gas_in_workbook_mode:
+                    _record_component_skip(
+                        skips=component_skips,
                         risk_type="inhalation",
-                        cas_number=substance.cas_number,
-                        exc=exc,
+                        reason_code="WORKBOOK_GAS_HEALTH_RA_NOT_ASSESSED",
+                        message=(
+                            "CREATE-SIMPLE workbook-faithful mode does not assess gas inhalation risk on the RA sheet/report path."
+                        ),
                     )
+                else:
+                    try:
+                        inhalation_result = calculate_inhalation_risk(
+                            assessment_input=assessment_input,
+                            substance=substance,
+                            content_percent=content,
+                            verbose=self._verbose,
+                        )
+                    except Exception as exc:
+                        _record_component_error(
+                            errors=component_errors,
+                            warnings=assessment_warnings,
+                            risk_type="inhalation",
+                            cas_number=substance.cas_number,
+                            exc=exc,
+                        )
 
             if self._assess_dermal:
-                try:
-                    dermal_result = calculate_dermal_risk(
-                        assessment_input=assessment_input,
-                        substance=substance,
-                        content_percent=content,
-                        verbose=self._verbose,
-                    )
-                except Exception as exc:
-                    _record_component_error(
-                        errors=component_errors,
-                        warnings=assessment_warnings,
+                if gas_in_workbook_mode:
+                    _record_component_skip(
+                        skips=component_skips,
                         risk_type="dermal",
-                        cas_number=substance.cas_number,
-                        exc=exc,
+                        reason_code="WORKBOOK_GAS_HEALTH_RA_NOT_ASSESSED",
+                        message=(
+                            "CREATE-SIMPLE workbook-faithful mode does not assess gas dermal risk on the RA sheet/report path."
+                        ),
                     )
+                else:
+                    try:
+                        dermal_result = calculate_dermal_risk(
+                            assessment_input=assessment_input,
+                            substance=substance,
+                            content_percent=content,
+                            verbose=self._verbose,
+                        )
+                    except Exception as exc:
+                        _record_component_error(
+                            errors=component_errors,
+                            warnings=assessment_warnings,
+                            risk_type="dermal",
+                            cas_number=substance.cas_number,
+                            exc=exc,
+                        )
 
             if self._assess_physical:
                 try:
@@ -828,6 +877,7 @@ class RiskAssessment:
                 physical=physical_result,
                 regulatory_info=regulatory_info,
                 calculation_errors=component_errors,
+                skipped_assessments=component_skips,
                 _substance=substance,  # Store for recommendations
             )
 
@@ -849,8 +899,7 @@ def _parse_property_type(value: str) -> PropertyType:
     mapping = {
         "solid": PropertyType.SOLID,
         "liquid": PropertyType.LIQUID,
-        # Gas is treated as liquid for CREATE-SIMPLE calculations
-        "gas": PropertyType.LIQUID,
+        "gas": PropertyType.GAS,
     }
     value_lower = value.lower()
     if value_lower in mapping:

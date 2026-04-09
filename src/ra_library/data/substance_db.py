@@ -8,6 +8,7 @@ Reference: public methodology sources and compatibility data loaders
 """
 
 import csv
+import json
 import logging
 import os
 import sqlite3
@@ -98,6 +99,7 @@ class SubstanceData:
     vapor_pressure_unit: Optional[str] = None
 
     # Regulatory
+    skin_hazard_flag_code: Optional[str] = None
     is_skin_hazard: bool = False
     is_carcinogen: bool = False
     is_conc_standard: bool = False
@@ -111,6 +113,9 @@ class SubstanceData:
     organic_class3: bool = False
     lead_regulation: bool = False
     tetraalkyl_lead: bool = False
+    update_status: Optional[str] = None
+    update_summary: Optional[str] = None
+    update_details: Optional[str] = None
 
 
 class SubstanceDatabase:
@@ -140,6 +145,7 @@ class SubstanceDatabase:
 
         self._substances: Dict[str, SubstanceData] = {}
         self._loaded = False
+        self._metadata_cache: dict[str, Any] | None = None
         self._load_stats: dict[str, Any] = {
             "rows_loaded": 0,
             "rows_skipped": 0,
@@ -225,6 +231,10 @@ class SubstanceDatabase:
                         "tetraalkyl_lead",
                     ):
                         record[key] = bool(record.get(key))
+                    raw_skin_flag = record.get("skin_hazard_flag_code")
+                    if raw_skin_flag is not None:
+                        raw_skin_flag = str(raw_skin_flag).strip()
+                        record["skin_hazard_flag_code"] = raw_skin_flag or None
                     self._substances[cas] = SubstanceData(**record)
                     self._load_stats["rows_loaded"] += 1
                 except Exception as exc:
@@ -269,9 +279,16 @@ class SubstanceDatabase:
         def safe_bool(value: str) -> bool:
             return value.strip() == "1" if value else False
 
+        def safe_code(value: str) -> Optional[str]:
+            if not value or str(value).strip() == "":
+                return None
+            return str(value).strip()
+
         # Ensure row has enough columns
-        while len(row) < 94:
+        while len(row) < 96:
             row.append("")
+
+        skin_hazard_flag_code = safe_code(row[80])
 
         return SubstanceData(
             cas_number=row[0].strip(),
@@ -350,7 +367,8 @@ class SubstanceDatabase:
             vapor_pressure_unit=safe_str(row[79]),
 
             # Regulatory
-            is_skin_hazard=safe_bool(row[80]),
+            skin_hazard_flag_code=skin_hazard_flag_code,
+            is_skin_hazard=skin_hazard_flag_code == "1",
             is_carcinogen=safe_bool(row[81]),
             is_conc_standard=safe_bool(row[82]),
             skin_hazard_threshold=safe_float(row[83]),
@@ -363,6 +381,9 @@ class SubstanceDatabase:
             organic_class3=safe_bool(row[90]),
             lead_regulation=safe_bool(row[91]),
             tetraalkyl_lead=safe_bool(row[92]),
+            update_status=safe_code(row[93]),
+            update_summary=safe_str(row[94]),
+            update_details=safe_str(row[95]),
         )
 
     def lookup(self, cas_number: str) -> Optional[SubstanceData]:
@@ -430,6 +451,24 @@ class SubstanceDatabase:
             "parse_errors": self._load_stats["parse_errors"],
             "error_samples": list(self._load_stats["error_samples"]),
         }
+
+    @property
+    def metadata(self) -> dict[str, Any]:
+        """Load optional metadata stored alongside the bundled database."""
+        if self._metadata_cache is not None:
+            return self._metadata_cache
+
+        metadata_path = self.csv_path.with_name(f"{self.csv_path.stem}.metadata.json")
+        if not metadata_path.exists():
+            self._metadata_cache = {}
+            return self._metadata_cache
+
+        try:
+            self._metadata_cache = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            logger.warning("Failed to load substance metadata from %s", metadata_path)
+            self._metadata_cache = {}
+        return self._metadata_cache
 
     def get_as_model(self, cas_number: str):
         """
@@ -512,6 +551,11 @@ def get_database() -> SubstanceDatabase:
         _db_instance = SubstanceDatabase()
         _db_instance.load()
     return _db_instance
+
+
+def get_database_metadata() -> dict[str, Any]:
+    """Get metadata for the bundled substance database."""
+    return get_database().metadata
 
 
 def lookup_substance(cas_number: str) -> Optional[SubstanceData]:

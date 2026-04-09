@@ -72,7 +72,7 @@ def to_oel_limits(
 
     Selects appropriate units based on property type:
     - SOLID: Uses mg/m³ values
-    - LIQUID: Uses ppm values
+    - LIQUID/GAS: Uses ppm values
 
     Note: The OccupationalExposureLimits model does not include jsoh_ceiling
     or acgih_tlv_c fields. These are stored in other_stel if available.
@@ -103,7 +103,7 @@ def to_oel_limits(
             other_stel_unit="mg/m³" if (data.jsoh_ceiling_mgm3 or data.acgih_tlv_c_mgm3) else None,
         )
     else:
-        # LIQUID (and GAS treated as LIQUID)
+        # LIQUID and GAS both use ppm-based OELs in workbook metadata.
         return OccupationalExposureLimits(
             concentration_standard_8hr=data.conc_standard_8hr_ppm,
             concentration_standard_8hr_unit="ppm",
@@ -149,7 +149,7 @@ def _determine_property_type(data: SubstanceData) -> PropertyType:
     Mapping:
     - 1 → LIQUID
     - 2 → SOLID
-    - 3 → LIQUID (gas treated as liquid for model purposes)
+    - 3 → GAS
     - None/other → SOLID (default)
 
     Args:
@@ -163,8 +163,7 @@ def _determine_property_type(data: SubstanceData) -> PropertyType:
     elif data.property_type == 2:
         return PropertyType.SOLID
     elif data.property_type == 3:
-        # Gas is treated as liquid for model purposes
-        return PropertyType.LIQUID
+        return PropertyType.GAS
     else:
         # Default to solid for unknown types
         return PropertyType.SOLID
@@ -210,5 +209,11 @@ def to_substance_model(data: SubstanceData) -> Substance:
         ghs=to_ghs_classification(data),
         oel=to_oel_limits(data, property_type),
         properties=to_physical_properties(data),
+        is_concentration_standard_substance=data.is_conc_standard,
+        is_skin_hazard_substance=(
+            data.skin_hazard_flag_code == "1"
+            if data.skin_hazard_flag_code is not None
+            else data.is_skin_hazard
+        ),
         is_carcinogen=_is_carcinogen(data),
     )

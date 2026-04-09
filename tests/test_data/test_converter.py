@@ -272,20 +272,19 @@ class TestToSubstanceModel:
         assert substance.oel.acgih_tlv_twa == 20.0
         assert substance.oel.acgih_tlv_twa_unit == "ppm"
 
-    def test_gas_converts_to_liquid(self):
-        """Gas (property_type=3) converts to LIQUID type."""
+    def test_gas_conversion_preserves_gas_property_type(self):
+        """Gas (property_type=3) should remain GAS in the public model."""
         data = SubstanceData(
-            cas_number="50-00-0",
-            name_ja="ホルムアルデヒド",
-            name_en="Formaldehyde",
+            cas_number="1333-74-0",
+            name_ja="水素",
+            name_en="Hydrogen",
             property_type=3,  # Gas
-            acgih_tlv_twa_ppm=0.1,
+            acgih_tlv_twa_ppm=1000.0,
         )
         substance = to_substance_model(data)
 
-        # Gas is treated as liquid for model purposes
-        assert substance.property_type == PropertyType.LIQUID
-        assert substance.oel.acgih_tlv_twa == 0.1
+        assert substance.property_type == PropertyType.GAS
+        assert substance.oel.acgih_tlv_twa == 1000.0
         assert substance.oel.acgih_tlv_twa_unit == "ppm"
 
     def test_carcinogen_flag(self):

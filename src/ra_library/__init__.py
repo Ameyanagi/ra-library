@@ -17,7 +17,7 @@ References:
 - ECETOC TRA
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Core models
 from .models.substance import (
@@ -74,6 +74,7 @@ from .presets import (
     LAB_POWDER,
     LAB_CATALYST,
     LAB_ANALYTICAL,
+    LAB_GAS,
     PRODUCTION_BATCH,
     PRODUCTION_CONTINUOUS,
     MAINTENANCE_CLEANING,
@@ -83,6 +84,7 @@ from .presets import (
 # Data module
 from .data import (
     get_database,
+    get_database_metadata,
     lookup_substance,
     SubstanceData,
     SubstanceDatabase,
@@ -155,12 +157,14 @@ __all__ = [
     "LAB_POWDER",
     "LAB_CATALYST",
     "LAB_ANALYTICAL",
+    "LAB_GAS",
     "PRODUCTION_BATCH",
     "PRODUCTION_CONTINUOUS",
     "MAINTENANCE_CLEANING",
     "SPRAY_PAINTING",
     # Data module
     "get_database",
+    "get_database_metadata",
     "lookup_substance",
     "SubstanceData",
     "SubstanceDatabase",

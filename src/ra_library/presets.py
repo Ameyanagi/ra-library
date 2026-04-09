@@ -40,7 +40,7 @@ class WorkPreset:
         description_en: English description
 
         # Conditions
-        property_type: "liquid" or "solid"
+        property_type: "liquid", "solid", or "gas"
         amount: Amount level
         ventilation: Ventilation level
         control_velocity_verified: Whether control velocity is verified
@@ -175,6 +175,21 @@ LAB_ANALYTICAL = WorkPreset(
     days_per_week=5,
     gloves="resistant",
     glove_training=True,
+    max_ventilation="local_enc",
+)
+
+LAB_GAS = WorkPreset(
+    name="lab_gas",
+    description="研究室でのガス取扱い（気体・少量・ドラフト使用）",
+    description_en="Laboratory gas handling (gas, small amount band, fume hood/local enclosure)",
+    property_type="gas",
+    amount="small",
+    ventilation="local_enc",
+    control_velocity_verified=True,
+    hours=1.0,
+    days_per_week=5,
+    gloves="none",
+    glove_training=False,
     max_ventilation="local_enc",
 )
 
@@ -354,6 +369,7 @@ PRESETS: dict[str, WorkPreset] = {
     "lab_powder": LAB_POWDER,
     "lab_catalyst": LAB_CATALYST,
     "lab_analytical": LAB_ANALYTICAL,
+    "lab_gas": LAB_GAS,
     # Production
     "production_batch": PRODUCTION_BATCH,
     "production_batch_enclosed": PRODUCTION_BATCH_ENCLOSED,
@@ -376,6 +392,7 @@ PRESETS_JA: dict[str, str] = {
     "粉体研究室": "lab_powder",
     "触媒研究室": "lab_catalyst",
     "分析研究室": "lab_analytical",
+    "ガス研究室": "lab_gas",
     "バッチ製造": "production_batch",
     "連続製造": "production_continuous",
     "粉体製造": "production_powder",
@@ -428,7 +445,7 @@ def list_presets() -> list[tuple[str, str, str]]:
 def print_presets():
     """Print all available presets in a readable format."""
     categories = {
-        "Laboratory (研究室)": ["lab_organic", "lab_organic_minute", "lab_powder", "lab_catalyst", "lab_analytical"],
+        "Laboratory (研究室)": ["lab_organic", "lab_organic_minute", "lab_powder", "lab_catalyst", "lab_analytical", "lab_gas"],
         "Production (製造)": ["production_batch", "production_batch_enclosed", "production_continuous", "production_powder", "production_packaging"],
         "Maintenance (保全)": ["maintenance_cleaning", "maintenance_cleaning_enclosed", "maintenance_tank"],
         "Spray (スプレー)": ["spray_painting", "spray_coating"],

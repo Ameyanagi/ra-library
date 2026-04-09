@@ -8,6 +8,7 @@ from .substance_db import (
     SubstanceData,
     SubstanceDatabase,
     get_database,
+    get_database_metadata,
     lookup_substance,
 )
 from .volatility import (
@@ -57,6 +58,7 @@ __all__ = [
     "SubstanceData",
     "SubstanceDatabase",
     "get_database",
+    "get_database_metadata",
     "lookup_substance",
     "calculate_volatility_from_boiling_point",
     "calculate_volatility_from_vapor_pressure",

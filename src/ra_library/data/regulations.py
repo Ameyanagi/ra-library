@@ -43,6 +43,13 @@ class RegulationsResult(TypedDict):
     concentration_standard: bool
 
 
+def _is_skin_hazard_substance(substance: SubstanceData) -> bool:
+    """Return True only when the workbook explicitly marks the substance as skin hazard."""
+    if substance.skin_hazard_flag_code is not None:
+        return substance.skin_hazard_flag_code == "1"
+    return substance.is_skin_hazard
+
+
 def check_tokka_regulation(
     substance: SubstanceData,
     content_pct: float,
@@ -138,7 +145,7 @@ def check_skin_hazard_regulation(
     Returns:
         True if skin hazard regulation applies and exceeds threshold
     """
-    if not substance.is_skin_hazard:
+    if not _is_skin_hazard_substance(substance):
         return False
 
     threshold = substance.skin_hazard_threshold

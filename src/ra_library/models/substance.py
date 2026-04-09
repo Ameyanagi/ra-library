@@ -16,6 +16,7 @@ class PropertyType(str, Enum):
 
     LIQUID = "liquid"  # 液体
     SOLID = "solid"  # 固体（粉体）
+    GAS = "gas"  # 気体
 
 
 class VolatilityLevel(str, Enum):
@@ -398,7 +399,9 @@ class Substance(BaseModel):
         return self.ghs.get_hazard_level()
 
     def get_volatility(self) -> VolatilityLevel:
-        """Get volatility level for liquids."""
+        """Get volatility level for liquids and gases."""
+        if self.property_type == PropertyType.GAS:
+            return VolatilityLevel.HIGH
         if self.property_type != PropertyType.LIQUID:
-            raise ValueError("Volatility is only applicable to liquids")
+            raise ValueError("Volatility is only applicable to liquids and gases")
         return self.properties.get_volatility_level()
