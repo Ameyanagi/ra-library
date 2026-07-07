@@ -164,7 +164,7 @@ def convert_solubility_to_mg_cm3(value: float, unit: str) -> float:
     """
     unit_lower = unit.lower()
 
-    if unit_lower == "mg/cm³" or unit_lower == "mg/cm3":
+    if unit_lower in {"mg/cm³", "mg/cm3", "mg/ml"}:
         return value
     elif unit_lower == "g/cm³" or unit_lower == "g/cm3":
         return value * 1000

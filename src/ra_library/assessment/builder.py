@@ -93,6 +93,12 @@ class RiskAssessment:
         self._ignore_minimum_floor: bool = False
         # Output language for recommendations
         self._language: str = "en"
+        self._methodology_version: str = "v3.2.1"
+
+    def with_methodology_version(self, version: str) -> RiskAssessment:
+        """Set the CREATE-SIMPLE methodology version for version-aware calculators."""
+        self._methodology_version = version
+        return self
 
     def use_preset(
         self,
@@ -710,6 +716,7 @@ class RiskAssessment:
 
         # Build assessment input
         assessment_input = AssessmentInput(
+            methodology_version=self._methodology_version,
             product_property=self._property_type,
             amount_level=self._amount_level,
             ventilation=self._ventilation,

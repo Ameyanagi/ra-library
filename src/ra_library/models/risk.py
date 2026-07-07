@@ -306,6 +306,8 @@ class PhysicalRisk(BaseModel):
     """
 
     hazard_type: str = Field(..., description="Type of physical hazard")
+    description: Optional[str] = Field(None, description="Physical hazard description")
+    description_ja: Optional[str] = Field(None, description="Japanese physical hazard description")
     is_fixed_level_iv: bool = Field(
         default=False, description="True if hazard always results in Level IV"
     )

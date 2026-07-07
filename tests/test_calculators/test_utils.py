@@ -130,6 +130,11 @@ class TestSolubilityConversion:
         result = convert_solubility_to_mg_cm3(5.0, "mg/cm³")
         assert result == 5.0
 
+    def test_mg_ml_identity(self):
+        """mg/mL is equivalent to mg/cm³."""
+        result = convert_solubility_to_mg_cm3(2.5, "mg/mL")
+        assert result == 2.5
+
     def test_g_100ml_to_mg_cm3(self):
         """Convert g/100mL to mg/cm³ (VBA: line 1591)."""
         # 1 g/100mL = 10 mg/cm³ (conversionFactor = 10)

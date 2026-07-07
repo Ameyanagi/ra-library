@@ -46,8 +46,9 @@ class CreateSimpleVersion(Enum):
     V2 = "v2.x"  # v1.0-v2.5.1 (same core logic)
     V3_0_2 = "v3.0.2"  # First v3 release (no floor)
     V3_1 = "v3.1+"  # v3.1, v3.1.1, v3.1.2 (with floor)
-    V3_2 = "v3.2"  # Latest workbook-aligned implementation
-    V3 = "v3.2"  # Current implementation (alias for latest)
+    V3_2 = "v3.2"  # Historical workbook-aligned implementation
+    V3_2_1 = "v3.2.1"  # Latest workbook-aligned implementation
+    V3 = "v3.2.1"  # Current implementation (alias for latest)
 
 
 # =============================================================================
@@ -479,7 +480,7 @@ def compare_versions(
     Compare v3.1+ calculation result with older methodologies.
 
     Returns a comparison dict showing differences between versions:
-    - v3_current: Current v3.2 results (recommended)
+    - v3_current: Current v3.2.1 results (recommended)
     - v302_intermediate: v3.0.2 results (no exposure floor)
     - v2_legacy: v2.x results (older methodology)
 
@@ -534,7 +535,7 @@ def compare_versions(
     # Build comparison
     comparison = {
         "v3_current": {
-            "version": "v3.2 (CREATE-SIMPLE 最新版)",
+            "version": "v3.2.1 (CREATE-SIMPLE 最新版)",
             "exposure": round(v3_exposure, 4),
             "exposure_unit": unit,
             "rcr": round(v3_rcr, 4),
@@ -594,7 +595,7 @@ def compare_versions(
     comparison["comparison_summary"] = {
         "risk_level_differs_v2": v3_risk_level != v2_result.risk_level,
         "v3_more_conservative_than_v2": v3_rcr > v2_result.rcr,
-        "recommendation": "v3.2を推奨 (最新の評価手法、STEL・経皮・物理危険性を含む)",
+        "recommendation": "v3.2.1を推奨 (最新の評価手法、STEL・経皮・物理危険性を含む)",
     }
 
     # Add v3.0.2 specific comparison notes

@@ -60,3 +60,20 @@ def test_v32_keeps_explicit_skin_hazard_designation():
     )
 
     assert result.skin_hazard is True
+
+
+def test_v321_keeps_v32_skin_hazard_override_behavior():
+    """v3.2.1 keeps the v3.2 raw code 2 skin-hazard override."""
+    calc = VersionCalculator(VersionConfig.v3_2_1())
+
+    result = calc.check_regulatory(
+        substance_flags={
+            "skin_hazard_flag_code": "2",
+            "is_skin_hazard": False,
+        },
+        ghs_classification=_ghs_skin_hazard(),
+        content_percent=100.0,
+    )
+
+    assert result.skin_hazard is False
+    assert result.skin_hazard_from_ghs is True

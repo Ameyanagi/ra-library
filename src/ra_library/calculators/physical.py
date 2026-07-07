@@ -20,6 +20,9 @@ from ..models.risk import RiskLevel, PhysicalRisk
 from ..models.explanation import CalculationExplanation, CalculationStep, Limitation
 
 
+LATEST_PHYSICAL_METHODOLOGY_VERSION = "v3.2.1"
+
+
 # Amount level to index mapping (for lookup tables)
 AMOUNT_LEVEL_INDEX = {
     AmountLevel.LARGE: 0,   # kL, ton
@@ -370,6 +373,7 @@ def assess_flammable_solid(
 def assess_self_reactive(
     ghs: GHSClassification,
     amount_level: AmountLevel,
+    methodology_version: str = LATEST_PHYSICAL_METHODOLOGY_VERSION,
 ) -> Optional[PhysicalHazardResult]:
     """
     Assess self-reactive substance risk.
@@ -382,9 +386,11 @@ def assess_self_reactive(
 
     idx = AMOUNT_LEVEL_INDEX[amount_level]
 
-    # Type A-E: Always Level IV (provisional 5)
-    # Note: VBA doesn't handle Type F, but per GHS it should be amount-dependent like G
-    if cat in ["A", "B", "C", "D", "E"]:
+    fixed_high_types = ["A", "B", "C", "D", "E"]
+    if methodology_version == "v3.2.1":
+        fixed_high_types.append("F")
+
+    if cat in fixed_high_types:
         return PhysicalHazardResult(
             hazard_type="self_reactive",
             hazard_type_ja="自己反応性化学品",
@@ -394,16 +400,29 @@ def assess_self_reactive(
             description_ja="専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱うこと。",
             is_fixed_level_iv=True,
         )
-    elif cat in ["F", "G"]:
-        # Type F and G: Amount-dependent
+    elif cat == "F" and methodology_version == "v3.2":
+        return PhysicalHazardResult(
+            hazard_type="self_reactive",
+            hazard_type_ja="自己反応性化学品",
+            provisional_level=1,
+            risk_level=RiskLevel.I,
+            description=f"Self-reactive Type {cat}",
+            description_ja=f"自己反応性化学品 タイプ{cat}",
+        )
+    elif cat == "G":
         provisional = [5, 4, 3, 2, 1][idx]
+        description_ja = (
+            "専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱うこと。"
+            if _provisional_to_risk_level(provisional) == RiskLevel.IV
+            else "SDS等を確認し、慎重に取り扱うこと。"
+        )
         return PhysicalHazardResult(
             hazard_type="self_reactive",
             hazard_type_ja="自己反応性化学品",
             provisional_level=provisional,
             risk_level=_provisional_to_risk_level(provisional),
             description=f"Self-reactive Type {cat}",
-            description_ja=f"自己反応性化学品 タイプ{cat}",
+            description_ja=description_ja,
         )
 
     return None
@@ -634,6 +653,7 @@ def assess_oxidizing_solid(
 def assess_organic_peroxide(
     ghs: GHSClassification,
     amount_level: AmountLevel,
+    methodology_version: str = LATEST_PHYSICAL_METHODOLOGY_VERSION,
 ) -> Optional[PhysicalHazardResult]:
     """
     Assess organic peroxide risk.
@@ -646,9 +666,11 @@ def assess_organic_peroxide(
 
     idx = AMOUNT_LEVEL_INDEX[amount_level]
 
-    # Type A-E: Always Level IV (provisional 5)
-    # Note: VBA doesn't handle Type F, but per GHS it should be amount-dependent like G
-    if cat in ["A", "B", "C", "D", "E"]:
+    fixed_high_types = ["A", "B", "C", "D", "E"]
+    if methodology_version == "v3.2.1":
+        fixed_high_types.append("F")
+
+    if cat in fixed_high_types:
         return PhysicalHazardResult(
             hazard_type="organic_peroxide",
             hazard_type_ja="有機過酸化物",
@@ -658,16 +680,29 @@ def assess_organic_peroxide(
             description_ja="専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱うこと。",
             is_fixed_level_iv=True,
         )
-    elif cat in ["F", "G"]:
-        # Type F and G: Amount-dependent
+    elif cat == "F" and methodology_version == "v3.2":
+        return PhysicalHazardResult(
+            hazard_type="organic_peroxide",
+            hazard_type_ja="有機過酸化物",
+            provisional_level=1,
+            risk_level=RiskLevel.I,
+            description=f"Organic peroxide Type {cat}",
+            description_ja=f"有機過酸化物 タイプ{cat}",
+        )
+    elif cat == "G":
         provisional = [5, 4, 3, 2, 1][idx]
+        description_ja = (
+            "専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱うこと。"
+            if _provisional_to_risk_level(provisional) == RiskLevel.IV
+            else "SDS等を確認し、慎重に取り扱うこと。"
+        )
         return PhysicalHazardResult(
             hazard_type="organic_peroxide",
             hazard_type_ja="有機過酸化物",
             provisional_level=provisional,
             risk_level=_provisional_to_risk_level(provisional),
             description=f"Organic peroxide Type {cat}",
-            description_ja=f"有機過酸化物 タイプ{cat}",
+            description_ja=description_ja,
         )
 
     return None
@@ -706,6 +741,7 @@ def calculate_physical_risk(
     assessment_input: AssessmentInput,
     substance: Substance,
     verbose: bool = True,
+    methodology_version: str | None = None,
 ) -> Optional[PhysicalRisk]:
     """
     Calculate physical hazard risk following CREATE-SIMPLE methodology.
@@ -729,6 +765,7 @@ def calculate_physical_risk(
     ghs = substance.ghs
     props = substance.properties
     amount_level = assessment_input.amount_level
+    methodology_version = methodology_version or assessment_input.methodology_version
 
     # Work condition flags (inverted where needed)
     ignition_removed = not assessment_input.has_ignition_sources
@@ -788,7 +825,7 @@ def calculate_physical_risk(
         hazard_results.append(result)
 
     # 8. Self-reactive
-    result = assess_self_reactive(ghs, amount_level)
+    result = assess_self_reactive(ghs, amount_level, methodology_version)
     if result:
         hazard_results.append(result)
 
@@ -823,7 +860,7 @@ def calculate_physical_risk(
         hazard_results.append(result)
 
     # 15. Organic peroxide
-    result = assess_organic_peroxide(ghs, amount_level)
+    result = assess_organic_peroxide(ghs, amount_level, methodology_version)
     if result:
         hazard_results.append(result)
 
@@ -893,6 +930,8 @@ def calculate_physical_risk(
 
     return PhysicalRisk(
         hazard_type=highest_hazard.hazard_type,
+        description=highest_hazard.description,
+        description_ja=highest_hazard.description_ja,
         is_fixed_level_iv=highest_hazard.is_fixed_level_iv,
         flash_point=props.flash_point,
         process_temperature=assessment_input.process_temperature,

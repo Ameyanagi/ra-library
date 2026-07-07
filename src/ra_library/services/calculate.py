@@ -12,15 +12,39 @@ from ..models.risk import RiskLevel
 from .common import ServiceError, ServiceResult
 from .conditions import format_conditions_used, get_gas_amount_metadata
 
-LATEST_METHODOLOGY_VERSION = "v3.2"
-FLOOR_METHODOLOGY_VERSIONS = {"v3.2", "v3.1.2"}
+LATEST_METHODOLOGY_VERSION = "v3.2.1"
+FLOOR_METHODOLOGY_VERSIONS = {"v3.2.1", "v3.2", "v3.1.2"}
 
 # Version metadata
 VERSION_INFO = {
+    "v3.2.1": {
+        "name_en": "CREATE-SIMPLE v3.2.1",
+        "name_ja": "CREATE-SIMPLE v3.2.1",
+        "is_recommended": True,
+        "exposure_floor": {
+            "enabled": True,
+            "liquid_ppm": MIN_EXPOSURE_LIQUID,
+            "solid_mg_m3": MIN_EXPOSURE_SOLID,
+        },
+        "features_en": [
+            "Exposure floor (minimum exposure limit)",
+            "v3.2.1 physical hazard corrections",
+            "Expanded v3.2 substance coverage",
+            "Raw-code aware skin hazard handling",
+        ],
+        "features_ja": [
+            "ばく露下限値（最小ばく露量）",
+            "v3.2.1の物理危険性判定修正",
+            "v3.2の物質データ拡張",
+            "rawコードを考慮した皮膚障害判定",
+        ],
+        "note_en": "Recommended latest version aligned to the CREATE-SIMPLE v3.2.1 workbook.",
+        "note_ja": "CREATE-SIMPLE v3.2.1ワークブックに合わせた推奨最新版です。",
+    },
     "v3.2": {
         "name_en": "CREATE-SIMPLE v3.2",
         "name_ja": "CREATE-SIMPLE v3.2",
-        "is_recommended": True,
+        "is_recommended": False,
         "exposure_floor": {
             "enabled": True,
             "liquid_ppm": MIN_EXPOSURE_LIQUID,
@@ -38,8 +62,8 @@ VERSION_INFO = {
             "ワークブック更新メタデータ対応",
             "rawコードを考慮した皮膚障害判定",
         ],
-        "note_en": "Recommended latest version aligned to the CREATE-SIMPLE v3.2 workbook.",
-        "note_ja": "CREATE-SIMPLE v3.2ワークブックに合わせた推奨最新版です。",
+        "note_en": "Compatibility version aligned to the CREATE-SIMPLE v3.2 workbook.",
+        "note_ja": "CREATE-SIMPLE v3.2ワークブックに合わせた互換用バージョンです。",
     },
     "v3.1.2": {
         "name_en": "CREATE-SIMPLE v3.1.2",
@@ -306,7 +330,7 @@ def calculate_risk(
     if not substances:
         raise ServiceError("MISSING_SUBSTANCES", "At least one substance is required")
 
-    valid_versions = [LATEST_METHODOLOGY_VERSION, "v3.1.2", "v3.0.2"]
+    valid_versions = [LATEST_METHODOLOGY_VERSION, "v3.2", "v3.1.2", "v3.0.2"]
     if methodology_version not in valid_versions:
         raise ServiceError(
             "INVALID_METHODOLOGY_VERSION",
@@ -315,7 +339,7 @@ def calculate_risk(
 
     use_v302 = methodology_version == "v3.0.2"
 
-    assessment = RiskAssessment()
+    assessment = RiskAssessment().with_methodology_version(methodology_version)
 
     if include_explanation:
         assessment = assessment.verbose(True)
@@ -651,6 +675,9 @@ def _format_result(
                 "risk_level": int(phys.risk_level),
                 "hazard_type": phys.hazard_type,
             }
+            description = phys.description_ja if language == "ja" else phys.description
+            if description:
+                phys_data["description"] = description
 
             # Add labels from PHYSICAL_HAZARD_LABELS
             from ..i18n.labels import PHYSICAL_HAZARD_LABELS

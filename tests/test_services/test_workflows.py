@@ -43,7 +43,7 @@ def test_get_recommendations_returns_fallback_warning(monkeypatch):
     assert result.data["mode"] == "fallback"
 
 
-def test_calculate_risk_defaults_to_v32_methodology():
+def test_calculate_risk_defaults_to_v321_methodology():
     """Default service output should report the latest supported methodology."""
     result = calculate_risk(
         substances=[{"cas_number": "7440-06-4", "content_percent": 100.0}],
@@ -52,8 +52,57 @@ def test_calculate_risk_defaults_to_v32_methodology():
         include_recommendations="never",
     )
 
-    assert result.data["methodology"]["version"] == "v3.2"
+    assert result.data["methodology"]["version"] == "v3.2.1"
     assert result.data["methodology"]["details"]["is_recommended"] is True
+
+
+def test_calculate_risk_accepts_v32_compatibility_methodology():
+    """v3.2 remains an accepted historical methodology version."""
+    result = calculate_risk(
+        substances=[{"cas_number": "7440-06-4", "content_percent": 100.0}],
+        methodology_version="v3.2",
+        assess_dermal=False,
+        assess_physical=False,
+        include_recommendations="never",
+    )
+
+    assert result.data["methodology"]["version"] == "v3.2"
+    assert result.data["methodology"]["details"]["is_recommended"] is False
+
+
+def test_calculate_risk_v321_organic_peroxide_type_f_is_level_iv():
+    """v3.2.1 fixes organic peroxide Type F to Level IV even for trace amounts."""
+    result = calculate_risk(
+        substances=[{"cas_number": "80-43-3", "content_percent": 100.0}],
+        methodology_version="v3.2.1",
+        conditions={"property_type": "liquid", "amount": "trace"},
+        assess_inhalation=False,
+        assess_dermal=False,
+        assess_physical=True,
+        include_recommendations="never",
+    )
+
+    physical = result.data["components"]["80-43-3"]["physical"]
+    assert physical["hazard_type"] == "organic_peroxide"
+    assert physical["risk_level"] == 4
+    assert "description" in physical
+
+
+def test_calculate_risk_v32_preserves_organic_peroxide_type_f_fallthrough():
+    """v3.2 compatibility preserves the historical Type F fall-through."""
+    result = calculate_risk(
+        substances=[{"cas_number": "80-43-3", "content_percent": 100.0}],
+        methodology_version="v3.2",
+        conditions={"property_type": "liquid", "amount": "trace"},
+        assess_inhalation=False,
+        assess_dermal=False,
+        assess_physical=True,
+        include_recommendations="never",
+    )
+
+    physical = result.data["components"]["80-43-3"]["physical"]
+    assert physical["hazard_type"] == "organic_peroxide"
+    assert physical["risk_level"] == 1
 
 
 def test_calculate_risk_hydrogen_uses_workbook_faithful_gas_behavior():

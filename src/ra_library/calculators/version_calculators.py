@@ -24,6 +24,10 @@ v3.2:
   - Same exposure floor behavior as v3.1.2
   - Updated workbook data (96 columns, 3417 unique CAS entries)
   - Column 81 raw code "2" suppresses GHS-based skin hazard labeling
+
+v3.2.1:
+  - Same health-risk behavior as v3.2
+  - Physical-hazard bug fix for Type F self-reactive chemicals and organic peroxides
 """
 
 from dataclasses import dataclass, field
@@ -49,7 +53,8 @@ class CalculationVersion(Enum):
 
     V3_0_2 = "v3.0.2"  # No floor, 3 regulatory categories
     V3_1_2 = "v3.1.2"  # With floor, 11 regulatory categories + GHS
-    V3_2 = "v3.2"  # Latest workbook data with raw skin-hazard override code
+    V3_2 = "v3.2"  # Workbook data with raw skin-hazard override code
+    V3_2_1 = "v3.2.1"  # Latest workbook and physical-hazard Type F fix
 
 
 @dataclass
@@ -95,9 +100,20 @@ class VersionConfig:
 
     @classmethod
     def v3_2(cls) -> "VersionConfig":
-        """Configuration for v3.2 calculation (latest/recommended)."""
+        """Configuration for v3.2 calculation."""
         return cls(
             version=CalculationVersion.V3_2,
+            apply_exposure_floor=True,
+            use_ghs_skin_detection=True,
+            regulatory_categories=11,
+            ghs_skin_override_block_codes=("0", "2"),
+        )
+
+    @classmethod
+    def v3_2_1(cls) -> "VersionConfig":
+        """Configuration for v3.2.1 calculation (latest/recommended)."""
+        return cls(
+            version=CalculationVersion.V3_2_1,
             apply_exposure_floor=True,
             use_ghs_skin_detection=True,
             regulatory_categories=11,
@@ -513,7 +529,7 @@ def compare_versions(
     ghs_classification: Optional[dict] = None,
 ) -> dict:
     """
-    Compare calculation results between v3.0.2 and v3.2.
+    Compare calculation results between v3.0.2 and v3.2.1.
 
     Returns a comprehensive comparison showing differences in:
     - Exposure values (8hr and STEL)
@@ -524,7 +540,7 @@ def compare_versions(
     """
     # Create calculators
     calc_302 = VersionCalculator(VersionConfig.v3_0_2())
-    calc_320 = VersionCalculator(VersionConfig.v3_2())
+    calc_320 = VersionCalculator(VersionConfig.v3_2_1())
 
     # Calculate exposure for both versions
     exp_302 = calc_302.calculate_exposure(
@@ -599,8 +615,8 @@ def compare_versions(
             ],
             "regulatory_categories": 3,
         },
-        "v3_2": {
-            "version": "v3.2 (CREATE-SIMPLE 最新版)",
+        "v3_2_1": {
+            "version": "v3.2.1 (CREATE-SIMPLE 最新版)",
             "exposure_8hr": exp_320.exposure_8hr,
             "exposure_stel": exp_320.exposure_stel,
             "unit": exp_320.unit,
@@ -616,7 +632,7 @@ def compare_versions(
                 "物理的危険性",
                 "ばく露下限値 (exposure floor)",
                 "GHS皮膚障害検出",
-                "v3.2更新データ",
+                "v3.2.1更新データ",
             ],
             "regulatory_categories": 11,
         },
@@ -636,7 +652,7 @@ def compare_versions(
     # Add regulatory comparison if available
     if reg_302 and reg_320:
         result["v3_0_2"]["regulatory"] = reg_302.to_list_v302()
-        result["v3_2"]["regulatory"] = reg_320.to_list_v312()
+        result["v3_2_1"]["regulatory"] = reg_320.to_list_v312()
         result["comparison"]["regulatory_differs"] = (
             reg_302.to_list_v302() != reg_320.to_list_v312()[:4]  # Compare first 4 for v3.0.2
         )

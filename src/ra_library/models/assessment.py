@@ -174,6 +174,9 @@ class ComponentInput(BaseModel):
 class AssessmentInput(BaseModel):
     """Input data for a risk assessment."""
 
+    # CREATE-SIMPLE methodology version used by version-aware calculators.
+    methodology_version: str = "v3.2.1"
+
     # Assessment mode - determines available control options
     mode: AssessmentMode = AssessmentMode.RA_SHEET
 

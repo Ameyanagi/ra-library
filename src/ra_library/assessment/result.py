@@ -495,6 +495,8 @@ class ComponentResult:
         level_labels = {1: "I", 2: "II", 3: "III", 4: "IV"}
         return {
             "hazard_type": self.physical.hazard_type,
+            "description": self.physical.description,
+            "description_ja": self.physical.description_ja,
             "is_fixed_level_iv": self.physical.is_fixed_level_iv,
             "flash_point": self.physical.flash_point,
             "process_temperature": self.physical.process_temperature,

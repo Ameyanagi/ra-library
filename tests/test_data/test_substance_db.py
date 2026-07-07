@@ -153,13 +153,33 @@ class TestGlobalDatabase:
         assert substance is not None
         assert substance.cas_number == "50-00-0"
 
-    def test_database_metadata_reports_v32(self):
-        """Bundled metadata should identify the v3.2 workbook."""
+    def test_database_metadata_reports_v321(self):
+        """Bundled metadata should identify the v3.2.1 workbook."""
         db = get_database()
         metadata = db.metadata
 
-        assert metadata["methodology_version"] == "v3.2"
+        assert metadata["methodology_version"] == "v3.2.1"
+        assert metadata["data_source_version"] == "v3.2.1"
+        assert metadata["source_workbook"] == "CREATE-SIMPLE_ver3.2.1.xlsm"
+        assert (
+            metadata["workbook_sha256"]
+            == "8d4b790a3ccc06b01dd21a41ed2321c63f9046c7077eb554ff5a662455691664"
+        )
         assert metadata["substance_unique_cas"] > 3400
+
+    def test_v321_corrected_unit_fields(self):
+        """v3.2.1 workbook unit corrections should be reflected in the DB."""
+        db = get_database()
+
+        substance = db.lookup("989-38-8")
+        assert substance is not None
+        assert substance.water_solubility == 1
+        assert substance.water_solubility_unit == "g/L"
+
+        petroleum_benzine = db.lookup("nocas-0013")
+        assert petroleum_benzine is not None
+        assert petroleum_benzine.vapor_pressure == 40
+        assert petroleum_benzine.vapor_pressure_unit == "mmHg"
 
 
 class TestPlatinumData:

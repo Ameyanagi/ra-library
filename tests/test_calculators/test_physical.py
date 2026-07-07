@@ -384,6 +384,23 @@ class TestSelfReactRisk:
         assert level_large == 4  # capped from 5
         assert level_small == 1
 
+    def test_type_f_v321_always_level_4(self):
+        """v3.2.1 fixes Type F to always return risk level 4."""
+        levels = [
+            calculate_self_react_risk(ghs_category="F", amount_level=amount)
+            for amount in range(1, 6)
+        ]
+        assert levels == [4, 4, 4, 4, 4]
+
+    def test_type_f_v32_historical_level_1(self):
+        """v3.2 compatibility preserves the workbook Type F fall-through."""
+        level = calculate_self_react_risk(
+            ghs_category="F",
+            amount_level=1,
+            methodology_version="v3.2",
+        )
+        assert level == 1
+
     def test_no_classification_returns_none(self):
         """No GHS classification returns None."""
         level = calculate_self_react_risk(ghs_category=None, amount_level=1)
@@ -666,12 +683,22 @@ class TestOrgPeroxRisk:
             level = calculate_org_perox_risk(ghs_category=cat, amount_level=5)
             assert level == 4
 
-    def test_type_f_varies_by_amount(self):
-        """Type F risk varies by amount level."""
-        level_large = calculate_org_perox_risk(ghs_category="F", amount_level=1)
-        level_small = calculate_org_perox_risk(ghs_category="F", amount_level=5)
-        assert level_large == 4  # capped from 5
-        assert level_small == 1
+    def test_type_f_v321_always_level_4(self):
+        """v3.2.1 fixes Type F to always return risk level 4."""
+        levels = [
+            calculate_org_perox_risk(ghs_category="F", amount_level=amount)
+            for amount in range(1, 6)
+        ]
+        assert levels == [4, 4, 4, 4, 4]
+
+    def test_type_f_v32_historical_level_1(self):
+        """v3.2 compatibility preserves the workbook Type F fall-through."""
+        level = calculate_org_perox_risk(
+            ghs_category="F",
+            amount_level=1,
+            methodology_version="v3.2",
+        )
+        assert level == 1
 
     def test_type_g_varies_by_amount(self):
         """Type G risk varies by amount level."""
@@ -739,11 +766,10 @@ class TestSelfReactTypeF:
     VBA Reference: modCalc.bas lines 1207-1247 (CalculateSelfReactRisk)
     """
 
-    def test_type_f_varies_by_amount(self):
-        """Type F risk varies by amount level (same as Type G)."""
-        level_large = calculate_self_react_risk(ghs_category="F", amount_level=1)
-        level_medium = calculate_self_react_risk(ghs_category="F", amount_level=3)
-        level_small = calculate_self_react_risk(ghs_category="F", amount_level=5)
-        assert level_large == 4  # capped from 5
-        assert level_medium == 3
-        assert level_small == 1
+    def test_type_f_uses_v321_fixed_high_risk_by_default(self):
+        """Type F uses v3.2.1 fixed high-risk behavior by default."""
+        levels = [
+            calculate_self_react_risk(ghs_category="F", amount_level=amount)
+            for amount in (1, 3, 5)
+        ]
+        assert levels == [4, 4, 4]

@@ -306,6 +306,7 @@ def calculate_gases_under_pressure_risk(
 def calculate_self_react_risk(
     ghs_category: Optional[str],
     amount_level: int,
+    methodology_version: str = "v3.2.1",
 ) -> Optional[int]:
     """
     Calculate self-reactive risk.
@@ -322,11 +323,15 @@ def calculate_self_react_risk(
     if ghs_category is None or ghs_category == "-9999":
         return None
 
-    # Types A-E always have temp_risk = 5 (high risk)
-    if ghs_category in ["A", "B", "C", "D", "E"]:
+    fixed_high_types = ["A", "B", "C", "D", "E"]
+    if methodology_version == "v3.2.1":
+        fixed_high_types.append("F")
+
+    if ghs_category in fixed_high_types:
         temp_risk = 5
-    elif ghs_category in ["F", "G"]:
-        # Types F and G have variable risk by amount
+    elif ghs_category == "F" and methodology_version == "v3.2":
+        temp_risk = 1
+    elif ghs_category == "G":
         base_risks = {1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
         temp_risk = base_risks.get(amount_level, 0)
     else:
@@ -554,6 +559,7 @@ def calculate_explosives_risk(
 def calculate_org_perox_risk(
     ghs_category: Optional[str],
     amount_level: int,
+    methodology_version: str = "v3.2.1",
 ) -> Optional[int]:
     """
     Calculate organic peroxide risk.
@@ -570,11 +576,15 @@ def calculate_org_perox_risk(
     if ghs_category is None or ghs_category == "-9999":
         return None
 
-    # Types A-E always have temp_risk = 5 (high risk)
-    if ghs_category in ["A", "B", "C", "D", "E"]:
+    fixed_high_types = ["A", "B", "C", "D", "E"]
+    if methodology_version == "v3.2.1":
+        fixed_high_types.append("F")
+
+    if ghs_category in fixed_high_types:
         temp_risk = 5
-    elif ghs_category in ["F", "G"]:
-        # Type F and G have variable risk by amount
+    elif ghs_category == "F" and methodology_version == "v3.2":
+        temp_risk = 1
+    elif ghs_category == "G":
         base_risks = {1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
         temp_risk = base_risks.get(amount_level, 0)
     else:
