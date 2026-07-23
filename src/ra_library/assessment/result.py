@@ -19,6 +19,7 @@ from ..models.regulatory import RegulatoryInfo
 if TYPE_CHECKING:
     from .builder import RiskAssessment
     from ..models.assessment import AssessmentInput
+    from ..models.recommendation import MultiRiskAnalysis
 
 
 @dataclass
@@ -248,7 +249,7 @@ class ComponentResult:
     @property
     def physical_level_one_achievable(self) -> bool:
         """Check if Level I is achievable for physical hazards."""
-        if self.physical and hasattr(self.physical, 'level_one_achievable'):
+        if self.physical and hasattr(self.physical, "level_one_achievable"):
             return self.physical.level_one_achievable
         min_level = self.physical_min_achievable_level
         if min_level is None:
@@ -293,41 +294,47 @@ class ComponentResult:
         # Inhalation limitations
         if self.inhalation and self.inhalation.limitations:
             for lim in self.inhalation.limitations:
-                lims.append({
-                    "risk_type": "inhalation",
-                    "factor": lim.factor_name,
-                    "factor_ja": lim.factor_name_ja,
-                    "description": lim.description,
-                    "description_ja": lim.description_ja,
-                    "impact": lim.impact,
-                    "impact_ja": lim.impact_ja,
-                })
+                lims.append(
+                    {
+                        "risk_type": "inhalation",
+                        "factor": lim.factor_name,
+                        "factor_ja": lim.factor_name_ja,
+                        "description": lim.description,
+                        "description_ja": lim.description_ja,
+                        "impact": lim.impact,
+                        "impact_ja": lim.impact_ja,
+                    }
+                )
 
         # Dermal limitations
         if self.dermal and self.dermal.limitations:
             for lim in self.dermal.limitations:
-                lims.append({
-                    "risk_type": "dermal",
-                    "factor": lim.factor_name,
-                    "factor_ja": lim.factor_name_ja,
-                    "description": lim.description,
-                    "description_ja": lim.description_ja,
-                    "impact": lim.impact,
-                    "impact_ja": lim.impact_ja,
-                })
+                lims.append(
+                    {
+                        "risk_type": "dermal",
+                        "factor": lim.factor_name,
+                        "factor_ja": lim.factor_name_ja,
+                        "description": lim.description,
+                        "description_ja": lim.description_ja,
+                        "impact": lim.impact,
+                        "impact_ja": lim.impact_ja,
+                    }
+                )
 
         # Physical limitations
         if self.physical and self.physical.limitations:
             for lim in self.physical.limitations:
-                lims.append({
-                    "risk_type": "physical",
-                    "factor": lim.factor_name,
-                    "factor_ja": lim.factor_name_ja,
-                    "description": lim.description,
-                    "description_ja": lim.description_ja,
-                    "impact": lim.impact,
-                    "impact_ja": lim.impact_ja,
-                })
+                lims.append(
+                    {
+                        "risk_type": "physical",
+                        "factor": lim.factor_name,
+                        "factor_ja": lim.factor_name_ja,
+                        "description": lim.description,
+                        "description_ja": lim.description_ja,
+                        "impact": lim.impact,
+                        "impact_ja": lim.impact_ja,
+                    }
+                )
 
         return lims
 
@@ -342,7 +349,9 @@ class ComponentResult:
         # Inhalation (8hr)
         if not self.inhalation_level_one_achievable:
             inh_level = self.inhalation_min_achievable_level
-            parts.append(f"Inhalation (8hr): min Level {_level_to_label(inh_level) if inh_level else '?'}")
+            parts.append(
+                f"Inhalation (8hr): min Level {_level_to_label(inh_level) if inh_level else '?'}"
+            )
             if self.inhalation and self.inhalation.limitations:
                 for lim in self.inhalation.limitations:
                     parts.append(f"  - {lim.factor_name}: {lim.impact}")
@@ -358,7 +367,9 @@ class ComponentResult:
         # Physical
         if not self.physical_level_one_achievable:
             phys_level = self.physical_min_achievable_level
-            parts.append(f"Physical: min Level {_level_to_label(phys_level) if phys_level else '?'}")
+            parts.append(
+                f"Physical: min Level {_level_to_label(phys_level) if phys_level else '?'}"
+            )
             if self.physical and self.physical.limitations:
                 for lim in self.physical.limitations:
                     parts.append(f"  - {lim.factor_name}: {lim.impact}")
@@ -376,7 +387,9 @@ class ComponentResult:
         # Inhalation (8hr)
         if not self.inhalation_level_one_achievable:
             inh_level = self.inhalation_min_achievable_level
-            parts.append(f"吸入 (8時間): 最小レベル {_level_to_label(inh_level) if inh_level else '?'}")
+            parts.append(
+                f"吸入 (8時間): 最小レベル {_level_to_label(inh_level) if inh_level else '?'}"
+            )
             if self.inhalation and self.inhalation.limitations:
                 for lim in self.inhalation.limitations:
                     parts.append(f"  - {lim.factor_name_ja}: {lim.impact_ja}")
@@ -470,7 +483,9 @@ class ComponentResult:
             d["stel_oel_source"] = self.inhalation.stel_oel_source
         if self.inhalation.stel_rcr is not None:
             d["stel_rcr"] = self.inhalation.stel_rcr
-            d["stel_risk_level"] = int(self.inhalation.stel_risk_level) if self.inhalation.stel_risk_level else None
+            d["stel_risk_level"] = (
+                int(self.inhalation.stel_risk_level) if self.inhalation.stel_risk_level else None
+            )
             d["stel_risk_label"] = RiskLevel.get_simple_label(self.inhalation.stel_rcr)
         return d
 
@@ -768,13 +783,15 @@ class AssessmentResult:
         collected: list[dict[str, str]] = []
         for cas, comp in self.components.items():
             for error in comp.calculation_errors:
-                collected.append({
-                    "cas_number": cas,
-                    "substance_name": comp.name,
-                    "risk_type": error.get("risk_type", "unknown"),
-                    "error_type": error.get("error_type", "Exception"),
-                    "message": error.get("message", ""),
-                })
+                collected.append(
+                    {
+                        "cas_number": cas,
+                        "substance_name": comp.name,
+                        "risk_type": error.get("risk_type", "unknown"),
+                        "error_type": error.get("error_type", "Exception"),
+                        "message": error.get("message", ""),
+                    }
+                )
         return collected
 
     @property
@@ -876,10 +893,7 @@ class AssessmentResult:
         Returns:
             List of recommendations that apply to this substance
         """
-        return [
-            rec for rec in self.recommendations
-            if f"[{cas}]" in rec.action
-        ]
+        return [rec for rec in self.recommendations if f"[{cas}]" in rec.action]
 
     def get_risk_level(self) -> int:
         """Get overall risk level."""
@@ -925,7 +939,6 @@ class AssessmentResult:
                     print(f"{path.description}: ↓{path.combined_reduction_percent}%")
         """
         from ..recommenders.paths import calculate_reduction_paths
-        from ..models.recommendation import RiskReductionAnalysis
 
         result: dict[str, RiskReductionAnalysis] = {}
 
@@ -1016,7 +1029,7 @@ class AssessmentResult:
         lines.append(f'amount = "{inp.amount_level.value}"')
         lines.append(f'ventilation = "{inp.ventilation.value}"')
         lines.append(f"control_velocity_verified = {str(inp.control_velocity_verified).lower()}")
-        if self.builder and getattr(self.builder, '_control_velocity_auto_enabled', False):
+        if self.builder and getattr(self.builder, "_control_velocity_auto_enabled", False):
             lines.append("control_velocity_auto_enabled = true")
         lines.append(f"is_spray = {str(inp.is_spray_operation).lower()}")
         lines.append(f'exposure_variation = "{inp.exposure_variation.value}"')
@@ -1053,7 +1066,7 @@ class AssessmentResult:
             if c.max_ventilation:
                 lines.append(f'max_ventilation = "{c.max_ventilation.value}"')
             if c.min_frequency:
-                lines.append(f'min_frequency_days = {c.min_frequency.get("days", 1)}')
+                lines.append(f"min_frequency_days = {c.min_frequency.get('days', 1)}")
                 lines.append(f'min_frequency_period = "{c.min_frequency.get("period", "month")}"')
             if c.excluded_measures:
                 excl_str = ", ".join(f'"{m}"' for m in c.excluded_measures)
@@ -1101,7 +1114,6 @@ class AssessmentResult:
                     print(f"Controlling: {multi.controlling_risk_label_ja}")
         """
         from ..recommenders.paths import calculate_multi_risk_analysis
-        from ..models.recommendation import MultiRiskAnalysis
 
         result: dict[str, MultiRiskAnalysis] = {}
 
@@ -1161,34 +1173,38 @@ class AssessmentResult:
         writer = csv.writer(output)
 
         if include_header:
-            writer.writerow([
-                "CAS Number",
-                "Substance Name",
-                "Content %",
-                "Risk Level",
-                "Inhalation RCR",
-                "Exposure (8hr)",
-                "OEL",
-                "OEL Source",
-                "Dermal RCR",
-                "Warnings",
-            ])
+            writer.writerow(
+                [
+                    "CAS Number",
+                    "Substance Name",
+                    "Content %",
+                    "Risk Level",
+                    "Inhalation RCR",
+                    "Exposure (8hr)",
+                    "OEL",
+                    "OEL Source",
+                    "Dermal RCR",
+                    "Warnings",
+                ]
+            )
 
         for cas, comp in self.components.items():
             inh = comp.inhalation
             derm = comp.dermal
-            writer.writerow([
-                cas,
-                comp.name,
-                comp.content_percent,
-                comp.risk_level or "",
-                f"{inh.rcr:.4f}" if inh else "",
-                f"{inh.exposure_8hr:.6f} {inh.exposure_8hr_unit}" if inh else "",
-                f"{inh.oel} {inh.oel_unit}" if inh else "",
-                inh.oel_source if inh else "",
-                f"{derm.rcr:.4f}" if derm else "",
-                "; ".join(comp.warnings),
-            ])
+            writer.writerow(
+                [
+                    cas,
+                    comp.name,
+                    comp.content_percent,
+                    comp.risk_level or "",
+                    f"{inh.rcr:.4f}" if inh else "",
+                    f"{inh.exposure_8hr:.6f} {inh.exposure_8hr_unit}" if inh else "",
+                    f"{inh.oel} {inh.oel_unit}" if inh else "",
+                    inh.oel_source if inh else "",
+                    f"{derm.rcr:.4f}" if derm else "",
+                    "; ".join(comp.warnings),
+                ]
+            )
 
         return output.getvalue()
 
@@ -1215,31 +1231,35 @@ class AssessmentResult:
         try:
             import pandas as pd
         except ImportError:
-            raise ImportError("pandas is required for DataFrame export. Install with: pip install pandas")
+            raise ImportError(
+                "pandas is required for DataFrame export. Install with: pip install pandas"
+            )
 
         rows = []
         for cas, comp in self.components.items():
             inh = comp.inhalation
             derm = comp.dermal
-            rows.append({
-                "cas_number": cas,
-                "name": comp.name,
-                "content_percent": comp.content_percent,
-                "risk_level": comp.risk_level,
-                "risk_label": comp.risk_label,
-                "inhalation_rcr": inh.rcr if inh else None,
-                "exposure_8hr": inh.exposure_8hr if inh else None,
-                "exposure_unit": inh.exposure_8hr_unit if inh else None,
-                "oel": inh.oel if inh else None,
-                "oel_unit": inh.oel_unit if inh else None,
-                "oel_source": inh.oel_source if inh else None,
-                "stel_rcr": inh.stel_rcr if inh else None,
-                "dermal_rcr": derm.rcr if derm else None,
-                "dermal_absorption": derm.skin_absorption if derm else None,
-                "has_skin_notation": comp.has_skin_notation,
-                "is_carcinogen": comp.is_carcinogen,
-                "warnings": "; ".join(comp.warnings),
-            })
+            rows.append(
+                {
+                    "cas_number": cas,
+                    "name": comp.name,
+                    "content_percent": comp.content_percent,
+                    "risk_level": comp.risk_level,
+                    "risk_label": comp.risk_label,
+                    "inhalation_rcr": inh.rcr if inh else None,
+                    "exposure_8hr": inh.exposure_8hr if inh else None,
+                    "exposure_unit": inh.exposure_8hr_unit if inh else None,
+                    "oel": inh.oel if inh else None,
+                    "oel_unit": inh.oel_unit if inh else None,
+                    "oel_source": inh.oel_source if inh else None,
+                    "stel_rcr": inh.stel_rcr if inh else None,
+                    "dermal_rcr": derm.rcr if derm else None,
+                    "dermal_absorption": derm.skin_absorption if derm else None,
+                    "has_skin_notation": comp.has_skin_notation,
+                    "is_carcinogen": comp.is_carcinogen,
+                    "warnings": "; ".join(comp.warnings),
+                }
+            )
 
         return pd.DataFrame(rows)
 
@@ -1253,11 +1273,6 @@ class AssessmentResult:
         Raises:
             ImportError: If pandas or openpyxl is not installed
         """
-        try:
-            import pandas as pd
-        except ImportError:
-            raise ImportError("pandas is required for Excel export. Install with: pip install pandas openpyxl")
-
         df = self.to_dataframe()
         df.to_excel(filepath, index=False, sheet_name="Assessment Results")
 
@@ -1310,7 +1325,9 @@ class AssessmentResult:
         if "ventilation" in changes:
             new_builder.with_conditions(ventilation=changes["ventilation"])
         if "control_velocity_verified" in changes:
-            new_builder.with_conditions(control_velocity_verified=changes["control_velocity_verified"])
+            new_builder.with_conditions(
+                control_velocity_verified=changes["control_velocity_verified"]
+            )
         if "is_spray" in changes:
             new_builder.with_conditions(is_spray=changes["is_spray"])
         if "dustiness" in changes:
@@ -1360,7 +1377,9 @@ class AssessmentResult:
                 "name": this_comp.name,
                 "this_level": this_comp.risk_level,
                 "other_level": other_comp.risk_level,
-                "level_improved": this_comp.risk_level < other_comp.risk_level if (this_comp.risk_level and other_comp.risk_level) else None,
+                "level_improved": this_comp.risk_level < other_comp.risk_level
+                if (this_comp.risk_level and other_comp.risk_level)
+                else None,
             }
 
             # Compare inhalation
@@ -1397,12 +1416,10 @@ class AssessmentResult:
 
         # Summary
         improved_count = sum(
-            1 for comp in comparison["components"].values()
-            if comp.get("level_improved")
+            1 for comp in comparison["components"].values() if comp.get("level_improved")
         )
         worsened_count = sum(
-            1 for comp in comparison["components"].values()
-            if comp.get("level_improved") is False
+            1 for comp in comparison["components"].values() if comp.get("level_improved") is False
         )
 
         comparison["summary"] = {
@@ -1442,7 +1459,9 @@ class AssessmentResult:
             if inh:
                 change = inh.get("rcr_change_percent", 0)
                 direction = "↓" if inh.get("improved") else "↑" if change < 0 else "="
-                lines.append(f"  {comp_data['name']}: RCR {inh['other_rcr']:.4f} → {inh['this_rcr']:.4f} ({direction} {abs(change):.1f}%)")
+                lines.append(
+                    f"  {comp_data['name']}: RCR {inh['other_rcr']:.4f} → {inh['this_rcr']:.4f} ({direction} {abs(change):.1f}%)"
+                )
 
         return "\n".join(lines)
 
@@ -1475,7 +1494,9 @@ class AssessmentResult:
             if inh:
                 change = inh.get("rcr_change_percent", 0)
                 direction = "低下" if inh.get("improved") else "上昇" if change < 0 else "同じ"
-                lines.append(f"  {comp_data['name']}: RCR {inh['other_rcr']:.4f} → {inh['this_rcr']:.4f} ({direction} {abs(change):.1f}%)")
+                lines.append(
+                    f"  {comp_data['name']}: RCR {inh['other_rcr']:.4f} → {inh['this_rcr']:.4f} ({direction} {abs(change):.1f}%)"
+                )
 
         return "\n".join(lines)
 
@@ -1656,9 +1677,12 @@ class AssessmentResult:
 
         # Sort by effectiveness and priority
         effectiveness_order = {
-            EffectivenessLevel.HIGH: 0, "high": 0,
-            EffectivenessLevel.MEDIUM: 1, "medium": 1,
-            EffectivenessLevel.LOW: 2, "low": 2,
+            EffectivenessLevel.HIGH: 0,
+            "high": 0,
+            EffectivenessLevel.MEDIUM: 1,
+            "medium": 1,
+            EffectivenessLevel.LOW: 2,
+            "low": 2,
         }
         all_recs.sort(key=lambda r: (effectiveness_order.get(r.effectiveness, 3), r.priority))
 
@@ -1675,8 +1699,8 @@ class AssessmentResult:
         critical_cas = crit[0] if crit else None
 
         lines = [
-            f"Risk Assessment Summary",
-            f"=" * 40,
+            "Risk Assessment Summary",
+            "=" * 40,
             f"Overall Risk Level: {self.overall_risk_label} (Level {self.overall_risk_level})",
         ]
 
@@ -1684,8 +1708,8 @@ class AssessmentResult:
         if crit and len(self.components) > 1:
             lines.append(f"Critical Substance: {crit[1].name} ({critical_cas})")
 
-        lines.append(f"")
-        lines.append(f"Components (by risk):")
+        lines.append("")
+        lines.append("Components (by risk):")
 
         # Show components sorted by risk (highest first)
         for cas, comp in self.risk_drivers:
@@ -1693,11 +1717,15 @@ class AssessmentResult:
             marker = " ⚠ CRITICAL" if is_critical else ""
             lines.append(f"  - {comp.name} ({cas}): {comp.content_percent}%{marker}")
             if comp.inhalation:
-                lines.append(f"    Inhalation (8hr): RCR={comp.inhalation.rcr:.2f}, Level {comp.risk_label}")
+                lines.append(
+                    f"    Inhalation (8hr): RCR={comp.inhalation.rcr:.2f}, Level {comp.risk_label}"
+                )
                 # Show STEL if available
                 if comp.has_stel_assessment:
                     stel_label = RiskLevel.get_simple_label(comp.stel_rcr)
-                    lines.append(f"    Inhalation (STEL): RCR={comp.stel_rcr:.2f}, Level {stel_label}")
+                    lines.append(
+                        f"    Inhalation (STEL): RCR={comp.stel_rcr:.2f}, Level {stel_label}"
+                    )
             if comp.dermal:
                 lines.append(f"    Dermal: RCR={comp.dermal.rcr:.2f}")
             if comp.physical:
@@ -1711,9 +1739,13 @@ class AssessmentResult:
             if comp.risk_level >= 3:  # Level III or higher
                 sub_recs = self.get_recommendations_for_substance(cas)
                 if sub_recs:
-                    lines.append(f"    Recommendations for this substance:")
+                    lines.append("    Recommendations for this substance:")
                     for rec in sub_recs[:2]:
-                        reduction = f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                        reduction = (
+                            f"(↓{rec.rcr_reduction_percent:.0f}%)"
+                            if rec.rcr_reduction_percent
+                            else ""
+                        )
                         # Remove CAS prefix from action for per-substance display
                         action = rec.action.replace(f"[{cas}] ", "")
                         lines.append(f"      → {action} {reduction}")
@@ -1722,50 +1754,68 @@ class AssessmentResult:
         if len(self.components) > 1:
             if self.mixed_inhalation_rcr is not None:
                 mixed_level = _level_to_label(self.mixed_inhalation_risk_level or 0)
-                lines.append(f"")
-                lines.append(f"Mixed Exposure (Additive Effect):")
-                lines.append(f"  Inhalation: Combined RCR={self.mixed_inhalation_rcr:.2f}, Level {mixed_level}")
+                lines.append("")
+                lines.append("Mixed Exposure (Additive Effect):")
+                lines.append(
+                    f"  Inhalation: Combined RCR={self.mixed_inhalation_rcr:.2f}, Level {mixed_level}"
+                )
                 if self.has_mixed_exposure_concern:
-                    lines.append(f"  ⚠ Mixed exposure exceeds individual risks - consider additional controls")
+                    lines.append(
+                        "  ⚠ Mixed exposure exceeds individual risks - consider additional controls"
+                    )
 
         if self.warnings:
-            lines.append(f"")
-            lines.append(f"Calculation Warnings:")
+            lines.append("")
+            lines.append("Calculation Warnings:")
             for warning in self.warnings:
                 lines.append(f"  ⚠ {warning}")
 
         if self.regulations:
-            lines.append(f"")
-            lines.append(f"Applicable Regulations:")
+            lines.append("")
+            lines.append("Applicable Regulations:")
             for reg in self.regulations:
                 lines.append(f"  - {reg}")
 
         if self.recommendations:
-            lines.append(f"")
-            lines.append(f"Top Recommendations (All Substances):")
+            lines.append("")
+            lines.append("Top Recommendations (All Substances):")
             for rec in self.recommendations[:5]:
-                reduction = f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                reduction = (
+                    f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                )
                 lines.append(f"  {rec.priority}. {rec.action} {reduction}")
 
         # Show achievability information (per risk type)
         if not self.level_one_achievable:
-            lines.append(f"")
-            lines.append(f"Achievability:")
+            lines.append("")
+            lines.append("Achievability:")
             min_level = _level_to_label(self.min_achievable_level)
-            lines.append(f"  ⚠ Level I is NOT achievable")
+            lines.append("  ⚠ Level I is NOT achievable")
             lines.append(f"  Minimum achievable level: {min_level}")
             for cas, comp in self.components.items():
                 if not comp.level_one_achievable:
                     # Show per-risk-type details
                     risk_details = []
                     if not comp.inhalation_level_one_achievable:
-                        inh_min = _level_to_label(comp.inhalation_min_achievable_level) if comp.inhalation_min_achievable_level else "?"
+                        inh_min = (
+                            _level_to_label(comp.inhalation_min_achievable_level)
+                            if comp.inhalation_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"Inhalation (8hr): {inh_min}")
                     if not comp.dermal_level_one_achievable:
-                        derm_min = _level_to_label(comp.dermal_min_achievable_level) if comp.dermal_min_achievable_level else "?"
+                        derm_min = (
+                            _level_to_label(comp.dermal_min_achievable_level)
+                            if comp.dermal_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"Dermal: {derm_min}")
                     if not comp.physical_level_one_achievable:
-                        phys_min = _level_to_label(comp.physical_min_achievable_level) if comp.physical_min_achievable_level else "?"
+                        phys_min = (
+                            _level_to_label(comp.physical_min_achievable_level)
+                            if comp.physical_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"Physical: {phys_min}")
                     if risk_details:
                         lines.append(f"  - {comp.name}: {', '.join(risk_details)}")
@@ -1779,8 +1829,8 @@ class AssessmentResult:
         critical_cas = crit[0] if crit else None
 
         lines = [
-            f"リスクアセスメント結果",
-            f"=" * 40,
+            "リスクアセスメント結果",
+            "=" * 40,
             f"総合リスクレベル: {self.overall_risk_label} (レベル {self.overall_risk_level})",
         ]
 
@@ -1788,8 +1838,8 @@ class AssessmentResult:
         if crit and len(self.components) > 1:
             lines.append(f"クリティカル物質: {crit[1].name} ({critical_cas})")
 
-        lines.append(f"")
-        lines.append(f"成分 (リスク順):")
+        lines.append("")
+        lines.append("成分 (リスク順):")
 
         # Show components sorted by risk (highest first)
         for cas, comp in self.risk_drivers:
@@ -1797,7 +1847,9 @@ class AssessmentResult:
             marker = " ⚠ クリティカル" if is_critical else ""
             lines.append(f"  - {comp.name} ({cas}): {comp.content_percent}%{marker}")
             if comp.inhalation:
-                lines.append(f"    吸入 (8時間): RCR={comp.inhalation.rcr:.2f}, レベル {comp.risk_label}")
+                lines.append(
+                    f"    吸入 (8時間): RCR={comp.inhalation.rcr:.2f}, レベル {comp.risk_label}"
+                )
                 # Show STEL if available
                 if comp.has_stel_assessment:
                     stel_label = RiskLevel.get_simple_label(comp.stel_rcr)
@@ -1815,62 +1867,88 @@ class AssessmentResult:
             if comp.risk_level >= 3:  # Level III or higher
                 sub_recs = self.get_recommendations_for_substance(cas)
                 if sub_recs:
-                    lines.append(f"    この物質への推奨対策:")
+                    lines.append("    この物質への推奨対策:")
                     for rec in sub_recs[:2]:
-                        reduction = f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                        reduction = (
+                            f"(↓{rec.rcr_reduction_percent:.0f}%)"
+                            if rec.rcr_reduction_percent
+                            else ""
+                        )
                         # Remove CAS prefix from action for per-substance display
-                        action_ja = rec.action_ja.replace(f"[{cas}] ", "") if rec.action_ja else rec.action.replace(f"[{cas}] ", "")
+                        action_ja = (
+                            rec.action_ja.replace(f"[{cas}] ", "")
+                            if rec.action_ja
+                            else rec.action.replace(f"[{cas}] ", "")
+                        )
                         lines.append(f"      → {action_ja} {reduction}")
 
         # Show mixed exposure if multiple substances
         if len(self.components) > 1:
             if self.mixed_inhalation_rcr is not None:
                 mixed_level = _level_to_label(self.mixed_inhalation_risk_level or 0)
-                lines.append(f"")
-                lines.append(f"混合暴露（相加効果）:")
-                lines.append(f"  吸入: 合計RCR={self.mixed_inhalation_rcr:.2f}, レベル {mixed_level}")
+                lines.append("")
+                lines.append("混合暴露（相加効果）:")
+                lines.append(
+                    f"  吸入: 合計RCR={self.mixed_inhalation_rcr:.2f}, レベル {mixed_level}"
+                )
                 if self.has_mixed_exposure_concern:
-                    lines.append(f"  ⚠ 混合暴露が個別リスクを上回っています - 追加対策を検討してください")
+                    lines.append(
+                        "  ⚠ 混合暴露が個別リスクを上回っています - 追加対策を検討してください"
+                    )
 
         if self.warnings:
-            lines.append(f"")
-            lines.append(f"計算時の警告:")
+            lines.append("")
+            lines.append("計算時の警告:")
             for warning in self.warnings:
                 lines.append(f"  ⚠ {warning}")
 
         if self.regulations:
-            lines.append(f"")
-            lines.append(f"適用される規制:")
+            lines.append("")
+            lines.append("適用される規制:")
             for reg in self.regulations:
                 lines.append(f"  - {reg}")
 
         if self.recommendations:
-            lines.append(f"")
-            lines.append(f"推奨対策 (全物質):")
+            lines.append("")
+            lines.append("推奨対策 (全物質):")
             for rec in self.recommendations[:5]:
-                reduction = f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                reduction = (
+                    f"(↓{rec.rcr_reduction_percent:.0f}%)" if rec.rcr_reduction_percent else ""
+                )
                 action_ja = rec.action_ja if rec.action_ja else rec.action
                 lines.append(f"  {rec.priority}. {action_ja} {reduction}")
 
         # Show achievability information (per risk type)
         if not self.level_one_achievable:
-            lines.append(f"")
-            lines.append(f"到達可能性:")
+            lines.append("")
+            lines.append("到達可能性:")
             min_level = _level_to_label(self.min_achievable_level)
-            lines.append(f"  ⚠ レベルIは達成できません")
+            lines.append("  ⚠ レベルIは達成できません")
             lines.append(f"  到達可能な最小レベル: {min_level}")
             for cas, comp in self.components.items():
                 if not comp.level_one_achievable:
                     # Show per-risk-type details
                     risk_details = []
                     if not comp.inhalation_level_one_achievable:
-                        inh_min = _level_to_label(comp.inhalation_min_achievable_level) if comp.inhalation_min_achievable_level else "?"
+                        inh_min = (
+                            _level_to_label(comp.inhalation_min_achievable_level)
+                            if comp.inhalation_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"吸入 (8時間): {inh_min}")
                     if not comp.dermal_level_one_achievable:
-                        derm_min = _level_to_label(comp.dermal_min_achievable_level) if comp.dermal_min_achievable_level else "?"
+                        derm_min = (
+                            _level_to_label(comp.dermal_min_achievable_level)
+                            if comp.dermal_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"経皮: {derm_min}")
                     if not comp.physical_level_one_achievable:
-                        phys_min = _level_to_label(comp.physical_min_achievable_level) if comp.physical_min_achievable_level else "?"
+                        phys_min = (
+                            _level_to_label(comp.physical_min_achievable_level)
+                            if comp.physical_min_achievable_level
+                            else "?"
+                        )
                         risk_details.append(f"物理: {phys_min}")
                     if risk_details:
                         lines.append(f"  - {comp.name}: {', '.join(risk_details)}")
@@ -1891,8 +1969,12 @@ class AssessmentResult:
                     "priority": r.priority,
                     "action": r.action,
                     "action_ja": r.action_ja,
-                    "category": str(r.category.value) if hasattr(r.category, 'value') else str(r.category),
-                    "effectiveness": str(r.effectiveness.value) if hasattr(r.effectiveness, 'value') else str(r.effectiveness),
+                    "category": str(r.category.value)
+                    if hasattr(r.category, "value")
+                    else str(r.category),
+                    "effectiveness": str(r.effectiveness.value)
+                    if hasattr(r.effectiveness, "value")
+                    else str(r.effectiveness),
                     "rcr_reduction_percent": r.rcr_reduction_percent,
                     "predicted_risk_level": r.predicted_risk_level,
                 }
@@ -1920,6 +2002,7 @@ class AssessmentResult:
     def to_json(self) -> str:
         """Convert to JSON string."""
         import json
+
         return json.dumps(self.to_dict(), ensure_ascii=False, indent=2)
 
     def full_report(self, language: str = "ja") -> str:
@@ -1961,9 +2044,13 @@ class AssessmentResult:
         lines.append(f"  目標リスクレベル: {target_label}")
         # Check if target is achieved
         if self.overall_risk_level <= self.target_inhalation:
-            lines.append(f"  判定: ✓ 目標達成 - {self._risk_judgment_ja(RiskLevel(self.overall_risk_level))}")
+            lines.append(
+                f"  判定: ✓ 目標達成 - {self._risk_judgment_ja(RiskLevel(self.overall_risk_level))}"
+            )
         else:
-            lines.append(f"  判定: ✗ 目標未達 - {self._risk_judgment_ja(RiskLevel(self.overall_risk_level))}")
+            lines.append(
+                f"  判定: ✗ 目標未達 - {self._risk_judgment_ja(RiskLevel(self.overall_risk_level))}"
+            )
         lines.append("")
 
         # === 2. QUICK RECOMMENDATION SUMMARY (推奨対策を2番目に) ===
@@ -1986,7 +2073,9 @@ class AssessmentResult:
                 # STEL if available
                 if inh.stel_rcr is not None and inh.stel_risk_level is not None:
                     stel_ind = self._risk_indicator(inh.stel_risk_level.value)
-                    lines.append(f"    吸入(短時間): レベル{inh.stel_risk_level.name} {stel_ind} (RCR={inh.stel_rcr:.2f})")
+                    lines.append(
+                        f"    吸入(短時間): レベル{inh.stel_risk_level.name} {stel_ind} (RCR={inh.stel_rcr:.2f})"
+                    )
             if comp.dermal:
                 derm = comp.dermal
                 ind = self._risk_indicator(derm.risk_level.value)
@@ -2004,30 +2093,46 @@ class AssessmentResult:
             if analysis and comp.inhalation:
                 if not analysis.has_achievable_path:
                     lines.append("  〈吸入リスク対策〉")
-                    lines.append(f"    ⚠ 現在の条件では目標達成不可")
+                    lines.append("    ⚠ 現在の条件では目標達成不可")
                     if analysis.best_achievable_level:
-                        lines.append(f"      到達可能な最良レベル: {analysis.best_achievable_level}")
+                        lines.append(
+                            f"      到達可能な最良レベル: {analysis.best_achievable_level}"
+                        )
                 else:
                     lines.append("  〈吸入リスク対策〉")
                     # Find best engineering option
-                    eng_paths = [p for p in analysis.achievable_paths
-                                if len(p.measures) == 1 and p.measures[0].category.value == "engineering"]
+                    eng_paths = [
+                        p
+                        for p in analysis.achievable_paths
+                        if len(p.measures) == 1 and p.measures[0].category.value == "engineering"
+                    ]
                     # Find best PPE option
-                    ppe_paths = [p for p in analysis.achievable_paths
-                                if len(p.measures) == 1 and p.measures[0].category.value == "ppe"]
+                    ppe_paths = [
+                        p
+                        for p in analysis.achievable_paths
+                        if len(p.measures) == 1 and p.measures[0].category.value == "ppe"
+                    ]
 
                     if eng_paths:
                         best_eng = eng_paths[0]
                         status = "✓" if best_eng.achieves_target else "△"
-                        lines.append(f"    {status} 工学的: {best_eng.description_ja} → レベル{best_eng.predicted_level}")
+                        lines.append(
+                            f"    {status} 工学的: {best_eng.description_ja} → レベル{best_eng.predicted_level}"
+                        )
 
                     if ppe_paths:
                         best_ppe = ppe_paths[0]
-                        lines.append(f"    ✓ PPE: {best_ppe.description_ja} → レベル{best_ppe.predicted_level}")
+                        lines.append(
+                            f"    ✓ PPE: {best_ppe.description_ja} → レベル{best_ppe.predicted_level}"
+                        )
 
                     # Show limitation if engineering alone doesn't achieve target
                     if analysis.limitations_ja:
-                        main_lim = analysis.limitations_ja[0].split(";")[0] if ";" in analysis.limitations_ja[0] else analysis.limitations_ja[0]
+                        main_lim = (
+                            analysis.limitations_ja[0].split(";")[0]
+                            if ";" in analysis.limitations_ja[0]
+                            else analysis.limitations_ja[0]
+                        )
                         lines.append(f"    ⚠ {main_lim}")
                 lines.append("")
 
@@ -2035,35 +2140,38 @@ class AssessmentResult:
             if comp.dermal:
                 lines.append("  〈経皮リスク対策〉")
                 if comp.dermal.risk_level.value <= 2:  # Level I or II
-                    lines.append(f"    ✓ 現状で目標達成")
+                    lines.append("    ✓ 現状で目標達成")
                 else:
-                    lines.append(f"    → 耐透過性手袋の着用を推奨")
+                    lines.append("    → 耐透過性手袋の着用を推奨")
                 lines.append("")
 
             # Physical recommendations
             if comp.physical:
                 lines.append("  〈危険性対策〉")
                 if comp.physical.risk_level.value <= 2:  # Level I or II
-                    lines.append(f"    ✓ 現状で目標達成")
+                    lines.append("    ✓ 現状で目標達成")
                 else:
-                    lines.append(f"    → 着火源の管理、換気の確保を推奨")
+                    lines.append("    → 着火源の管理、換気の確保を推奨")
                 lines.append("")
 
         # === 3. ASSESSMENT CONDITIONS (評価条件) ===
         lines.append("■ 評価条件")
         lines.append("-" * 40)
         # Show preset if used
-        if self.builder and getattr(self.builder, '_preset_name', None):
+        if self.builder and getattr(self.builder, "_preset_name", None):
             from ..presets import get_preset
+
             preset = get_preset(self.builder._preset_name)
             lines.append(f"  プリセット: {preset.description}")
-        product_form_ja = {"liquid": "液体", "solid": "固体", "gas": "気体"}.get(inp.product_property.value, inp.product_property.value)
+        product_form_ja = {"liquid": "液体", "solid": "固体", "gas": "気体"}.get(
+            inp.product_property.value, inp.product_property.value
+        )
         lines.append(f"  製品形態: {product_form_ja}")
         lines.append(f"  取扱量: {self._amount_label_ja(inp.amount_level.value)}")
         lines.append(f"  換気条件: {self._vent_label_ja(inp.ventilation.value)}")
         if inp.control_velocity_verified:
             auto_note = ""
-            if self.builder and getattr(self.builder, '_control_velocity_auto_enabled', False):
+            if self.builder and getattr(self.builder, "_control_velocity_auto_enabled", False):
                 auto_note = "（局所排気のため自動適用）"
             lines.append(f"  制御風速: 確認済み{auto_note}")
         hours = inp.working_hours_per_day
@@ -2076,7 +2184,9 @@ class AssessmentResult:
         lines.append(f"  暴露変動: {self._variation_label_ja(inp.exposure_variation.value)}")
         if inp.rpe_type and inp.rpe_type.value != "none":
             lines.append(f"  呼吸用保護具: {self._rpe_label_ja(inp.rpe_type.value)}")
-        lines.append(f"  評価モード: {'実施レポート' if inp.mode.value == 'report' else 'RAシート'}")
+        lines.append(
+            f"  評価モード: {'実施レポート' if inp.mode.value == 'report' else 'RAシート'}"
+        )
         lines.append("")
 
         # === 4. SUBSTANCE DETAILS (物質詳細) ===
@@ -2098,7 +2208,9 @@ class AssessmentResult:
                 lines.append("-" * 40)
                 lines.append(f"  暴露推定値: {inh.exposure_8hr:.4f} {inh.exposure_8hr_unit}")
                 if inh.exposure_8hr_min:
-                    lines.append(f"  暴露範囲: {inh.exposure_8hr_min:.4f} - {inh.exposure_8hr:.4f} {inh.exposure_8hr_unit}")
+                    lines.append(
+                        f"  暴露範囲: {inh.exposure_8hr_min:.4f} - {inh.exposure_8hr:.4f} {inh.exposure_8hr_unit}"
+                    )
                 lines.append(f"  OEL: {inh.oel} {inh.oel_unit} ({inh.oel_source})")
                 if inh.acrmax:
                     lines.append(f"  ACRmax: {inh.acrmax} {inh.acrmax_unit} (管理目標濃度)")
@@ -2113,12 +2225,16 @@ class AssessmentResult:
 
                 # Show engineering control limit with contextual explanation
                 if inh.min_achievable_rcr and inh.min_achievable_rcr > 0.1:
-                    lines.extend(self._format_engineering_limit_ja(
-                        current_rcr=inh.rcr,
-                        min_achievable_rcr=inh.min_achievable_rcr,
-                        min_achievable_reason_ja=getattr(inh, 'min_achievable_reason_ja', None),
-                        target_rcr=self.target_inhalation.get_rcr_threshold() if self.target_inhalation else 0.1,
-                    ))
+                    lines.extend(
+                        self._format_engineering_limit_ja(
+                            current_rcr=inh.rcr,
+                            min_achievable_rcr=inh.min_achievable_rcr,
+                            min_achievable_reason_ja=getattr(inh, "min_achievable_reason_ja", None),
+                            target_rcr=self.target_inhalation.get_rcr_threshold()
+                            if self.target_inhalation
+                            else 0.1,
+                        )
+                    )
 
             # --- INHALATION STEL ---
             if comp.inhalation and comp.inhalation.stel_rcr is not None:
@@ -2126,9 +2242,13 @@ class AssessmentResult:
                 lines.append("【吸入リスク（短時間暴露）】")
                 lines.append("-" * 40)
                 if inh.exposure_stel:
-                    lines.append(f"  短時間暴露推定値: {inh.exposure_stel:.4f} {inh.exposure_stel_unit}")
+                    lines.append(
+                        f"  短時間暴露推定値: {inh.exposure_stel:.4f} {inh.exposure_stel_unit}"
+                    )
                 if inh.stel_oel:
-                    lines.append(f"  STEL OEL: {inh.stel_oel} {inh.stel_oel_unit} ({inh.stel_oel_source})")
+                    lines.append(
+                        f"  STEL OEL: {inh.stel_oel} {inh.stel_oel_unit} ({inh.stel_oel_source})"
+                    )
                 lines.append(f"  STEL RCR: {inh.stel_rcr:.4f}")
                 if inh.stel_risk_level:
                     lines.append(f"  リスクレベル: {inh.stel_risk_level.name}")
@@ -2150,7 +2270,6 @@ class AssessmentResult:
             # --- COMBINED ---
             if comp.inhalation and comp.dermal:
                 combined_rcr = comp.inhalation.rcr + comp.dermal.rcr
-                combined_level = RiskLevel.from_rcr(combined_rcr)
                 dominant = "吸入" if comp.inhalation.rcr > comp.dermal.rcr else "経皮吸収"
                 lines.append("【合計リスク（吸入＋経皮）】")
                 lines.append("-" * 40)
@@ -2182,7 +2301,9 @@ class AssessmentResult:
             comp = self.components.get(cas)
             current_indicator = self._risk_indicator_from_label(analysis.current_level)
             lines.append(f"【{comp.name if comp else cas}】")
-            lines.append(f"現状: レベル{analysis.current_level} {current_indicator} (RCR={analysis.current_rcr:.2f})")
+            lines.append(
+                f"現状: レベル{analysis.current_level} {current_indicator} (RCR={analysis.current_rcr:.2f})"
+            )
             lines.append("")
 
             # Get minimum measures for each level
@@ -2198,7 +2319,6 @@ class AssessmentResult:
 
             for item in summary:
                 level = item["level"]
-                path = item["path"]
                 cat = item["category_type"]
                 rcr = item["rcr"]
                 desc = item["description_ja"]
@@ -2272,16 +2392,19 @@ class AssessmentResult:
         lines.append("-" * 40)
         inp = self.assessment_input
         # Show preset if used
-        if self.builder and getattr(self.builder, '_preset_name', None):
+        if self.builder and getattr(self.builder, "_preset_name", None):
             from ..presets import get_preset
+
             preset = get_preset(self.builder._preset_name)
             lines.append(f"  Preset: {preset.description_en}")
-        product_form_en = {"liquid": "Liquid", "solid": "Solid", "gas": "Gas"}.get(inp.product_property.value, inp.product_property.value)
+        product_form_en = {"liquid": "Liquid", "solid": "Solid", "gas": "Gas"}.get(
+            inp.product_property.value, inp.product_property.value
+        )
         lines.append(f"  Product form: {product_form_en}")
         lines.append(f"  Amount: {inp.amount_level.value}")
         lines.append(f"  Ventilation: {inp.ventilation.value}")
         if inp.control_velocity_verified:
-            lines.append(f"  Control velocity: Verified")
+            lines.append("  Control velocity: Verified")
         lines.append(f"  Working hours: {inp.working_hours_per_day} hours/day")
         if inp.frequency_type == "weekly":
             lines.append(f"  Frequency: {inp.frequency_value} days/week")
@@ -2326,7 +2449,9 @@ class AssessmentResult:
                 lines.append("[Inhalation Risk (STEL)]")
                 lines.append("-" * 40)
                 if inh.exposure_stel:
-                    lines.append(f"  STEL exposure: {inh.exposure_stel:.4f} {inh.exposure_stel_unit}")
+                    lines.append(
+                        f"  STEL exposure: {inh.exposure_stel:.4f} {inh.exposure_stel_unit}"
+                    )
                 if inh.stel_oel:
                     lines.append(f"  STEL OEL: {inh.stel_oel} {inh.stel_oel_unit}")
                 lines.append(f"  STEL RCR: {inh.stel_rcr:.4f}")
@@ -2387,7 +2512,9 @@ class AssessmentResult:
         for cas, analysis in paths_by_cas.items():
             comp = self.components.get(cas)
             lines.append(f"[{comp.name if comp else cas}]")
-            lines.append(f"Current: Level {analysis.current_level} (RCR={analysis.current_rcr:.2f})")
+            lines.append(
+                f"Current: Level {analysis.current_level} (RCR={analysis.current_rcr:.2f})"
+            )
             lines.append(f"Target: Level {analysis.target_level} (RCR≤{analysis.target_rcr})")
             lines.append("")
 
@@ -2395,7 +2522,7 @@ class AssessmentResult:
                 lines.append("<Achievable Options (by Hierarchy of Controls)>")
                 for i, p in enumerate(analysis.achievable_paths[:5]):
                     cat = p.measures[0].category.value if p.measures else "N/A"
-                    lines.append(f"  {i+1}. [{cat}] {p.description}")
+                    lines.append(f"  {i + 1}. [{cat}] {p.description}")
                     lines.append(f"     → Level {p.predicted_level} (RCR={p.predicted_rcr:.4f})")
                 lines.append("")
 
@@ -2483,6 +2610,7 @@ class AssessmentResult:
     def _detailed_level_label(self, level: "DetailedRiskLevel") -> str:
         """Get detailed level label (I, II-A, II-B, III, IV)."""
         from ..models.risk import DetailedRiskLevel
+
         if isinstance(level, DetailedRiskLevel):
             return level.get_label()
         # Fallback for int (shouldn't happen but just in case)
@@ -2531,7 +2659,10 @@ class AssessmentResult:
 
         # Tolerance for comparing floats
         tolerance = 0.01
-        at_limit = abs(current_rcr - min_achievable_rcr) < tolerance * min_achievable_rcr or current_rcr <= min_achievable_rcr
+        at_limit = (
+            abs(current_rcr - min_achievable_rcr) < tolerance * min_achievable_rcr
+            or current_rcr <= min_achievable_rcr
+        )
 
         lines.append("  ※ 工学的対策の限界:")
 
@@ -2540,7 +2671,9 @@ class AssessmentResult:
             lines.append(f"     現在のRCR ({current_rcr:.2f}) は工学的対策として最適化済み")
         else:
             # Room for engineering improvement
-            lines.append(f"     換気改善により RCR {min_achievable_rcr:.2f} (レベル{min_detailed}) まで低減可能")
+            lines.append(
+                f"     換気改善により RCR {min_achievable_rcr:.2f} (レベル{min_detailed}) まで低減可能"
+            )
             lines.append(f"     現在: {current_rcr:.2f} → 改善後: {min_achievable_rcr:.2f}")
 
         # Explain why (use reason_ja if available, else default)
@@ -2551,7 +2684,7 @@ class AssessmentResult:
 
         # What to do next
         if min_achievable_rcr > target_rcr:
-            lines.append(f"     → 目標レベル達成には呼吸用保護具（RPE）が必要です")
+            lines.append("     → 目標レベル達成には呼吸用保護具（RPE）が必要です")
 
         lines.append("")
         return lines

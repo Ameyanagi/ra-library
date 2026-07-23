@@ -7,7 +7,6 @@ Provides a chainable API for constructing and executing chemical risk assessment
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from ..models.substance import Substance, PropertyType
 from ..models.assessment import (
@@ -22,8 +21,8 @@ from ..models.assessment import (
 )
 from ..models.risk import DetailedRiskLevel
 from ..models.constraints import AssessmentConstraints
-from ..data import get_database, lookup_substance, to_substance_model, get_regulatory_info
-from ..presets import get_preset, WorkPreset, PRESETS
+from ..data import get_database, get_regulatory_info
+from ..presets import get_preset, WorkPreset
 from .result import AssessmentResult, ComponentResult
 
 logger = logging.getLogger(__name__)
@@ -300,7 +299,10 @@ class RiskAssessment:
             # Auto-enable control velocity verification for enclosed local exhaust (draft)
             # This reflects standard practice: drafts are typically verified
             # User can explicitly set control_velocity_verified=False to override
-            if self._ventilation in (VentilationLevel.LOCAL_ENCLOSED, VentilationLevel.LOCAL_EXTERNAL):
+            if self._ventilation in (
+                VentilationLevel.LOCAL_ENCLOSED,
+                VentilationLevel.LOCAL_EXTERNAL,
+            ):
                 if control_velocity_verified is None:
                     self._control_velocity_verified = True
                     self._control_velocity_auto_enabled = True
@@ -320,12 +322,16 @@ class RiskAssessment:
 
         if work_area_size is not None:
             if work_area_size not in ("small", "medium", "large"):
-                raise ValueError(f"Invalid work area size: {work_area_size}. Must be 'small', 'medium', or 'large'")
+                raise ValueError(
+                    f"Invalid work area size: {work_area_size}. Must be 'small', 'medium', or 'large'"
+                )
             self._work_area_size = work_area_size
 
         if dustiness is not None:
             if dustiness not in ("high", "medium", "low"):
-                raise ValueError(f"Invalid dustiness: {dustiness}. Must be 'high', 'medium', or 'low'")
+                raise ValueError(
+                    f"Invalid dustiness: {dustiness}. Must be 'high', 'medium', or 'low'"
+                )
             self._dustiness = dustiness
 
         if ignore_minimum_floor is not None:
@@ -901,6 +907,7 @@ class RiskAssessment:
 
 # Helper functions for parsing string inputs
 
+
 def _parse_property_type(value: str) -> PropertyType:
     """Parse property type from string."""
     mapping = {
@@ -1050,6 +1057,5 @@ def _parse_detailed_level(value: str | DetailedRiskLevel) -> DetailedRiskLevel:
     if value_lower in mapping:
         return mapping[value_lower]
     raise ValueError(
-        f"Invalid risk level: {value}. "
-        f"Valid values: I, II-A, II-B, III, IV (or 1, 2, 2a, 2b, 3, 4)"
+        f"Invalid risk level: {value}. Valid values: I, II-A, II-B, III, IV (or 1, 2, 2a, 2b, 3, 4)"
     )

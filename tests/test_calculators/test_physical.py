@@ -14,7 +14,6 @@ VBA Reference:
 - CalculateWaterReactRisk: modCalc.bas lines 1312-1378
 """
 
-import pytest
 from ra_library.calculators.physical_hazards import (
     calculate_flam_gas_risk,
     calculate_flam_sol_risk,
@@ -617,7 +616,9 @@ class TestFlamLiqRisk:
     def test_both_controls_reduce_risk_by_2(self):
         """Both controls reduce risk by 2."""
         base = calculate_flam_liq_risk("3", 1)
-        controlled = calculate_flam_liq_risk("3", 1, ignition_controlled=True, explosive_atm_controlled=True)
+        controlled = calculate_flam_liq_risk(
+            "3", 1, ignition_controlled=True, explosive_atm_controlled=True
+        )
         assert controlled == base - 2
 
     def test_no_classification_returns_none(self):
@@ -769,7 +770,6 @@ class TestSelfReactTypeF:
     def test_type_f_uses_v321_fixed_high_risk_by_default(self):
         """Type F uses v3.2.1 fixed high-risk behavior by default."""
         levels = [
-            calculate_self_react_risk(ghs_category="F", amount_level=amount)
-            for amount in (1, 3, 5)
+            calculate_self_react_risk(ghs_category="F", amount_level=amount) for amount in (1, 3, 5)
         ]
         assert levels == [4, 4, 4]

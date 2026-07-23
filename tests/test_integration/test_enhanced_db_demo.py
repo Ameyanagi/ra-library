@@ -8,14 +8,8 @@ This test demonstrates the complete workflow:
 4. Run comprehensive risk assessment
 """
 
-import pytest
 from ra_library.data import (
     get_database,
-    lookup_substance,
-    to_substance_model,
-    get_hazard_level,
-    get_volatility_for_assessment,
-    get_applicable_regulations,
     get_regulatory_summary,
 )
 from ra_library.models.substance import PropertyType
@@ -56,7 +50,7 @@ class TestEnhancedDatabaseWorkflow:
 
         # Step 5: Check regulations
         regulations = db.check_regulations("7440-06-4", content_pct=100.0)
-        print(f"\nRegulations:")
+        print("\nRegulations:")
         print(f"  - Tokka: {regulations['tokka']}")
         print(f"  - Organic Solvent: {regulations['organic_solvent']}")
         print(f"  - Skin Hazard: {regulations['skin_hazard']}")
@@ -69,7 +63,7 @@ class TestEnhancedDatabaseWorkflow:
         print(f"\nSubstance Model Created: {pt_model.property_type}")
 
         # Step 7: OEL values
-        print(f"\nOEL Values:")
+        print("\nOEL Values:")
         print(f"  - ACGIH TLV-TWA: {pt_model.oel.acgih_tlv_twa} {pt_model.oel.acgih_tlv_twa_unit}")
         print(f"  - JSOH 8hr: {pt_model.oel.jsoh_8hr} {pt_model.oel.jsoh_8hr_unit}")
 
@@ -90,7 +84,7 @@ class TestEnhancedDatabaseWorkflow:
             content_percent=100.0,
         )
 
-        print(f"\nRisk Assessment Results:")
+        print("\nRisk Assessment Results:")
         print(f"  - Selected OEL: {risk.oel}")
         print(f"  - Exposure (8hr): {risk.exposure_8hr:.4f}")
         print(f"  - RCR: {risk.rcr:.2f}")
@@ -111,12 +105,11 @@ class TestEnhancedDatabaseWorkflow:
 
         # Get all info using enhanced methods
         hazard_level = db.get_hazard_level("7440-16-6")
-        regulations = db.check_regulations("7440-16-6")
         rh_model = db.get_as_model("7440-16-6")
 
         print(f"\nHazard Level: {hazard_level}")
         print(f"Property Type: {rh_model.property_type}")
-        print(f"\nOEL Values:")
+        print("\nOEL Values:")
         print(f"  - ACGIH TLV-TWA: {rh_model.oel.acgih_tlv_twa} {rh_model.oel.acgih_tlv_twa_unit}")
 
         # Run risk assessment
@@ -136,7 +129,7 @@ class TestEnhancedDatabaseWorkflow:
             content_percent=100.0,
         )
 
-        print(f"\nRisk Assessment Results:")
+        print("\nRisk Assessment Results:")
         print(f"  - Selected OEL: {risk.oel}")
         print(f"  - Exposure (8hr): {risk.exposure_8hr:.4f}")
         print(f"  - RCR: {risk.rcr:.2f}")
@@ -169,7 +162,7 @@ class TestEnhancedDatabaseWorkflow:
         # Get model and run assessment
         fa_model = db.get_as_model("50-00-0")
 
-        print(f"\nOEL Values:")
+        print("\nOEL Values:")
         print(f"  - JSOH 8hr: {fa_model.oel.jsoh_8hr} {fa_model.oel.jsoh_8hr_unit}")
 
         # Use LIQUID for gas/vapor
@@ -190,7 +183,7 @@ class TestEnhancedDatabaseWorkflow:
             content_percent=37.0,  # Typical formalin concentration
         )
 
-        print(f"\nRisk Assessment (37% solution):")
+        print("\nRisk Assessment (37% solution):")
         print(f"  - Selected OEL: {risk.oel}")
         print(f"  - Exposure (8hr): {risk.exposure_8hr:.4f}")
         print(f"  - RCR: {risk.rcr:.2f}")

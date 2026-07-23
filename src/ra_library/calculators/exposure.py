@@ -562,7 +562,6 @@ def calculate_exposure(
 
     if verbose:
         # Explain the time coefficient logic
-        weekly_hours = assessment_input.working_hours_per_day * min(assessment_input.frequency_value, 7)
         time_explanation = _explain_time_coefficient(
             assessment_input.frequency_type,
             assessment_input.frequency_value,
@@ -642,12 +641,7 @@ def calculate_exposure(
             assessment_input.exposure_variation.value, 1.0
         )
         stel_before_floor = (
-            base_band
-            * content_coeff
-            * spray_coeff
-            * work_area_coeff
-            * vent_coeff
-            * variation_coeff
+            base_band * content_coeff * spray_coeff * work_area_coeff * vent_coeff * variation_coeff
         )
         stel_exposure = apply_minimum_floor(stel_before_floor, property_type)
         stel_exposure = round_down_significant(stel_exposure, 2)
@@ -705,7 +699,9 @@ def _explain_time_coefficient(
         if time_coeff == 1.0:
             return f"Yearly hours ({yearly_hours:.1f}h) > 192h → coefficient = 1"
         else:
-            return f"Yearly hours ({yearly_hours:.1f}h) ≤ 192h → coefficient = 0.1 (reduced exposure)"
+            return (
+                f"Yearly hours ({yearly_hours:.1f}h) ≤ 192h → coefficient = 0.1 (reduced exposure)"
+            )
 
 
 def _explain_content_coefficient(content: float, coeff: float) -> str:

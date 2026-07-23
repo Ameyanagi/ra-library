@@ -1,26 +1,21 @@
+minimum_pre_commit_version: "3.2.0"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+      - id: check-toml
       - id: check-added-large-files
+        args: ["--maxkb=20000"]
       - id: check-merge-conflict
+      - id: debug-statements
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.0
+    rev: v0.14.10
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-
-  # TODO: Enable ty after fixing type errors in explainers and recommenders
-  # - repo: local
-  #   hooks:
-  #     - id: ty
-  #       name: ty (type checker)
-  #       entry: uv run --project ra-library ty check ra-library/src
-  #       language: system
-  #       types: [python]
-  #       pass_filenames: false

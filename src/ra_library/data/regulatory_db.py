@@ -168,12 +168,14 @@ class RegulatoryDatabase:
         self._load_stats["parse_errors"] += 1
         self._load_stats["rows_skipped"] += 1
         if len(self._load_stats["error_samples"]) < 10:
-            self._load_stats["error_samples"].append({
-                "row": row_index,
-                "cas_number": cas,
-                "error_type": type(exc).__name__,
-                "message": str(exc) or type(exc).__name__,
-            })
+            self._load_stats["error_samples"].append(
+                {
+                    "row": row_index,
+                    "cas_number": cas,
+                    "error_type": type(exc).__name__,
+                    "message": str(exc) or type(exc).__name__,
+                }
+            )
 
     def _parse_row(self, row: Dict[str, str]) -> RegulatoryData:
         """Parse a CSV row into RegulatoryData."""

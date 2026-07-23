@@ -35,8 +35,7 @@ def get_recommendations(
 
     try:
         assessment = (
-            assessment
-            .add_substance(cas_number, content=100.0)
+            assessment.add_substance(cas_number, content=100.0)
             .with_target_levels(inhalation=target_level)
             .with_language(language)
         )
@@ -65,7 +64,10 @@ def get_recommendations(
 
     try:
         recommendations = result.get_recommendations_for_substance(cas_number)
-        paths = [_recommendation_path(rec, idx, language) for idx, rec in enumerate(recommendations[:5], start=1)]
+        paths = [
+            _recommendation_path(rec, idx, language)
+            for idx, rec in enumerate(recommendations[:5], start=1)
+        ]
         target_level_int = _level_to_int(target_level)
         achievable = any(
             _level_to_int(path["predicted_level"]) <= target_level_int
@@ -133,7 +135,9 @@ def _recommendation_path(rec: Any, index: int, language: str) -> dict[str, Any]:
         "priority": rec.priority,
         "category": rec.category.value,
         "action": rec.action_ja if language == "ja" and rec.action_ja else rec.action,
-        "description": rec.description_ja if language == "ja" and rec.description_ja else rec.description,
+        "description": rec.description_ja
+        if language == "ja" and rec.description_ja
+        else rec.description,
         "effectiveness": rec.effectiveness.value,
         "feasibility": rec.feasibility.value,
         "current_level": rec.current_risk_level,
@@ -155,13 +159,23 @@ def _recommendation_path(rec: Any, index: int, language: str) -> dict[str, Any]:
     return path
 
 
-def _summary_from_paths(paths: list[dict[str, Any]], target_level: str, achievable: bool, language: str) -> str:
+def _summary_from_paths(
+    paths: list[dict[str, Any]], target_level: str, achievable: bool, language: str
+) -> str:
     if not paths:
-        return "推奨対策は見つかりませんでした" if language == "ja" else "No recommendation paths were generated"
+        return (
+            "推奨対策は見つかりませんでした"
+            if language == "ja"
+            else "No recommendation paths were generated"
+        )
 
     if language == "ja":
         head = f"{len(paths)}件の推奨対策を提示しました。"
-        tail = f"目標レベル{target_level}は到達可能です。" if achievable else f"目標レベル{target_level}への到達は追加対策が必要です。"
+        tail = (
+            f"目標レベル{target_level}は到達可能です。"
+            if achievable
+            else f"目標レベル{target_level}への到達は追加対策が必要です。"
+        )
         return f"{head}{tail}"
 
     head = f"{len(paths)} recommendation paths were generated."
@@ -194,4 +208,8 @@ def _generate_basic_recommendations(component: Any, target_level: str, language:
             recommendations.append("- Consider using chemical-resistant gloves")
         return "\n".join(recommendations) if recommendations else "Controls needed"
 
-    return "現在のリスクレベルは目標を達成しています" if language == "ja" else "Current risk level meets target"
+    return (
+        "現在のリスクレベルは目標を達成しています"
+        if language == "ja"
+        else "Current risk level meets target"
+    )

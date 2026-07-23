@@ -388,22 +388,14 @@ def calculate_v302_exposure_without_floor(
         floor = EXPOSURE_FLOOR_LIQUID_PPM
         if v31_exposure <= floor:
             # v3.1+ applied floor - v3.0.2 would have a lower value
-            notes.append(
-                f"v3.0.2: No exposure floor (v3.1+ applied {floor} ppm floor)"
-            )
-            notes.append(
-                "v3.0.2: Actual exposure could be lower than floor value"
-            )
+            notes.append(f"v3.0.2: No exposure floor (v3.1+ applied {floor} ppm floor)")
+            notes.append("v3.0.2: Actual exposure could be lower than floor value")
             return v31_exposure, True, notes
     else:  # solid
         floor = EXPOSURE_FLOOR_SOLID_MG_M3
         if v31_exposure <= floor:
-            notes.append(
-                f"v3.0.2: No exposure floor (v3.1+ applied {floor} mg/m³ floor)"
-            )
-            notes.append(
-                "v3.0.2: Actual exposure could be lower than floor value"
-            )
+            notes.append(f"v3.0.2: No exposure floor (v3.1+ applied {floor} mg/m³ floor)")
+            notes.append("v3.0.2: Actual exposure could be lower than floor value")
             return v31_exposure, True, notes
 
     # Above floor - v3.0.2 and v3.1+ would calculate the same
@@ -558,9 +550,7 @@ def compare_versions(
     # Add v3.0.2 comparison if calculated
     if v302_result:
         v302_exposure = (
-            v302_result.exposure_ppm
-            if property_type == "liquid"
-            else v302_result.exposure_mg_m3
+            v302_result.exposure_ppm if property_type == "liquid" else v302_result.exposure_mg_m3
         )
         comparison["v302_intermediate"] = {
             "version": v302_result.version,
@@ -611,9 +601,7 @@ def compare_versions(
             f"v3={v3_risk_level}, v2={v2_result.risk_level}"
         )
         if v3_rcr > v2_result.rcr:
-            comparison["comparison_summary"]["note"] = (
-                "v3ではより保守的な評価 (リスクレベルが高い)"
-            )
+            comparison["comparison_summary"]["note"] = "v3ではより保守的な評価 (リスクレベルが高い)"
         else:
             comparison["comparison_summary"]["note"] = (
                 "v2では評価手法の違いによりリスクレベルが異なる"

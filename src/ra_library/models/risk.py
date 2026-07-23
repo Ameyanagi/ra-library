@@ -222,10 +222,14 @@ class InhalationRisk(BaseModel):
     """
 
     exposure_8hr: float = Field(..., description="8-hour TWA exposure max (ppm or mg/m³)")
-    exposure_8hr_min: Optional[float] = Field(None, description="8-hour TWA exposure min (max * 0.1)")
+    exposure_8hr_min: Optional[float] = Field(
+        None, description="8-hour TWA exposure min (max * 0.1)"
+    )
     exposure_8hr_unit: str = Field(default="ppm")
     exposure_stel: Optional[float] = Field(None, description="Short-term exposure max")
-    exposure_stel_min: Optional[float] = Field(None, description="Short-term exposure min (max * 0.1)")
+    exposure_stel_min: Optional[float] = Field(
+        None, description="Short-term exposure min (max * 0.1)"
+    )
     exposure_stel_unit: Optional[str] = None
 
     oel: float = Field(..., description="Occupational Exposure Limit used")

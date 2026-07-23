@@ -14,11 +14,7 @@ from ra_library.data.converter import (
 )
 from ra_library.data import SubstanceData, lookup_substance
 from ra_library.models.substance import (
-    Substance,
     PropertyType,
-    GHSClassification,
-    OccupationalExposureLimits,
-    PhysicochemicalProperties,
 )
 
 

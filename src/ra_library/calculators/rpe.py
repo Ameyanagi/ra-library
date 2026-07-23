@@ -9,7 +9,7 @@ RA Sheet mode does NOT support RPE (apfCoeff = 1 always).
 
 from typing import Optional
 
-from ..models.assessment import RPEType, AssessmentMode, RPE_APF_VALUES
+from ..models.assessment import RPEType, RPE_APF_VALUES
 
 
 def calculate_apf_coefficient(

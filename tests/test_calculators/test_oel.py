@@ -4,7 +4,6 @@ Tests for OEL (Occupational Exposure Limit) selection.
 VBA Reference: modCalc.bas lines 80-229
 """
 
-import pytest
 from ra_library.models.substance import OccupationalExposureLimits
 from ra_library.calculators.oel import select_oel, select_oel_stel
 

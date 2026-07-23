@@ -4,7 +4,6 @@ Tests for exposure calculation.
 VBA Reference: modCalc.bas lines 312-483 (CalculateExposureBands)
 """
 
-import pytest
 from ra_library.calculators.exposure import (
     apply_ventilation_coefficient,
     calculate_exposure,
@@ -97,40 +96,47 @@ class TestTimeCoefficient:
         """Weekly hours > 40 should return coefficient 10."""
         # 10 hrs/day × 5 days = 50 hrs > 40
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("weekly", 5, 10.0) == 10.0
 
     def test_time_coeff_weekly_long_days(self):
         """Hours > 8 and days >= 3 should return coefficient 10."""
         # 9 hrs/day × 3 days = 27 hrs, but > 8hrs and >= 3 days
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("weekly", 3, 9.0) == 10.0
 
     def test_time_coeff_weekly_under_4hrs(self):
         """Weekly hours <= 4 should return coefficient 0.1."""
         # 2 hrs/day × 2 days = 4 hrs
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("weekly", 2, 2.0) == 0.1
 
     def test_time_coeff_weekly_normal(self):
         """Normal weekly hours (8 × 5 = 40) should return coefficient 1.0."""
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("weekly", 5, 8.0) == 1.0
 
     def test_time_coeff_monthly_over_192_yearly(self):
         """Yearly hours > 192 should return coefficient 1.0."""
         # 8 hrs × 3 days/month × 12 = 288 hrs > 192
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("monthly", 3, 8.0) == 1.0
 
     def test_time_coeff_monthly_under_192_yearly(self):
         """Yearly hours <= 192 should return coefficient 0.1."""
         # 4 hrs × 2 days/month × 12 = 96 hrs < 192
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("monthly", 2, 4.0) == 0.1
 
     def test_time_coeff_short_term_effect(self):
         """Short-term effect should always return 1.0."""
         from ra_library.calculators.exposure import calculate_time_coefficient
+
         assert calculate_time_coefficient("weekly", 5, 10.0, has_short_term_effect=True) == 1.0
 
 
@@ -144,18 +150,21 @@ class TestExposureCaps:
     def test_exposure_8hr_max_cap_5000(self):
         """8hr exposure should be capped at 5000."""
         from ra_library.calculators.exposure import apply_exposure_caps
+
         result = apply_exposure_caps(10000.0, 15000.0)
         assert result[0] == 5000.0
 
     def test_exposure_stel_max_cap_5000(self):
         """STEL should be capped at 5000."""
         from ra_library.calculators.exposure import apply_exposure_caps
+
         result = apply_exposure_caps(1000.0, 10000.0)
         assert result[1] == 5000.0
 
     def test_exposure_below_cap_unchanged(self):
         """Exposure below cap should remain unchanged."""
         from ra_library.calculators.exposure import apply_exposure_caps
+
         result = apply_exposure_caps(100.0, 300.0)
         assert result[0] == 100.0
         assert result[1] == 300.0

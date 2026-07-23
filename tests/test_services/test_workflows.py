@@ -34,7 +34,9 @@ def test_get_recommendations_returns_fallback_warning(monkeypatch):
     def _raise_recommendations(*args, **kwargs):
         raise RuntimeError("forced recommendation failure")
 
-    monkeypatch.setattr(AssessmentResult, "get_recommendations_for_substance", _raise_recommendations)
+    monkeypatch.setattr(
+        AssessmentResult, "get_recommendations_for_substance", _raise_recommendations
+    )
 
     result = get_recommendations(cas_number="7440-06-4", target_level="I")
 
@@ -121,10 +123,16 @@ def test_calculate_risk_hydrogen_uses_workbook_faithful_gas_behavior():
 
     assert payload["conditions_used"]["property_type"]["key"] == "gas"
     assert payload["conditions_used"]["amount"]["band_basis"] == "workbook_q1_gas_mass_band"
-    assert payload["conditions_used"]["amount"]["volume_equivalent_at_25c_1atm"]["max_liters"] is not None
+    assert (
+        payload["conditions_used"]["amount"]["volume_equivalent_at_25c_1atm"]["max_liters"]
+        is not None
+    )
     assert component["inhalation"]["status"] == "not_assessed"
     assert component["inhalation"]["reason_code"] == "WORKBOOK_GAS_HEALTH_RA_NOT_ASSESSED"
     assert component["dermal"]["status"] == "not_assessed"
     assert component["physical"]["hazard_type"] == "flammable_gas"
     assert component["risk_label"] == "III"
-    assert component["gas_quantity_estimate"]["volume_equivalent_at_25c_1atm"]["min_liters"] is not None
+    assert (
+        component["gas_quantity_estimate"]["volume_equivalent_at_25c_1atm"]["min_liters"]
+        is not None
+    )

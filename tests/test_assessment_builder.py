@@ -6,15 +6,11 @@ import pytest
 from ra_library import (
     RiskAssessment,
     AssessmentResult,
-    ComponentResult,
     Substance,
     PropertyType,
     GHSClassification,
     OccupationalExposureLimits,
-    AmountLevel,
-    VentilationLevel,
     RPEType,
-    GloveType,
     DetailedRiskLevel,
 )
 
@@ -68,11 +64,7 @@ class TestBuilderBasic:
         assert not RiskAssessment().is_valid()
 
         # Valid
-        assert (
-            RiskAssessment()
-            .add_substance("7440-06-4", 100.0)
-            .is_valid()
-        )
+        assert RiskAssessment().add_substance("7440-06-4", 100.0).is_valid()
 
 
 class TestMultiSubstance:
@@ -1545,7 +1537,10 @@ class TestComparisonMode:
         comparison = with_better_vent.compare_to(baseline)
 
         # Should show improvement
-        assert comparison["overall"]["level_improved"] or comparison["components"]["7440-06-4"]["inhalation"]["improved"]
+        assert (
+            comparison["overall"]["level_improved"]
+            or comparison["components"]["7440-06-4"]["inhalation"]["improved"]
+        )
 
 
 class TestExport:
@@ -1604,6 +1599,7 @@ class TestExport:
         json_output = result.to_json()
         assert isinstance(json_output, str)
         import json
+
         parsed = json.loads(json_output)
         assert "overall_risk_level" in parsed
 
@@ -1887,7 +1883,11 @@ class TestDetailedRiskLevelDisplay:
         comp = result.components.get("7440-06-4")
         if comp and comp.inhalation and comp.inhalation.rcr <= 0.5:
             # If RCR is <= 0.5, should show II-A
-            assert "レベルII-A" in report or "リスクレベル: II-A" in report or "リスクレベル: I" in report
+            assert (
+                "レベルII-A" in report
+                or "リスクレベル: II-A" in report
+                or "リスクレベル: I" in report
+            )
 
     def test_stel_shows_basic_level_only(self):
         """Test that STEL shows basic level (II, not II-A/II-B)."""
@@ -1925,8 +1925,9 @@ class TestDetailedRiskLevelDisplay:
         assert stel_level_line is not None, "STEL risk level line not found"
         # If it shows II, it should NOT have -A or -B suffix
         if "II" in stel_level_line:
-            assert "II-A" not in stel_level_line and "II-B" not in stel_level_line, \
+            assert "II-A" not in stel_level_line and "II-B" not in stel_level_line, (
                 f"STEL should use basic level, got: {stel_level_line}"
+            )
 
 
 class TestCalculationDiagnostics:

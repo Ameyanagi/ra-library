@@ -17,7 +17,9 @@ from .acr import get_acrmax, calculate_rcr, calculate_engineering_limit
 from .rpe import calculate_apf_coefficient_for_mode
 
 
-def select_stel_oel(oel: OccupationalExposureLimits) -> tuple[Optional[float], Optional[str], Optional[str]]:
+def select_stel_oel(
+    oel: OccupationalExposureLimits,
+) -> tuple[Optional[float], Optional[str], Optional[str]]:
     """
     Select the appropriate STEL OEL value following priority order.
 
@@ -235,6 +237,7 @@ def calculate_inhalation_risk(
 
         # Check if target would be achieved without floor (target is Level I by default)
         from ..models.risk import DetailedRiskLevel
+
         level_without_floor = DetailedRiskLevel.from_rcr(rcr_without_floor)
         current_level = DetailedRiskLevel.from_rcr(rcr)
         # Would achieve target if floor-less level is better than current level

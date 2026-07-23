@@ -246,15 +246,18 @@ class SubstanceDatabase:
         self._load_stats["parse_errors"] += 1
         self._load_stats["rows_skipped"] += 1
         if len(self._load_stats["error_samples"]) < 10:
-            self._load_stats["error_samples"].append({
-                "row": row_index,
-                "cas_number": cas,
-                "error_type": type(exc).__name__,
-                "message": str(exc) or type(exc).__name__,
-            })
+            self._load_stats["error_samples"].append(
+                {
+                    "row": row_index,
+                    "cas_number": cas,
+                    "error_type": type(exc).__name__,
+                    "message": str(exc) or type(exc).__name__,
+                }
+            )
 
     def _parse_row(self, row: List[str]) -> SubstanceData:
         """Parse a CSV row into SubstanceData."""
+
         def safe_float(value: str) -> Optional[float]:
             if not value or value.strip() == "":
                 return None
@@ -294,7 +297,6 @@ class SubstanceDatabase:
             cas_number=row[0].strip(),
             name_ja=safe_str(row[2]) or "",
             name_en=safe_str(row[3]) or "",
-
             # GHS Physical Hazards
             ghs_explosives=safe_str(row[5]),
             ghs_flam_gas=safe_str(row[6]),
@@ -313,7 +315,6 @@ class SubstanceDatabase:
             ghs_org_perox=safe_str(row[19]),
             ghs_met_corr=safe_str(row[20]),
             ghs_inert_explosives=safe_str(row[21]),
-
             # GHS Health Hazards
             ghs_acute_oral=safe_str(row[22]),
             ghs_acute_dermal=safe_str(row[23]),
@@ -330,18 +331,15 @@ class SubstanceDatabase:
             ghs_stot_se=safe_str(row[34]),
             ghs_stot_re=safe_str(row[35]),
             ghs_aspiration=safe_str(row[36]),
-
             # OEL Values
             conc_standard_8hr_ppm=safe_float(row[42]),
             conc_standard_8hr_mgm3=safe_float(row[43]),
             conc_standard_stel_ppm=safe_float(row[44]),
             conc_standard_stel_mgm3=safe_float(row[45]),
-
             jsoh_8hr_ppm=safe_float(row[49]),
             jsoh_8hr_mgm3=safe_float(row[50]),
             jsoh_ceiling_ppm=safe_float(row[51]),
             jsoh_ceiling_mgm3=safe_float(row[52]),
-
             acgih_tlv_twa_ppm=safe_float(row[56]),
             acgih_tlv_twa_mgm3=safe_float(row[57]),
             acgih_tlv_stel_ppm=safe_float(row[58]),
@@ -349,12 +347,10 @@ class SubstanceDatabase:
             acgih_tlv_c_ppm=safe_float(row[60]),
             acgih_tlv_c_mgm3=safe_float(row[61]),
             acgih_skin=safe_str(row[54]) == "Skin" if len(row) > 54 else False,
-
             dfg_mak_ppm=safe_float(row[65]),
             dfg_mak_mgm3=safe_float(row[66]),
             dfg_peak_ppm=safe_float(row[67]),
             dfg_peak_mgm3=safe_float(row[68]),
-
             # Physical Properties
             property_type=safe_int(row[71]),
             molecular_weight=safe_float(row[72]),
@@ -365,7 +361,6 @@ class SubstanceDatabase:
             water_solubility_unit=safe_str(row[77]),
             vapor_pressure=safe_float(row[78]),
             vapor_pressure_unit=safe_str(row[79]),
-
             # Regulatory
             skin_hazard_flag_code=skin_hazard_flag_code,
             is_skin_hazard=skin_hazard_flag_code == "1",
@@ -419,8 +414,7 @@ class SubstanceDatabase:
         results = []
 
         for substance in self._substances.values():
-            if (name_lower in substance.name_ja.lower() or
-                name_lower in substance.name_en.lower()):
+            if name_lower in substance.name_ja.lower() or name_lower in substance.name_en.lower():
                 results.append(substance)
                 if len(results) >= limit:
                     break

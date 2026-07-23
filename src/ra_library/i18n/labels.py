@@ -397,14 +397,24 @@ PHYSICAL_HAZARD_LABELS = {
         "ja": "引火性液体",
         "en": "Flammable liquid",
         "categories": {
-            "1": {"ja": "区分1（引火点 < 23℃、沸点 ≤ 35℃）", "en": "Category 1 (FP < 23°C, BP ≤ 35°C)"},
-            "2": {"ja": "区分2（引火点 < 23℃、沸点 > 35℃）", "en": "Category 2 (FP < 23°C, BP > 35°C)"},
+            "1": {
+                "ja": "区分1（引火点 < 23℃、沸点 ≤ 35℃）",
+                "en": "Category 1 (FP < 23°C, BP ≤ 35°C)",
+            },
+            "2": {
+                "ja": "区分2（引火点 < 23℃、沸点 > 35℃）",
+                "en": "Category 2 (FP < 23°C, BP > 35°C)",
+            },
             "3": {"ja": "区分3（23℃ ≤ 引火点 ≤ 60℃）", "en": "Category 3 (23°C ≤ FP ≤ 60°C)"},
             "4": {"ja": "区分4（60℃ < 引火点 ≤ 93℃）", "en": "Category 4 (60°C < FP ≤ 93°C)"},
         },
         "warnings": {
             "ja": ["着火源から離して保管", "静電気対策が必要", "適切な換気を確保"],
-            "en": ["Keep away from ignition sources", "Anti-static measures required", "Ensure adequate ventilation"],
+            "en": [
+                "Keep away from ignition sources",
+                "Anti-static measures required",
+                "Ensure adequate ventilation",
+            ],
         },
     },
     "flammable_solid": {
@@ -423,8 +433,14 @@ PHYSICAL_HAZARD_LABELS = {
         "ja": "可燃性ガス",
         "en": "Flammable gas",
         "categories": {
-            "1": {"ja": "区分1（爆発限界濃度範囲が広い）", "en": "Category 1 (wide flammability range)"},
-            "2": {"ja": "区分2（爆発限界濃度範囲が狭い）", "en": "Category 2 (narrow flammability range)"},
+            "1": {
+                "ja": "区分1（爆発限界濃度範囲が広い）",
+                "en": "Category 1 (wide flammability range)",
+            },
+            "2": {
+                "ja": "区分2（爆発限界濃度範囲が狭い）",
+                "en": "Category 2 (narrow flammability range)",
+            },
         },
         "warnings": {
             "ja": ["漏洩検知器を設置", "換気を確保", "着火源厳禁"],
@@ -461,7 +477,10 @@ PHYSICAL_HAZARD_LABELS = {
         "ja": "自己反応性化学品",
         "en": "Self-reactive substance",
         "categories": {
-            "A": {"ja": "タイプA（爆轟・急速爆発）", "en": "Type A (detonation/rapid deflagration)"},
+            "A": {
+                "ja": "タイプA（爆轟・急速爆発）",
+                "en": "Type A (detonation/rapid deflagration)",
+            },
             "B": {"ja": "タイプB（爆発性）", "en": "Type B (explosive)"},
             "C": {"ja": "タイプC（急速反応）", "en": "Type C (rapid effect)"},
             "D": {"ja": "タイプD（中程度の反応）", "en": "Type D (medium effect)"},
@@ -499,7 +518,11 @@ PHYSICAL_HAZARD_LABELS = {
         },
         "warnings": {
             "ja": ["空気との接触を完全に遮断", "不活性ガス下で取扱い", "消火時は水を使用しない"],
-            "en": ["Complete air exclusion required", "Handle under inert gas", "Do not use water for fire"],
+            "en": [
+                "Complete air exclusion required",
+                "Handle under inert gas",
+                "Do not use water for fire",
+            ],
         },
     },
     "pyrophoric_solid": {
@@ -510,7 +533,11 @@ PHYSICAL_HAZARD_LABELS = {
         },
         "warnings": {
             "ja": ["空気との接触を完全に遮断", "不活性ガス下で取扱い", "消火時は水を使用しない"],
-            "en": ["Complete air exclusion required", "Handle under inert gas", "Do not use water for fire"],
+            "en": [
+                "Complete air exclusion required",
+                "Handle under inert gas",
+                "Do not use water for fire",
+            ],
         },
     },
     "self_heating": {
@@ -518,7 +545,10 @@ PHYSICAL_HAZARD_LABELS = {
         "en": "Self-heating substance",
         "categories": {
             "1": {"ja": "区分1（大量で自己発熱）", "en": "Category 1 (self-heating in bulk)"},
-            "2": {"ja": "区分2（少量で自己発熱）", "en": "Category 2 (self-heating in small amounts)"},
+            "2": {
+                "ja": "区分2（少量で自己発熱）",
+                "en": "Category 2 (self-heating in small amounts)",
+            },
         },
         "warnings": {
             "ja": ["通気を確保", "蓄熱を避ける", "温度監視"],
@@ -529,7 +559,10 @@ PHYSICAL_HAZARD_LABELS = {
         "ja": "水反応可燃性化学品",
         "en": "Water-reactive substance",
         "categories": {
-            "1": {"ja": "区分1（水と激しく反応）", "en": "Category 1 (violent reaction with water)"},
+            "1": {
+                "ja": "区分1（水と激しく反応）",
+                "en": "Category 1 (violent reaction with water)",
+            },
             "2": {"ja": "区分2（水と反応）", "en": "Category 2 (reacts with water)"},
             "3": {"ja": "区分3（水と緩やかに反応）", "en": "Category 3 (slow reaction with water)"},
         },
@@ -543,7 +576,10 @@ PHYSICAL_HAZARD_LABELS = {
         "en": "Explosives",
         "categories": {
             "unstable": {"ja": "不安定爆発物", "en": "Unstable explosive"},
-            "1.1": {"ja": "等級1.1（大量爆発危険性）", "en": "Division 1.1 (mass explosion hazard)"},
+            "1.1": {
+                "ja": "等級1.1（大量爆発危険性）",
+                "en": "Division 1.1 (mass explosion hazard)",
+            },
             "1.2": {"ja": "等級1.2（飛散危険性）", "en": "Division 1.2 (projection hazard)"},
             "1.3": {"ja": "等級1.3（火災・軽度爆発）", "en": "Division 1.3 (fire/minor blast)"},
             "1.4": {"ja": "等級1.4（軽微な危険性）", "en": "Division 1.4 (minor hazard)"},
@@ -667,8 +703,15 @@ def get_labels(
             result[field] = label_data[field_key]
 
     # Add numeric fields
-    for field in ["coefficient", "coefficient_verified", "coefficient_unverified",
-                  "area_cm2", "apf", "stel_multiplier", "range"]:
+    for field in [
+        "coefficient",
+        "coefficient_verified",
+        "coefficient_unverified",
+        "area_cm2",
+        "apf",
+        "stel_multiplier",
+        "range",
+    ]:
         if field in label_data:
             result[field] = label_data[field]
 

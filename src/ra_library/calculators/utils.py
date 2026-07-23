@@ -5,7 +5,6 @@ VBA Reference: modCalc.bas, modFunction.bas
 """
 
 import math
-from typing import Optional
 
 
 def round_significant(value: float, digits: int = 2) -> float:
@@ -57,7 +56,7 @@ def round_down_significant(value: float, digits: int = 2) -> float:
 
     # Round down (truncate toward zero)
     if decimal_places >= 0:
-        multiplier = 10 ** decimal_places
+        multiplier = 10**decimal_places
         return math.floor(value * multiplier) / multiplier
     else:
         # For large numbers, round down to the appropriate place

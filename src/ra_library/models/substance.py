@@ -288,7 +288,8 @@ class OccupationalExposureLimits(BaseModel):
 
     # Skin notation - indicates significant potential for skin absorption
     skin_notation: bool = Field(
-        False, description="Skin notation (経皮吸収注意) - significant potential for skin absorption"
+        False,
+        description="Skin notation (経皮吸収注意) - significant potential for skin absorption",
     )
 
     def get_primary_oel(self) -> tuple[Optional[float], Optional[str]]:

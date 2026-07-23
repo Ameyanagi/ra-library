@@ -9,7 +9,6 @@ Checks content percentage against regulatory thresholds:
 - Organic solvents
 """
 
-import pytest
 from ra_library.data.regulations import (
     check_tokka_regulation,
     check_organic_solvent_regulation,

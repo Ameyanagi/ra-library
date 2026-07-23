@@ -254,9 +254,7 @@ class TestRhodiumRiskAssessment:
 class TestComparisonPtRh:
     """Compare Platinum and Rhodium risk assessments."""
 
-    def test_same_conditions_different_hazards(
-        self, platinum_substance, rhodium_substance
-    ):
+    def test_same_conditions_different_hazards(self, platinum_substance, rhodium_substance):
         """Compare Pt and Rh under identical conditions."""
         assessment_input = AssessmentInput(
             product_property=PropertyType.SOLID,
@@ -327,13 +325,9 @@ class TestRiskLevelTransitions:
             frequency_value=5,
         )
 
-        risk_no_control = calculate_inhalation_risk(
-            no_control, platinum_substance, 100.0
-        )
+        risk_no_control = calculate_inhalation_risk(no_control, platinum_substance, 100.0)
         risk_local = calculate_inhalation_risk(local_exhaust, platinum_substance, 100.0)
-        risk_enclosed = calculate_inhalation_risk(
-            enclosed_verified, platinum_substance, 100.0
-        )
+        risk_enclosed = calculate_inhalation_risk(enclosed_verified, platinum_substance, 100.0)
 
         # Risk should decrease with better controls
         # (RCR decreases as ventilation improves)

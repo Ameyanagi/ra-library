@@ -90,7 +90,7 @@ def calculate_dermal_kp_detailed(
 
     # Stratum corneum permeability
     log_kp_sc = -1.326 + 0.6097 * log_kow - 0.1786 * sqrt_mw
-    kp_sc = 10 ** log_kp_sc
+    kp_sc = 10**log_kp_sc
 
     # Polar route permeability
     k_pol = 0.0001519 / sqrt_mw
@@ -207,15 +207,13 @@ def calculate_evaporation_rate(
     molecular_diffusivity = 0.06 * (76 / molecular_weight) ** 0.5
 
     # Calculate beta coefficient (VBA line 48)
-    beta_coefficient = (
-        (0.0111 * (AIR_VELOCITY ** 0.96) * (molecular_diffusivity ** 0.19))
-        / ((KINEMATIC_VISCOSITY ** 0.15) * (EVAPORATION_AREA_LENGTH ** 0.04))
+    beta_coefficient = (0.0111 * (AIR_VELOCITY**0.96) * (molecular_diffusivity**0.19)) / (
+        (KINEMATIC_VISCOSITY**0.15) * (EVAPORATION_AREA_LENGTH**0.04)
     )
 
     # Calculate evaporation rate (VBA line 49)
-    evaporation_rate = (
-        (beta_coefficient * vapor_pressure * molecular_weight)
-        / (GAS_CONSTANT * TEMPERATURE * 10)
+    evaporation_rate = (beta_coefficient * vapor_pressure * molecular_weight) / (
+        GAS_CONSTANT * TEMPERATURE * 10
     )
 
     return evaporation_rate
@@ -389,7 +387,7 @@ def calculate_dermal_risk(
         absorption_rate = calculate_absorption_rate_vba(kp, water_solubility)
 
         # Adjust for content percentage
-        absorption_rate *= (content_percent / 100)
+        absorption_rate *= content_percent / 100
 
         if verbose:
             steps.append(

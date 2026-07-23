@@ -39,46 +39,58 @@ def select_oel(oel_data: OccupationalExposureLimits) -> Tuple[Optional[float], s
     candidates: list[tuple[float, str, str]] = []
 
     if oel_data.concentration_standard_8hr is not None:
-        candidates.append((
-            oel_data.concentration_standard_8hr,
-            oel_data.concentration_standard_8hr_unit or "ppm",
-            "濃度基準値",
-        ))
+        candidates.append(
+            (
+                oel_data.concentration_standard_8hr,
+                oel_data.concentration_standard_8hr_unit or "ppm",
+                "濃度基準値",
+            )
+        )
 
     if oel_data.jsoh_8hr is not None:
-        candidates.append((
-            oel_data.jsoh_8hr,
-            oel_data.jsoh_8hr_unit or "ppm",
-            "許容濃度 (JSOH)",
-        ))
+        candidates.append(
+            (
+                oel_data.jsoh_8hr,
+                oel_data.jsoh_8hr_unit or "ppm",
+                "許容濃度 (JSOH)",
+            )
+        )
 
     if oel_data.acgih_tlv_twa is not None:
-        candidates.append((
-            oel_data.acgih_tlv_twa,
-            oel_data.acgih_tlv_twa_unit or "ppm",
-            "TLV-TWA (ACGIH)",
-        ))
+        candidates.append(
+            (
+                oel_data.acgih_tlv_twa,
+                oel_data.acgih_tlv_twa_unit or "ppm",
+                "TLV-TWA (ACGIH)",
+            )
+        )
 
     if oel_data.dfg_mak is not None:
-        candidates.append((
-            oel_data.dfg_mak,
-            oel_data.dfg_mak_unit or "ppm",
-            "DFG MAK",
-        ))
+        candidates.append(
+            (
+                oel_data.dfg_mak,
+                oel_data.dfg_mak_unit or "ppm",
+                "DFG MAK",
+            )
+        )
 
     if oel_data.dnel_worker_inhalation is not None:
-        candidates.append((
-            oel_data.dnel_worker_inhalation,
-            "mg/m³",
-            "DNEL",
-        ))
+        candidates.append(
+            (
+                oel_data.dnel_worker_inhalation,
+                "mg/m³",
+                "DNEL",
+            )
+        )
 
     if oel_data.other_8hr is not None:
-        candidates.append((
-            oel_data.other_8hr,
-            oel_data.other_8hr_unit or "ppm",
-            "Other",
-        ))
+        candidates.append(
+            (
+                oel_data.other_8hr,
+                oel_data.other_8hr_unit or "ppm",
+                "Other",
+            )
+        )
 
     if not candidates:
         return (None, "", "None")

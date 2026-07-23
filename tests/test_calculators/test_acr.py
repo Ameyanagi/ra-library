@@ -4,7 +4,6 @@ Tests for ACRmax (Management Target Concentration) calculation.
 VBA Reference: modCalc.bas lines 231-277 (CalculateACRMax)
 """
 
-import pytest
 from ra_library.calculators.acr import get_acrmax
 
 

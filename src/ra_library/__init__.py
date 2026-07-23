@@ -42,7 +42,14 @@ from .models.assessment import (
     SKIN_AREA_VALUES,
     RPE_APF_VALUES,
 )
-from .models.risk import RiskLevel, DetailedRiskLevel, RiskResult, InhalationRisk, DermalRisk, PhysicalRisk
+from .models.risk import (
+    RiskLevel,
+    DetailedRiskLevel,
+    RiskResult,
+    InhalationRisk,
+    DermalRisk,
+    PhysicalRisk,
+)
 from .models.explanation import CalculationExplanation, CalculationStep
 from .models.recommendation import Recommendation, RecommendationSet
 

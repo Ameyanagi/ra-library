@@ -64,6 +64,7 @@ class WorkPreset:
         excluded_rpe: List of excluded RPE types
         no_admin: Whether to exclude frequency reduction
     """
+
     name: str
     description: str
     description_en: str
@@ -422,9 +423,7 @@ def get_preset(name: str) -> WorkPreset:
 
     if name not in PRESETS:
         available = ", ".join(sorted(PRESETS.keys()))
-        raise ValueError(
-            f"Unknown preset: {name}. Available presets: {available}"
-        )
+        raise ValueError(f"Unknown preset: {name}. Available presets: {available}")
 
     return PRESETS[name]
 
@@ -436,18 +435,32 @@ def list_presets() -> list[tuple[str, str, str]]:
     Returns:
         List of (name, description_ja, description_en) tuples
     """
-    return [
-        (name, preset.description, preset.description_en)
-        for name, preset in PRESETS.items()
-    ]
+    return [(name, preset.description, preset.description_en) for name, preset in PRESETS.items()]
 
 
 def print_presets():
     """Print all available presets in a readable format."""
     categories = {
-        "Laboratory (研究室)": ["lab_organic", "lab_organic_minute", "lab_powder", "lab_catalyst", "lab_analytical", "lab_gas"],
-        "Production (製造)": ["production_batch", "production_batch_enclosed", "production_continuous", "production_powder", "production_packaging"],
-        "Maintenance (保全)": ["maintenance_cleaning", "maintenance_cleaning_enclosed", "maintenance_tank"],
+        "Laboratory (研究室)": [
+            "lab_organic",
+            "lab_organic_minute",
+            "lab_powder",
+            "lab_catalyst",
+            "lab_analytical",
+            "lab_gas",
+        ],
+        "Production (製造)": [
+            "production_batch",
+            "production_batch_enclosed",
+            "production_continuous",
+            "production_powder",
+            "production_packaging",
+        ],
+        "Maintenance (保全)": [
+            "maintenance_cleaning",
+            "maintenance_cleaning_enclosed",
+            "maintenance_tank",
+        ],
         "Spray (スプレー)": ["spray_painting", "spray_coating"],
     }
 

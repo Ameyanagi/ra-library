@@ -2,6 +2,7 @@
 name = "ra-library"
 version = "0.2.0"
 description = "Chemical risk assessment library based on publicly documented methodology references"
+authors = [{ name = "Ameyanagi", email = "contact@ameyanagi.com" }]
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
@@ -10,6 +11,9 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Chemistry",
 ]
@@ -17,6 +21,9 @@ classifiers = [
 dependencies = [
     "pydantic>=2.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/Ameyanagi/ra-library"
 
 [build-system]
 requires = ["hatchling"]
@@ -39,9 +46,11 @@ strict = true
 
 [dependency-groups]
 dev = [
+    "build>=1.3.0",
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.10",
+    "twine>=6.2.0",
     "ty>=0.0.7",
 ]

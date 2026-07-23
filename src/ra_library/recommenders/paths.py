@@ -60,7 +60,12 @@ VENTILATION_MEASURES = [
         "coefficient_verified": 0.01,  # With verification
         "feasibility": Feasibility.DIFFICULT,
         "cost": "high",
-        "from_levels": [VentilationLevel.NONE, VentilationLevel.BASIC, VentilationLevel.INDUSTRIAL, VentilationLevel.LOCAL_EXTERNAL],
+        "from_levels": [
+            VentilationLevel.NONE,
+            VentilationLevel.BASIC,
+            VentilationLevel.INDUSTRIAL,
+            VentilationLevel.LOCAL_EXTERNAL,
+        ],
     },
     {
         "action": "sealed",
@@ -69,7 +74,13 @@ VENTILATION_MEASURES = [
         "coefficient": 0.001,
         "feasibility": Feasibility.VERY_DIFFICULT,
         "cost": "very_high",
-        "from_levels": [VentilationLevel.NONE, VentilationLevel.BASIC, VentilationLevel.INDUSTRIAL, VentilationLevel.LOCAL_EXTERNAL, VentilationLevel.LOCAL_ENCLOSED],
+        "from_levels": [
+            VentilationLevel.NONE,
+            VentilationLevel.BASIC,
+            VentilationLevel.INDUSTRIAL,
+            VentilationLevel.LOCAL_EXTERNAL,
+            VentilationLevel.LOCAL_ENCLOSED,
+        ],
     },
     {
         "action": "verify_control_velocity",
@@ -185,17 +196,25 @@ def _get_admin_measures(assessment_input: AssessmentInput) -> list[dict]:
         if hours < current_hours:
             # Calculate relative reduction from current
             relative_coeff = coeff / current_hours_coeff if current_hours_coeff > 0 else coeff
-            feasibility = Feasibility.EASY if hours >= 4 else Feasibility.MODERATE if hours >= 2 else Feasibility.DIFFICULT
-            measures.append({
-                "action": f"hours_{hours}",
-                "label": f"Reduce working hours to {hours}h/day",
-                "label_ja": f"作業時間を{hours}時間/日に短縮",
-                "coefficient": relative_coeff,
-                "feasibility": feasibility,
-                "cost": "low",
-                "parameter": "working_hours_per_day",
-                "new_value": hours,
-            })
+            feasibility = (
+                Feasibility.EASY
+                if hours >= 4
+                else Feasibility.MODERATE
+                if hours >= 2
+                else Feasibility.DIFFICULT
+            )
+            measures.append(
+                {
+                    "action": f"hours_{hours}",
+                    "label": f"Reduce working hours to {hours}h/day",
+                    "label_ja": f"作業時間を{hours}時間/日に短縮",
+                    "coefficient": relative_coeff,
+                    "feasibility": feasibility,
+                    "cost": "low",
+                    "parameter": "working_hours_per_day",
+                    "new_value": hours,
+                }
+            )
 
     # === Frequency Reduction Options ===
     if current_freq_type == "weekly":
@@ -203,17 +222,25 @@ def _get_admin_measures(assessment_input: AssessmentInput) -> list[dict]:
         for days, coeff in sorted(FREQUENCY_WEEKLY_OPTIONS.items(), reverse=True):
             if days < current_freq_value:
                 relative_coeff = coeff / current_freq_coeff if current_freq_coeff > 0 else coeff
-                feasibility = Feasibility.EASY if days >= 3 else Feasibility.MODERATE if days >= 2 else Feasibility.DIFFICULT
-                measures.append({
-                    "action": f"freq_weekly_{days}",
-                    "label": f"Reduce frequency to {days} days/week",
-                    "label_ja": f"頻度を{days}日/週に削減",
-                    "coefficient": relative_coeff,
-                    "feasibility": feasibility,
-                    "cost": "low",
-                    "parameter": "frequency_value",
-                    "new_value": days,
-                })
+                feasibility = (
+                    Feasibility.EASY
+                    if days >= 3
+                    else Feasibility.MODERATE
+                    if days >= 2
+                    else Feasibility.DIFFICULT
+                )
+                measures.append(
+                    {
+                        "action": f"freq_weekly_{days}",
+                        "label": f"Reduce frequency to {days} days/week",
+                        "label_ja": f"頻度を{days}日/週に削減",
+                        "coefficient": relative_coeff,
+                        "feasibility": feasibility,
+                        "cost": "low",
+                        "parameter": "frequency_value",
+                        "new_value": days,
+                    }
+                )
 
         # Also suggest switching to monthly (less than weekly)
         # Monthly options are more restrictive
@@ -222,68 +249,78 @@ def _get_admin_measures(assessment_input: AssessmentInput) -> list[dict]:
             relative_coeff = coeff / current_freq_coeff if current_freq_coeff > 0 else coeff
             if relative_coeff < 1.0:  # Only if it reduces exposure
                 feasibility = Feasibility.MODERATE if days >= 2 else Feasibility.DIFFICULT
-                measures.append({
-                    "action": f"freq_monthly_{days}",
-                    "label": f"Reduce to {days} days/month (less than weekly)",
-                    "label_ja": f"頻度を{days}日/月に削減（週未満作業）",
-                    "coefficient": relative_coeff,
-                    "feasibility": feasibility,
-                    "cost": "low",
-                    "parameter": "frequency_type",
-                    "new_value": f"monthly_{days}",
-                })
+                measures.append(
+                    {
+                        "action": f"freq_monthly_{days}",
+                        "label": f"Reduce to {days} days/month (less than weekly)",
+                        "label_ja": f"頻度を{days}日/月に削減（週未満作業）",
+                        "coefficient": relative_coeff,
+                        "feasibility": feasibility,
+                        "cost": "low",
+                        "parameter": "frequency_type",
+                        "new_value": f"monthly_{days}",
+                    }
+                )
     else:
         # Already monthly: suggest reducing days/month
         for days, coeff in sorted(FREQUENCY_MONTHLY_OPTIONS.items(), reverse=True):
             if days < current_freq_value:
                 relative_coeff = coeff / current_freq_coeff if current_freq_coeff > 0 else coeff
                 feasibility = Feasibility.EASY if days >= 2 else Feasibility.MODERATE
-                measures.append({
-                    "action": f"freq_monthly_{days}",
-                    "label": f"Reduce frequency to {days} days/month",
-                    "label_ja": f"頻度を{days}日/月に削減",
-                    "coefficient": relative_coeff,
-                    "feasibility": feasibility,
-                    "cost": "low",
-                    "parameter": "frequency_value",
-                    "new_value": days,
-                })
+                measures.append(
+                    {
+                        "action": f"freq_monthly_{days}",
+                        "label": f"Reduce frequency to {days} days/month",
+                        "label_ja": f"頻度を{days}日/月に削減",
+                        "coefficient": relative_coeff,
+                        "feasibility": feasibility,
+                        "cost": "low",
+                        "parameter": "frequency_value",
+                        "new_value": days,
+                    }
+                )
 
     # === Exposure Variation Options ===
     if current_variation == "constant":
         # Suggest intermittent or brief
-        measures.append({
-            "action": "variation_intermittent",
-            "label": "Change to intermittent exposure",
-            "label_ja": "暴露を間欠的に変更",
-            "coefficient": 0.5 / current_var_coeff,
-            "feasibility": Feasibility.MODERATE,
-            "cost": "low",
-            "parameter": "exposure_variation",
-            "new_value": "intermittent",
-        })
-        measures.append({
-            "action": "variation_brief",
-            "label": "Change to brief exposure",
-            "label_ja": "暴露を短時間に変更",
-            "coefficient": 0.1 / current_var_coeff,
-            "feasibility": Feasibility.DIFFICULT,
-            "cost": "low",
-            "parameter": "exposure_variation",
-            "new_value": "brief",
-        })
+        measures.append(
+            {
+                "action": "variation_intermittent",
+                "label": "Change to intermittent exposure",
+                "label_ja": "暴露を間欠的に変更",
+                "coefficient": 0.5 / current_var_coeff,
+                "feasibility": Feasibility.MODERATE,
+                "cost": "low",
+                "parameter": "exposure_variation",
+                "new_value": "intermittent",
+            }
+        )
+        measures.append(
+            {
+                "action": "variation_brief",
+                "label": "Change to brief exposure",
+                "label_ja": "暴露を短時間に変更",
+                "coefficient": 0.1 / current_var_coeff,
+                "feasibility": Feasibility.DIFFICULT,
+                "cost": "low",
+                "parameter": "exposure_variation",
+                "new_value": "brief",
+            }
+        )
     elif current_variation == "intermittent":
         # Suggest brief only
-        measures.append({
-            "action": "variation_brief",
-            "label": "Change to brief exposure",
-            "label_ja": "暴露を短時間に変更",
-            "coefficient": 0.1 / current_var_coeff,
-            "feasibility": Feasibility.MODERATE,
-            "cost": "low",
-            "parameter": "exposure_variation",
-            "new_value": "brief",
-        })
+        measures.append(
+            {
+                "action": "variation_brief",
+                "label": "Change to brief exposure",
+                "label_ja": "暴露を短時間に変更",
+                "coefficient": 0.1 / current_var_coeff,
+                "feasibility": Feasibility.MODERATE,
+                "cost": "low",
+                "parameter": "exposure_variation",
+                "new_value": "brief",
+            }
+        )
 
     return measures
 
@@ -448,10 +485,6 @@ def calculate_reduction_paths(
 
     # Get current coefficients
     current_vent_coeff = _get_current_ventilation_coefficient(assessment_input)
-    current_rpe_coeff = 1.0  # Assume no RPE currently
-    if assessment_input.rpe_type and assessment_input.rpe_type != RPEType.NONE:
-        # Already has RPE - can still upgrade
-        pass
 
     # === Build list of available measures ===
 
@@ -468,7 +501,8 @@ def calculate_reduction_paths(
     for vent in VENTILATION_MEASURES:
         if current_vent in vent.get("from_levels", []):
             if vent.get("requires_local_exhaust") and current_vent not in (
-                VentilationLevel.LOCAL_EXTERNAL, VentilationLevel.LOCAL_ENCLOSED
+                VentilationLevel.LOCAL_EXTERNAL,
+                VentilationLevel.LOCAL_ENCLOSED,
             ):
                 continue
 
@@ -666,7 +700,12 @@ def calculate_reduction_paths(
                 continue
 
             # Determine overall feasibility (worst of two)
-            feasibility_order = [Feasibility.EASY, Feasibility.MODERATE, Feasibility.DIFFICULT, Feasibility.VERY_DIFFICULT]
+            feasibility_order = [
+                Feasibility.EASY,
+                Feasibility.MODERATE,
+                Feasibility.DIFFICULT,
+                Feasibility.VERY_DIFFICULT,
+            ]
             f1_idx = feasibility_order.index(m1.feasibility)
             f2_idx = feasibility_order.index(m2.feasibility)
             overall_feas = feasibility_order[max(f1_idx, f2_idx)]
@@ -681,9 +720,13 @@ def calculate_reduction_paths(
                 predicted_level=new_level,
                 achieves_target=achieves,
                 target_level=target_level.get_label(),
-                gap_to_target_percent=(1 - target_rcr / new_rcr) * 100 if new_rcr > target_rcr else 0,
+                gap_to_target_percent=(1 - target_rcr / new_rcr) * 100
+                if new_rcr > target_rcr
+                else 0,
                 overall_feasibility=overall_feas,
-                overall_cost="high" if overall_feas in (Feasibility.DIFFICULT, Feasibility.VERY_DIFFICULT) else "medium",
+                overall_cost="high"
+                if overall_feas in (Feasibility.DIFFICULT, Feasibility.VERY_DIFFICULT)
+                else "medium",
             )
 
             if achieves:
@@ -721,12 +764,14 @@ def calculate_reduction_paths(
         """Return 1 for combinations, 0 for single measures (sort singles first)."""
         return 1 if len(path.measures) > 1 else 0
 
-    achievable_paths.sort(key=lambda p: (
-        _get_path_hierarchy(p),  # Hierarchy of controls first
-        _is_combination(p),  # Single measures before combinations
-        feasibility_order[p.overall_feasibility],  # Then by feasibility
-        -p.combined_reduction_percent,  # Then by reduction (highest first)
-    ))
+    achievable_paths.sort(
+        key=lambda p: (
+            _get_path_hierarchy(p),  # Hierarchy of controls first
+            _is_combination(p),  # Single measures before combinations
+            feasibility_order[p.overall_feasibility],  # Then by feasibility
+            -p.combined_reduction_percent,  # Then by reduction (highest first)
+        )
+    )
 
     # Insufficient: sort by reduction (highest first)
     insufficient_paths.sort(key=lambda p: -p.combined_reduction_percent)
@@ -767,7 +812,7 @@ def calculate_reduction_paths(
                 )
 
                 # Get reason from risk object if available
-                reason_ja = getattr(risk, 'min_achievable_reason_ja', None)
+                reason_ja = getattr(risk, "min_achievable_reason_ja", None)
 
                 if rpe_achievable:
                     # Achievable with RPE but not without
@@ -786,8 +831,7 @@ def calculate_reduction_paths(
                             f"engineering controls alone can improve to Level {min_level}"
                         )
                         limitations_ja.append(
-                            f"換気改善でレベル{min_level}まで低減可能; "
-                            f"目標達成にはRPEも必要"
+                            f"換気改善でレベル{min_level}まで低減可能; 目標達成にはRPEも必要"
                         )
                 else:
                     # Not achievable at all
@@ -796,8 +840,7 @@ def calculate_reduction_paths(
                         f"best possible is Level {min_level}"
                     )
                     limitations_ja.append(
-                        f"目標レベル{target_level.get_label()}は達成不可; "
-                        f"最良はレベル{min_level}"
+                        f"目標レベル{target_level.get_label()}は達成不可; 最良はレベル{min_level}"
                     )
 
                 best_achievable = min_level
@@ -822,7 +865,11 @@ def calculate_reduction_paths(
 
     # === Build result ===
     easiest = achievable_paths[0] if achievable_paths else None
-    most_effective = max(achievable_paths, key=lambda p: p.combined_reduction_percent) if achievable_paths else None
+    most_effective = (
+        max(achievable_paths, key=lambda p: p.combined_reduction_percent)
+        if achievable_paths
+        else None
+    )
 
     return RiskReductionAnalysis(
         substance_cas=substance.cas_number,
@@ -862,10 +909,7 @@ def _calculate_minimality_score(path: RiskReductionPath) -> tuple:
     }
 
     # Use the "worst" (highest) category in the path
-    worst_category = max(
-        (category_priority.get(m.category, 99) for m in path.measures),
-        default=99
-    )
+    worst_category = max((category_priority.get(m.category, 99) for m in path.measures), default=99)
 
     # Cost ranking
     cost_rank = {
@@ -940,14 +984,16 @@ def get_minimum_measures_summary(analysis: RiskReductionAnalysis) -> list[dict]:
             else:
                 category_type = "combination"
 
-            summary.append({
-                "level": level,
-                "path": path,
-                "category_type": category_type,
-                "num_measures": len(path.measures),
-                "description_ja": path.description_ja,
-                "rcr": path.predicted_rcr,
-            })
+            summary.append(
+                {
+                    "level": level,
+                    "path": path,
+                    "category_type": category_type,
+                    "num_measures": len(path.measures),
+                    "description_ja": path.description_ja,
+                    "rcr": path.predicted_rcr,
+                }
+            )
 
     return summary
 
@@ -1017,7 +1063,9 @@ def calculate_multi_risk_analysis(
                 current_level=current_level,
                 target_level=target_inhalation.get_label(),
                 target_rcr=target_rcr,
-                reduction_needed_percent=(1 - target_rcr / inhalation_risk.rcr) * 100 if inhalation_risk.rcr > 0 else 0,
+                reduction_needed_percent=(1 - target_rcr / inhalation_risk.rcr) * 100
+                if inhalation_risk.rcr > 0
+                else 0,
                 achievable_paths=analysis.achievable_paths,
                 insufficient_paths=analysis.insufficient_paths,
                 has_achievable_path=analysis.has_achievable_path,
@@ -1060,9 +1108,13 @@ def calculate_multi_risk_analysis(
                 current_level=current_level,
                 target_level=target_inhalation.get_label(),
                 target_rcr=target_rcr,
-                reduction_needed_percent=(1 - target_rcr / inhalation_risk.stel_rcr) * 100 if inhalation_risk.stel_rcr > 0 else 0,
+                reduction_needed_percent=(1 - target_rcr / inhalation_risk.stel_rcr) * 100
+                if inhalation_risk.stel_rcr > 0
+                else 0,
                 needs_action=True,
-                limitations=["STEL risk focuses on peak exposure; engineering controls most effective"],
+                limitations=[
+                    "STEL risk focuses on peak exposure; engineering controls most effective"
+                ],
                 limitations_ja=["短時間暴露リスクはピーク暴露に焦点；工学的対策が最も効果的"],
             )
         else:
@@ -1105,16 +1157,18 @@ def calculate_multi_risk_analysis(
                     path_id=path_id,
                     description=measure["label"],
                     description_ja=measure["label_ja"],
-                    measures=[Measure(
-                        category=measure["category"],
-                        action=measure["action"],
-                        action_label=measure["label"],
-                        action_label_ja=measure["label_ja"],
-                        reduction_percent=(1 - measure["coefficient"]) * 100,
-                        coefficient=measure["coefficient"],
-                        feasibility=measure["feasibility"],
-                        cost_estimate=measure.get("cost", "low"),
-                    )],
+                    measures=[
+                        Measure(
+                            category=measure["category"],
+                            action=measure["action"],
+                            action_label=measure["label"],
+                            action_label_ja=measure["label_ja"],
+                            reduction_percent=(1 - measure["coefficient"]) * 100,
+                            coefficient=measure["coefficient"],
+                            feasibility=measure["feasibility"],
+                            cost_estimate=measure.get("cost", "low"),
+                        )
+                    ],
                     combined_reduction_percent=(1 - measure["coefficient"]) * 100,
                     predicted_rcr=new_rcr,
                     predicted_level=new_level,
@@ -1138,7 +1192,9 @@ def calculate_multi_risk_analysis(
                 current_level=current_level,
                 target_level=target_dermal.get_label(),
                 target_rcr=target_rcr,
-                reduction_needed_percent=(1 - target_rcr / dermal_risk.rcr) * 100 if dermal_risk.rcr > 0 else 0,
+                reduction_needed_percent=(1 - target_rcr / dermal_risk.rcr) * 100
+                if dermal_risk.rcr > 0
+                else 0,
                 achievable_paths=achievable_paths,
                 insufficient_paths=insufficient_paths,
                 has_achievable_path=len(achievable_paths) > 0,
@@ -1173,7 +1229,9 @@ def calculate_multi_risk_analysis(
         dominant_percent = max(inhalation_risk.rcr, dermal_risk.rcr) / combined_rcr * 100
 
         limitations = [f"Combined risk dominated by {dominant_risk} ({dominant_percent:.0f}%)"]
-        limitations_ja = [f"合計リスクは{('吸入' if dominant_risk == 'inhalation' else '経皮吸収')}が支配的（{dominant_percent:.0f}%）"]
+        limitations_ja = [
+            f"合計リスクは{('吸入' if dominant_risk == 'inhalation' else '経皮吸収')}が支配的（{dominant_percent:.0f}%）"
+        ]
 
         combined_analysis = RiskTypeAnalysis(
             risk_type=RiskType.COMBINED,
@@ -1183,7 +1241,9 @@ def calculate_multi_risk_analysis(
             current_level=current_level,
             target_level=target_inhalation.get_label(),
             target_rcr=target_rcr,
-            reduction_needed_percent=(1 - target_rcr / combined_rcr) * 100 if combined_rcr > 0 else 0,
+            reduction_needed_percent=(1 - target_rcr / combined_rcr) * 100
+            if combined_rcr > 0
+            else 0,
             needs_action=needs_action,
             limitations=limitations,
             limitations_ja=limitations_ja,
@@ -1211,7 +1271,9 @@ def calculate_multi_risk_analysis(
             target_level=f"Level {target_physical.name}",
             target_rcr=0.0,  # Not applicable
             needs_action=needs_action,
-            limitations=["Physical hazard risk based on process conditions, not exposure"] if needs_action else [],
+            limitations=["Physical hazard risk based on process conditions, not exposure"]
+            if needs_action
+            else [],
             limitations_ja=["危険性は暴露ではなく工程条件に基づく"] if needs_action else [],
         )
 
@@ -1221,10 +1283,16 @@ def calculate_multi_risk_analysis(
 
     # === Build overall result ===
     overall_level = RiskLevel.get_detailed_label(max_risk_level) if max_risk_level else "I"
-    overall_achievable = all([
-        inhalation_8hr_analysis is None or not inhalation_8hr_analysis.needs_action or inhalation_8hr_analysis.has_achievable_path,
-        dermal_analysis is None or not dermal_analysis.needs_action or dermal_analysis.has_achievable_path,
-    ])
+    overall_achievable = all(
+        [
+            inhalation_8hr_analysis is None
+            or not inhalation_8hr_analysis.needs_action
+            or inhalation_8hr_analysis.has_achievable_path,
+            dermal_analysis is None
+            or not dermal_analysis.needs_action
+            or dermal_analysis.has_achievable_path,
+        ]
+    )
 
     return MultiRiskAnalysis(
         substance_cas=substance.cas_number,
@@ -1235,8 +1303,12 @@ def calculate_multi_risk_analysis(
         combined=combined_analysis,
         physical=physical_analysis,
         controlling_risk_type=controlling_risk_type,
-        controlling_risk_label=RISK_TYPE_LABELS_EN.get(controlling_risk_type, "") if controlling_risk_type else "",
-        controlling_risk_label_ja=RISK_TYPE_LABELS_JA.get(controlling_risk_type, "") if controlling_risk_type else "",
+        controlling_risk_label=RISK_TYPE_LABELS_EN.get(controlling_risk_type, "")
+        if controlling_risk_type
+        else "",
+        controlling_risk_label_ja=RISK_TYPE_LABELS_JA.get(controlling_risk_type, "")
+        if controlling_risk_type
+        else "",
         overall_risk_level=overall_level,
         overall_achievable=overall_achievable,
     )
@@ -1251,47 +1323,55 @@ def _get_dermal_measures(assessment_input: AssessmentInput, dermal_risk: DermalR
 
     # Glove upgrade
     if current_glove == GloveType.NONE:
-        measures.append({
-            "action": "gloves_resistant",
-            "label": "Use chemical-resistant gloves",
-            "label_ja": "耐透過性手袋の着用",
-            "coefficient": 0.2,  # 80% reduction
-            "category": ActionCategory.PPE,
-            "feasibility": Feasibility.EASY,
-            "cost": "low",
-        })
+        measures.append(
+            {
+                "action": "gloves_resistant",
+                "label": "Use chemical-resistant gloves",
+                "label_ja": "耐透過性手袋の着用",
+                "coefficient": 0.2,  # 80% reduction
+                "category": ActionCategory.PPE,
+                "feasibility": Feasibility.EASY,
+                "cost": "low",
+            }
+        )
     elif current_glove == GloveType.NON_RESISTANT:
-        measures.append({
-            "action": "gloves_upgrade",
-            "label": "Switch to chemical-resistant gloves",
-            "label_ja": "耐透過性手袋への変更",
-            "coefficient": 0.2,
-            "category": ActionCategory.PPE,
-            "feasibility": Feasibility.EASY,
-            "cost": "low",
-        })
+        measures.append(
+            {
+                "action": "gloves_upgrade",
+                "label": "Switch to chemical-resistant gloves",
+                "label_ja": "耐透過性手袋への変更",
+                "coefficient": 0.2,
+                "category": ActionCategory.PPE,
+                "feasibility": Feasibility.EASY,
+                "cost": "low",
+            }
+        )
 
     # Glove training
     if not assessment_input.glove_training:
-        measures.append({
-            "action": "glove_training",
-            "label": "Implement glove use training",
-            "label_ja": "手袋使用教育の実施",
-            "coefficient": 0.5,  # 50% reduction with proper training
-            "category": ActionCategory.ADMINISTRATIVE,
-            "feasibility": Feasibility.EASY,
-            "cost": "low",
-        })
+        measures.append(
+            {
+                "action": "glove_training",
+                "label": "Implement glove use training",
+                "label_ja": "手袋使用教育の実施",
+                "coefficient": 0.5,  # 50% reduction with proper training
+                "category": ActionCategory.ADMINISTRATIVE,
+                "feasibility": Feasibility.EASY,
+                "cost": "low",
+            }
+        )
 
     # Protective clothing
-    measures.append({
-        "action": "protective_clothing",
-        "label": "Use protective clothing (long sleeves)",
-        "label_ja": "保護衣の着用（長袖）",
-        "coefficient": 0.7,  # 30% reduction by reducing exposed area
-        "category": ActionCategory.PPE,
-        "feasibility": Feasibility.EASY,
-        "cost": "low",
-    })
+    measures.append(
+        {
+            "action": "protective_clothing",
+            "label": "Use protective clothing (long sleeves)",
+            "label_ja": "保護衣の着用（長袖）",
+            "coefficient": 0.7,  # 30% reduction by reducing exposed area
+            "category": ActionCategory.PPE,
+            "feasibility": Feasibility.EASY,
+            "cost": "low",
+        }
+    )
 
     return measures

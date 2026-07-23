@@ -44,7 +44,6 @@ from .constants import (
     EXPOSURE_BANDS_SOLID,
     CONTENT_COEFFICIENTS,
     VENTILATION_COEFFICIENTS,
-    DURATION_COEFFICIENTS,
 )
 
 
@@ -244,9 +243,7 @@ class VersionCalculator:
         - v3.1.2: Minimum floor of 0.005 ppm (liquid) or 0.001 mg/m³ (solid)
         """
         # Get initial exposure band
-        initial_band = self._get_exposure_band(
-            property_type, volatility_or_dustiness, amount_level
-        )
+        initial_band = self._get_exposure_band(property_type, volatility_or_dustiness, amount_level)
 
         # Calculate coefficients
         content_coeff = self._get_content_coefficient(content_percent)
@@ -256,12 +253,7 @@ class VersionCalculator:
 
         # Calculate 8-hour exposure
         exposure_8hr = (
-            initial_band
-            * content_coeff
-            * spray_coeff
-            * vent_coeff
-            * time_coeff
-            * apf_coefficient
+            initial_band * content_coeff * spray_coeff * vent_coeff * time_coeff * apf_coefficient
         )
 
         # Calculate STEL exposure
@@ -359,9 +351,11 @@ class VersionCalculator:
             result.concentration_standard = substance_flags.get("is_conc_standard", False)
 
             # Risk level S from OEL skin notation
-            if (substance_flags.get("skin_corr_irrit") or
-                substance_flags.get("eye_damage") or
-                substance_flags.get("skin_sens")):
+            if (
+                substance_flags.get("skin_corr_irrit")
+                or substance_flags.get("eye_damage")
+                or substance_flags.get("skin_sens")
+            ):
                 result.risk_level_s = True
 
             return result
@@ -423,9 +417,11 @@ class VersionCalculator:
         result.concentration_standard = substance_flags.get("is_conc_standard", False)
 
         # Risk level S
-        if (substance_flags.get("skin_corr_irrit") or
-            substance_flags.get("eye_damage") or
-            substance_flags.get("skin_sens")):
+        if (
+            substance_flags.get("skin_corr_irrit")
+            or substance_flags.get("eye_damage")
+            or substance_flags.get("skin_sens")
+        ):
             result.risk_level_s = True
 
         return result
@@ -509,6 +505,7 @@ class VersionCalculator:
         if value == 0:
             return 0
         import math
+
         magnitude = math.floor(math.log10(abs(value)))
         return round(value, -int(magnitude) + (digits - 1))
 
@@ -640,8 +637,9 @@ def compare_versions(
             "exposure_differs": exp_302.exposure_8hr != exp_320.exposure_8hr,
             "exposure_difference_pct": round(
                 (exp_320.exposure_8hr - exp_302.exposure_8hr) / exp_302.exposure_8hr * 100
-                if exp_302.exposure_8hr > 0 else 0,
-                2
+                if exp_302.exposure_8hr > 0
+                else 0,
+                2,
             ),
             "rcr_differs": rcr_302 != rcr_320,
             "risk_level_differs": risk_302 != risk_320,

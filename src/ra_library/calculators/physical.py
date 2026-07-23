@@ -25,11 +25,11 @@ LATEST_PHYSICAL_METHODOLOGY_VERSION = "v3.2.1"
 
 # Amount level to index mapping (for lookup tables)
 AMOUNT_LEVEL_INDEX = {
-    AmountLevel.LARGE: 0,   # kL, ton
+    AmountLevel.LARGE: 0,  # kL, ton
     AmountLevel.MEDIUM: 1,  # ≥1L, ≥1kg
-    AmountLevel.SMALL: 2,   # 100mL-1L, 100g-1kg
+    AmountLevel.SMALL: 2,  # 100mL-1L, 100g-1kg
     AmountLevel.MINUTE: 3,  # 10mL-100mL, 10g-100g
-    AmountLevel.TRACE: 4,   # <10mL, <10g
+    AmountLevel.TRACE: 4,  # <10mL, <10g
 }
 
 
@@ -60,6 +60,7 @@ def _parse_ghs_category(value: Optional[str]) -> Optional[str]:
 @dataclass
 class PhysicalHazardResult:
     """Result from individual hazard assessment."""
+
     hazard_type: str
     hazard_type_ja: str
     provisional_level: int
@@ -72,6 +73,7 @@ class PhysicalHazardResult:
 # =============================================================================
 # Individual Hazard Assessment Functions (following VBA modCalc.bas)
 # =============================================================================
+
 
 def assess_explosives(ghs: GHSClassification) -> Optional[PhysicalHazardResult]:
     """
@@ -294,7 +296,11 @@ def assess_flammable_liquid(
 
     if process_temp_exceeds_flash or cat in ["1", "2"]:
         provisional = [5, 5, 4, 3, 2][idx]
-        desc = "Process temp ≥ flash point" if process_temp_exceeds_flash else f"Flammable liquid Category {cat}"
+        desc = (
+            "Process temp ≥ flash point"
+            if process_temp_exceeds_flash
+            else f"Flammable liquid Category {cat}"
+        )
         desc_ja = "取扱温度≧引火点" if process_temp_exceeds_flash else f"引火性液体 区分{cat}"
     elif cat == "3":
         provisional = [4, 3, 2, 2, 2][idx]
@@ -737,6 +743,7 @@ def assess_corrosive_to_metals(ghs: GHSClassification) -> Optional[PhysicalHazar
 # Main Physical Risk Calculator
 # =============================================================================
 
+
 def calculate_physical_risk(
     assessment_input: AssessmentInput,
     substance: Substance,
@@ -788,7 +795,9 @@ def calculate_physical_risk(
         hazard_results.append(result)
 
     # 2. Flammable gas
-    result = assess_flammable_gas(ghs, amount_level, ignition_removed, explosive_atmosphere_prevented)
+    result = assess_flammable_gas(
+        ghs, amount_level, ignition_removed, explosive_atmosphere_prevented
+    )
     if result:
         hazard_results.append(result)
 
@@ -809,17 +818,23 @@ def calculate_physical_risk(
 
     # 6. Flammable liquid
     result = assess_flammable_liquid(
-        ghs, amount_level, props.flash_point,
+        ghs,
+        amount_level,
+        props.flash_point,
         assessment_input.process_temperature,
-        ignition_removed, explosive_atmosphere_prevented,
+        ignition_removed,
+        explosive_atmosphere_prevented,
     )
     if result:
         hazard_results.append(result)
 
     # 7. Flammable solid
     result = assess_flammable_solid(
-        ghs, amount_level, dustiness_low,
-        ignition_removed, explosive_atmosphere_prevented,
+        ghs,
+        amount_level,
+        dustiness_low,
+        ignition_removed,
+        explosive_atmosphere_prevented,
     )
     if result:
         hazard_results.append(result)
@@ -887,7 +902,7 @@ def calculate_physical_risk(
                     step_number=step_num,
                     description=f"Assess {hr.hazard_type}",
                     description_ja=f"{hr.hazard_type_ja}の評価",
-                    formula=f"GHS category + amount level → provisional RL",
+                    formula="GHS category + amount level → provisional RL",
                     input_values={
                         "hazard_type": hr.hazard_type,
                         "amount_level": amount_level.value,

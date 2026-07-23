@@ -5,8 +5,6 @@ VBA Reference: modCalc.bas lines 2-79 (CalculateDermalAbsorption)
                modCalc.bas lines 278-311 (CalculateOELDermal)
 """
 
-import pytest
-import math
 from ra_library.calculators.dermal import (
     calculate_oel_dermal,
     calculate_dermal_kp_detailed,

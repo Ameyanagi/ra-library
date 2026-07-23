@@ -5,7 +5,6 @@ Converts SubstanceData (database format) to Substance (model format)
 for use in risk assessment calculations.
 """
 
-from typing import Optional
 from .substance_db import SubstanceData
 from ..models.substance import (
     Substance,

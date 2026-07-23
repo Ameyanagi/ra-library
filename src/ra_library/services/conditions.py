@@ -52,8 +52,12 @@ def get_gas_amount_metadata(
     metadata["volume_equivalent_at_25c_1atm"] = {
         "molecular_weight_g_mol": round(molecular_weight, 4),
         "liters_per_kg": round(liters_per_kg, 4),
-        "min_liters": round(band["min_kg"] * liters_per_kg, 2) if band["min_kg"] is not None else None,
-        "max_liters": round(band["max_kg"] * liters_per_kg, 2) if band["max_kg"] is not None else None,
+        "min_liters": round(band["min_kg"] * liters_per_kg, 2)
+        if band["min_kg"] is not None
+        else None,
+        "max_liters": round(band["max_kg"] * liters_per_kg, 2)
+        if band["max_kg"] is not None
+        else None,
     }
     return metadata
 
@@ -186,11 +190,21 @@ def format_conditions_used(
         "frequency_value": inp.frequency_value,
     }
     if inp.frequency_type == "weekly":
-        freq_label = f"週{inp.frequency_value}日" if language == "ja" else f"{inp.frequency_value} days/week"
+        freq_label = (
+            f"週{inp.frequency_value}日" if language == "ja" else f"{inp.frequency_value} days/week"
+        )
     else:
-        freq_label = f"月{inp.frequency_value}日" if language == "ja" else f"{inp.frequency_value} days/month"
+        freq_label = (
+            f"月{inp.frequency_value}日"
+            if language == "ja"
+            else f"{inp.frequency_value} days/month"
+        )
 
-    hours_label = f"{inp.working_hours_per_day}時間/日" if language == "ja" else f"{inp.working_hours_per_day}h/day"
+    hours_label = (
+        f"{inp.working_hours_per_day}時間/日"
+        if language == "ja"
+        else f"{inp.working_hours_per_day}h/day"
+    )
     duration_info["label"] = f"{hours_label}、{freq_label}"
     result["duration"] = duration_info
 
@@ -235,12 +249,16 @@ def format_conditions_used(
         if flash_point is not None:
             phys_props["flash_point"] = {
                 "value_celsius": flash_point,
-                "label": f"引火点: {flash_point}°C" if language == "ja" else f"Flash point: {flash_point}°C",
+                "label": f"引火点: {flash_point}°C"
+                if language == "ja"
+                else f"Flash point: {flash_point}°C",
             }
         if boiling_point is not None:
             phys_props["boiling_point"] = {
                 "value_celsius": boiling_point,
-                "label": f"沸点: {boiling_point}°C" if language == "ja" else f"Boiling point: {boiling_point}°C",
+                "label": f"沸点: {boiling_point}°C"
+                if language == "ja"
+                else f"Boiling point: {boiling_point}°C",
             }
         result["physical_properties"] = phys_props
 

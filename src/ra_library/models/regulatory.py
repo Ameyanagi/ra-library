@@ -72,7 +72,9 @@ class RegulatoryInfo:
     """Regulatory classification and health check requirements."""
 
     # Classification
-    regulation_type: Optional[RegulationType]  # tokka, organic, lead, prohibited, waste, prtr1, prtr2
+    regulation_type: Optional[
+        RegulationType
+    ]  # tokka, organic, lead, prohibited, waste, prtr1, prtr2
     regulation_class: Optional[int]  # 1, 2, 3 (None for lead/prohibited/waste/prtr1/prtr2)
     regulation_label: str  # "特化則第2類", "有機則第1種", etc.
 
@@ -111,13 +113,9 @@ class RegulatoryInfo:
                 "特別管理物質" if language == "ja" else "Special Management Substance"
             )
         if self.special_organic:
-            designations.append(
-                "特別有機溶剤" if language == "ja" else "Special Organic Solvent"
-            )
+            designations.append("特別有機溶剤" if language == "ja" else "Special Organic Solvent")
         if self.carcinogen:
-            designations.append(
-                "がん原性物質" if language == "ja" else "Carcinogenic Substance"
-            )
+            designations.append("がん原性物質" if language == "ja" else "Carcinogenic Substance")
         return designations
 
     def to_dict(self, language: str = "ja") -> dict:

@@ -16,7 +16,11 @@ This library implements an independent risk assessment workflow with detailed ex
 ## Installation
 
 ```bash
-uv add "ra-library @ git+https://github.com/Ameyanagi/ra-library.git"
+pip install ra-library
+```
+
+```bash
+uv add ra-library
 ```
 
 ## Usage
@@ -38,6 +42,21 @@ result = calculate_inhalation_risk(input, substance)
 print(f"Risk Level: {result.risk_level.name}")
 print(f"RCR: {result.rcr:.4f}")
 ```
+
+## Development
+
+```bash
+uv sync --group dev
+uv run pre-commit install
+uv run pre-commit run --all-files
+uv run pytest -q
+```
+
+## Release
+
+PyPI publishing is handled by GitHub Actions only when a matching `v*` tag is
+pushed. See [docs/release.md](docs/release.md) for the cleanup and release
+checklist.
 
 ## Notes
 

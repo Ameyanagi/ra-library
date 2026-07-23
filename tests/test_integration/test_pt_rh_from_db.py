@@ -23,7 +23,6 @@ from ra_library.models.assessment import (
     ExposureVariation,
 )
 from ra_library.calculators.inhalation import calculate_inhalation_risk
-from ra_library.calculators.acr import get_acrmax
 from ra_library.models.risk import RiskLevel
 
 
@@ -147,9 +146,9 @@ class TestPlatinumFromDatabase:
         """Platinum has OEL values from database."""
         # Check for any OEL value
         has_oel = (
-            platinum_data.acgih_tlv_twa_mgm3 is not None or
-            platinum_data.jsoh_8hr_mgm3 is not None or
-            platinum_data.conc_standard_8hr_mgm3 is not None
+            platinum_data.acgih_tlv_twa_mgm3 is not None
+            or platinum_data.jsoh_8hr_mgm3 is not None
+            or platinum_data.conc_standard_8hr_mgm3 is not None
         )
         assert has_oel, "Platinum should have OEL values"
 
@@ -322,13 +321,13 @@ class TestComparisonPtRhFromDB:
         assert rh_risk is not None
 
         # Both should produce valid results
-        print(f"\n=== Platinum (7440-06-4) ===")
+        print("\n=== Platinum (7440-06-4) ===")
         print(f"OEL: {pt_risk.oel}")
         print(f"Exposure (8hr): {pt_risk.exposure_8hr}")
         print(f"RCR: {pt_risk.rcr}")
         print(f"Risk Level: {pt_risk.risk_level}")
 
-        print(f"\n=== Rhodium (7440-16-6) ===")
+        print("\n=== Rhodium (7440-16-6) ===")
         print(f"OEL: {rh_risk.oel}")
         print(f"Exposure (8hr): {rh_risk.exposure_8hr}")
         print(f"RCR: {rh_risk.rcr}")

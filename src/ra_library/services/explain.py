@@ -54,7 +54,9 @@ def explain_calculation(
             if skipped.get("risk_type") == risk_type:
                 raise ServiceError(
                     "ASSESSMENT_NOT_APPLICABLE",
-                    skipped.get("message", f"No {risk_type} assessment available for this substance"),
+                    skipped.get(
+                        "message", f"No {risk_type} assessment available for this substance"
+                    ),
                 )
         raise ServiceError(
             "ASSESSMENT_NOT_AVAILABLE",
@@ -138,7 +140,9 @@ def explain_calculation(
             output["limitations"].append(limitation_data)
 
         output["summary"] = (
-            getattr(explanation, "summary_ja", None) if language == "ja" else getattr(explanation, "summary", None)
+            getattr(explanation, "summary_ja", None)
+            if language == "ja"
+            else getattr(explanation, "summary", None)
         )
     else:
         output["summary"] = _generate_basic_explanation(risk_result, risk_type, language)

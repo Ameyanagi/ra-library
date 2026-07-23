@@ -26,20 +26,20 @@ MIN_EXPOSURE_SOLID: float = 0.001  # mg/m³
 
 # Liquid ACRmax values (ppm)
 ACRMAX_VALUES_LIQUID: dict[str, float] = {
-    "HL5": 0.05,   # Carcinogen 1A/1B
-    "HL4": 0.5,    # Carcinogen 2, Mutagen 1A/1B/2
-    "HL3": 5.0,    # General hazards
-    "HL2": 50.0,   # Moderate hazards
+    "HL5": 0.05,  # Carcinogen 1A/1B
+    "HL4": 0.5,  # Carcinogen 2, Mutagen 1A/1B/2
+    "HL3": 5.0,  # General hazards
+    "HL2": 50.0,  # Moderate hazards
     "HL1": 500.0,  # Low hazards
 }
 
 # Solid ACRmax values (mg/m³)
 ACRMAX_VALUES_SOLID: dict[str, float] = {
     "HL5": 0.001,  # Carcinogen 1A/1B
-    "HL4": 0.01,   # Carcinogen 2, Mutagen 1A/1B/2
-    "HL3": 0.1,    # General hazards
-    "HL2": 1.0,    # Moderate hazards
-    "HL1": 10.0,   # Low hazards
+    "HL4": 0.01,  # Carcinogen 2, Mutagen 1A/1B/2
+    "HL3": 0.1,  # General hazards
+    "HL2": 1.0,  # Moderate hazards
+    "HL1": 10.0,  # Low hazards
 }
 
 # Legacy alias for backwards compatibility
@@ -245,9 +245,9 @@ SPRAY_COEFFICIENT: float = 10.0
 # =============================================================================
 
 WORK_AREA_SIZE_COEFFICIENTS: dict[str, float] = {
-    "small": 1.5,   # Small/confined area - increased concentration
+    "small": 1.5,  # Small/confined area - increased concentration
     "medium": 1.0,  # Standard work area - baseline
-    "large": 0.5,   # Large/well-ventilated area - dilution effect
+    "large": 0.5,  # Large/well-ventilated area - dilution effect
 }
 
 

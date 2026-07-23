@@ -82,9 +82,7 @@ class ExposureVariation(str, Enum):
 
         Reference: CREATE-SIMPLE Design v3.1, Figure 23
         """
-        if self in (
-            ExposureVariation.LARGE,
-        ):
+        if self in (ExposureVariation.LARGE,):
             return 6.0
         # SMALL and all legacy values use multiplier 4
         return 4.0

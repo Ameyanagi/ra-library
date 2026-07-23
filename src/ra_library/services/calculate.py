@@ -358,7 +358,9 @@ def calculate_risk(
         try:
             assessment = assessment.add_substance(cas, content=content)
         except ValueError as exc:
-            raise ServiceError("SUBSTANCE_LOOKUP_FAILED", f"Substance lookup failed for {cas}: {exc}") from exc
+            raise ServiceError(
+                "SUBSTANCE_LOOKUP_FAILED", f"Substance lookup failed for {cas}: {exc}"
+            ) from exc
 
     ignore_floor = conditions.get("ignore_minimum_floor") if conditions else None
     if use_v302:
@@ -504,9 +506,7 @@ def _extract_conditions_info(
 def _format_skipped_assessment(skip: dict[str, str], language: str) -> dict[str, Any]:
     """Format a workbook-faithful skipped assessment entry."""
     if language == "ja":
-        reason = (
-            "CREATE-SIMPLEのワークブック準拠モードでは、RAシート/実施レポート経路で気体の健康リスク評価は行いません。"
-        )
+        reason = "CREATE-SIMPLEのワークブック準拠モードでは、RAシート/実施レポート経路で気体の健康リスク評価は行いません。"
     else:
         reason = skip.get("message", "")
     return {
@@ -599,8 +599,7 @@ def _format_result(
 
     for cas, comp in result.components.items():
         skipped_by_risk_type = {
-            skip.get("risk_type", ""): skip
-            for skip in getattr(comp, "skipped_assessments", [])
+            skip.get("risk_type", ""): skip for skip in getattr(comp, "skipped_assessments", [])
         }
         comp_data = {
             "cas_number": comp.cas_number,
@@ -629,9 +628,7 @@ def _format_result(
                     if comp.inhalation.stel_risk_level
                     else None
                 )
-                inh_data["stel_risk_label"] = RiskLevel.get_simple_label(
-                    comp.inhalation.stel_rcr
-                )
+                inh_data["stel_risk_label"] = RiskLevel.get_simple_label(comp.inhalation.stel_rcr)
             # Add floor tracking info
             if comp.inhalation.would_achieve_target_without_floor:
                 inh_data["would_achieve_target_without_floor"] = True
@@ -686,7 +683,9 @@ def _format_result(
             if hazard_key in PHYSICAL_HAZARD_LABELS:
                 hazard_info = PHYSICAL_HAZARD_LABELS[hazard_key]
                 # Get localized hazard label
-                phys_data["hazard_label"] = hazard_info.get(language, hazard_info.get("en", hazard_key))
+                phys_data["hazard_label"] = hazard_info.get(
+                    language, hazard_info.get("en", hazard_key)
+                )
                 # Get warnings
                 phys_data["warnings"] = hazard_info.get("warnings", {}).get(language, [])
             else:
@@ -853,12 +852,18 @@ def _generate_v2_comparison(
         amount_level = assessment_input.amount.value if assessment_input.amount else "medium"
 
         # Get ventilation
-        ventilation = assessment_input.ventilation.value if assessment_input.ventilation else "industrial"
+        ventilation = (
+            assessment_input.ventilation.value if assessment_input.ventilation else "industrial"
+        )
 
         # Get working conditions
         is_spray = assessment_input.is_spray if hasattr(assessment_input, "is_spray") else False
-        working_hours = assessment_input.working_hours if hasattr(assessment_input, "working_hours") else 8.0
-        days_per_week = assessment_input.days_per_week if hasattr(assessment_input, "days_per_week") else 5
+        working_hours = (
+            assessment_input.working_hours if hasattr(assessment_input, "working_hours") else 8.0
+        )
+        days_per_week = (
+            assessment_input.days_per_week if hasattr(assessment_input, "days_per_week") else 5
+        )
 
         # Get volatility/dustiness from builder
         volatility_or_dustiness = builder._dustiness if property_type == "solid" else None
@@ -919,7 +924,9 @@ def _generate_v2_comparison(
                     if language == "en"
                     else f"{LATEST_METHODOLOGY_VERSION}を推奨 (STEL、経皮吸収、物理的危険性を含む最新の評価手法)"
                 ),
-                "v3_features": ["8-hour TWA", "STEL", "Dermal absorption", "Physical hazards"] if language == "en" else ["8時間TWA", "短時間STEL", "経皮吸収", "物理的危険性"],
+                "v3_features": ["8-hour TWA", "STEL", "Dermal absorption", "Physical hazards"]
+                if language == "en"
+                else ["8時間TWA", "短時間STEL", "経皮吸収", "物理的危険性"],
                 "v2_features": ["8-hour TWA only"] if language == "en" else ["8時間TWAのみ"],
             }
             return {

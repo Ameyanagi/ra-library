@@ -11,7 +11,6 @@ Hazard levels:
 - HL1: No significant health hazards
 """
 
-import pytest
 from ra_library.data.hazard_level import (
     get_hazard_level,
     is_carcinogen,
@@ -19,7 +18,6 @@ from ra_library.data.hazard_level import (
     is_reproductive_toxicant,
     is_stot_re,
     is_respiratory_sensitizer,
-    has_health_hazards,
 )
 from ra_library.data import SubstanceData
 

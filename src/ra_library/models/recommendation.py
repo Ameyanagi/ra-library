@@ -318,7 +318,9 @@ class RiskReductionAnalysis(BaseModel):
             "limitations_ja": self.limitations_ja,
             "best_achievable_level": self.best_achievable_level,
             "easiest_path": self.easiest_path.to_dict() if self.easiest_path else None,
-            "most_effective_path": self.most_effective_path.to_dict() if self.most_effective_path else None,
+            "most_effective_path": self.most_effective_path.to_dict()
+            if self.most_effective_path
+            else None,
         }
 
     def _get_category_label(self, path: "RiskReductionPath", lang: str = "en") -> str:
@@ -348,9 +350,13 @@ class RiskReductionAnalysis(BaseModel):
             return labels.get(cat, str(cat.value))
         else:
             # Mixed - show both
-            parts = [labels.get(c, str(c.value)) for c in sorted(
-                categories, key=lambda x: {"engineering": 0, "administrative": 1, "ppe": 2}.get(x.value, 9)
-            )]
+            parts = [
+                labels.get(c, str(c.value))
+                for c in sorted(
+                    categories,
+                    key=lambda x: {"engineering": 0, "administrative": 1, "ppe": 2}.get(x.value, 9),
+                )
+            ]
             return " + ".join(parts)
 
     def summary(self) -> str:
@@ -365,11 +371,18 @@ class RiskReductionAnalysis(BaseModel):
         if self.achievable_paths:
             lines.append("✓ ACHIEVABLE OPTIONS (by hierarchy of controls):")
             for i, path in enumerate(self.achievable_paths[:5], 1):
-                feasibility_icon = {"easy": "🟢", "moderate": "🟡", "difficult": "🟠", "very_difficult": "🔴"}
+                feasibility_icon = {
+                    "easy": "🟢",
+                    "moderate": "🟡",
+                    "difficult": "🟠",
+                    "very_difficult": "🔴",
+                }
                 icon = feasibility_icon.get(path.overall_feasibility.value, "⚪")
                 cat_label = self._get_category_label(path, "en")
                 lines.append(f"  {i}. [{cat_label}] {path.description} {icon}")
-                lines.append(f"     → Level {path.predicted_level} (↓{path.combined_reduction_percent:.0f}%)")
+                lines.append(
+                    f"     → Level {path.predicted_level} (↓{path.combined_reduction_percent:.0f}%)"
+                )
         else:
             lines.append("✗ NO SINGLE MEASURE ACHIEVES TARGET")
 
@@ -377,7 +390,9 @@ class RiskReductionAnalysis(BaseModel):
             lines.append("")
             lines.append("△ HELPS BUT INSUFFICIENT ALONE:")
             for path in self.insufficient_paths[:3]:
-                lines.append(f"  - {path.description} (↓{path.combined_reduction_percent:.0f}%, still Level {path.predicted_level})")
+                lines.append(
+                    f"  - {path.description} (↓{path.combined_reduction_percent:.0f}%, still Level {path.predicted_level})"
+                )
 
         if self.limitations:
             lines.append("")
@@ -399,12 +414,19 @@ class RiskReductionAnalysis(BaseModel):
         if self.achievable_paths:
             lines.append("✓ 達成可能なオプション（管理の優先順位に従い表示）:")
             for i, path in enumerate(self.achievable_paths[:5], 1):
-                feasibility_icon = {"easy": "🟢", "moderate": "🟡", "difficult": "🟠", "very_difficult": "🔴"}
+                feasibility_icon = {
+                    "easy": "🟢",
+                    "moderate": "🟡",
+                    "difficult": "🟠",
+                    "very_difficult": "🔴",
+                }
                 icon = feasibility_icon.get(path.overall_feasibility.value, "⚪")
                 desc = path.description_ja or path.description
                 cat_label = self._get_category_label(path, "ja")
                 lines.append(f"  {i}. [{cat_label}] {desc} {icon}")
-                lines.append(f"     → レベル{path.predicted_level} (↓{path.combined_reduction_percent:.0f}%)")
+                lines.append(
+                    f"     → レベル{path.predicted_level} (↓{path.combined_reduction_percent:.0f}%)"
+                )
         else:
             lines.append("✗ 単独で目標達成可能な対策はありません")
 
@@ -413,7 +435,9 @@ class RiskReductionAnalysis(BaseModel):
             lines.append("△ 効果はあるが単独では不十分:")
             for path in self.insufficient_paths[:3]:
                 desc = path.description_ja or path.description
-                lines.append(f"  - {desc} (↓{path.combined_reduction_percent:.0f}%、レベル{path.predicted_level})")
+                lines.append(
+                    f"  - {desc} (↓{path.combined_reduction_percent:.0f}%、レベル{path.predicted_level})"
+                )
 
         if self.limitations_ja:
             lines.append("")
@@ -476,7 +500,9 @@ class MultiRiskAnalysis(BaseModel):
         return {
             "substance_cas": self.substance_cas,
             "substance_name": self.substance_name,
-            "controlling_risk_type": self.controlling_risk_type.value if self.controlling_risk_type else None,
+            "controlling_risk_type": self.controlling_risk_type.value
+            if self.controlling_risk_type
+            else None,
             "controlling_risk_label": self.controlling_risk_label,
             "controlling_risk_label_ja": self.controlling_risk_label_ja,
             "overall_risk_level": self.overall_risk_level,
@@ -514,7 +540,9 @@ class MultiRiskAnalysis(BaseModel):
                 lines.append("")
                 continue
 
-            lines.append(f"  Current: Level {analysis.current_level} (RCR={analysis.current_rcr:.2f})")
+            lines.append(
+                f"  Current: Level {analysis.current_level} (RCR={analysis.current_rcr:.2f})"
+            )
             lines.append(f"  Target: Level {analysis.target_level} (RCR≤{analysis.target_rcr})")
 
             if analysis.achievable_paths:

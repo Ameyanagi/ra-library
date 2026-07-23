@@ -212,7 +212,9 @@ def calculate_engineering_limit(
         if practical_min_rcr == theoretical_min_rcr:
             # Constraint doesn't affect the result (already using sealed or floor is the limit)
             reason_en = "model_floor"
-            reason_ja = f"暴露推定モデル下限値（{min_exposure} {unit}）が{limit_source_ja}と同等のため"
+            reason_ja = (
+                f"暴露推定モデル下限値（{min_exposure} {unit}）が{limit_source_ja}と同等のため"
+            )
         else:
             reason_en = "ventilation_constraint"
             reason_ja = f"制約条件（最大換気: {vent_name_ja}）による限界"

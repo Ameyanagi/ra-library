@@ -10,7 +10,6 @@ from typing import Optional
 
 from ..models.assessment import (
     AssessmentInput,
-    AssessmentMode,
     PropertyType,
     VentilationLevel,
 )
@@ -63,14 +62,10 @@ def get_inhalation_recommendations(
         recommendations.append(_recommend_substitution(substance, risk, language))
 
     # Engineering recommendations
-    recommendations.extend(
-        _recommend_ventilation(assessment_input, risk, language, constraints)
-    )
+    recommendations.extend(_recommend_ventilation(assessment_input, risk, language, constraints))
 
     # Administrative recommendations
-    recommendations.extend(
-        _recommend_administrative(assessment_input, risk, language, constraints)
-    )
+    recommendations.extend(_recommend_administrative(assessment_input, risk, language, constraints))
 
     # PPE recommendations
     # Note: Originally restricted to Report mode only per CREATE-SIMPLE VBA design,
@@ -267,9 +262,7 @@ def _recommend_ventilation(
         # Check both constraint AND floor for sealed system
         if _is_allowed(VentilationLevel.SEALED) and not _would_hit_floor(ratio):
             recommendations.append(
-                _create_vent_recommendation(
-                    current, VentilationLevel.SEALED, risk, ratio, language
-                )
+                _create_vent_recommendation(current, VentilationLevel.SEALED, risk, ratio, language)
             )
 
     return recommendations
