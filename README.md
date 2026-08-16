@@ -1,5 +1,9 @@
 # RA Library
 
+<p align="center">
+  <img src="assets/logo.png" alt="RA Suite logo" width="180">
+</p>
+
 Chemical risk assessment library built from publicly documented methodology references.
 
 ## Overview
