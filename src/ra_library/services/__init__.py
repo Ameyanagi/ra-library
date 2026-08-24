@@ -5,6 +5,7 @@ from .substances import lookup_substances
 from .calculate import calculate_risk
 from .explain import explain_calculation
 from .recommendations import get_recommendations
+from .presets import list_preset_profiles
 
 __all__ = [
     "ServiceError",
@@ -13,4 +14,5 @@ __all__ = [
     "calculate_risk",
     "explain_calculation",
     "get_recommendations",
+    "list_preset_profiles",
 ]
