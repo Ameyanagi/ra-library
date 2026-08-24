@@ -86,4 +86,3 @@ def list_preset_profiles(category: str | None = None, language: str = "en") -> S
             },
         }
     )
-
