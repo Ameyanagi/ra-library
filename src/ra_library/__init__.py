@@ -17,7 +17,7 @@ References:
 - ECETOC TRA
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 # Core models
 from .models.substance import (
@@ -101,6 +101,7 @@ from .services import (
     ServiceResult,
     lookup_substances,
     calculate_risk,
+    calculate_control_scenarios,
     explain_calculation,
     get_recommendations,
     list_preset_profiles,
@@ -181,6 +182,7 @@ __all__ = [
     "ServiceResult",
     "lookup_substances",
     "calculate_risk",
+    "calculate_control_scenarios",
     "explain_calculation",
     "get_recommendations",
     "list_preset_profiles",

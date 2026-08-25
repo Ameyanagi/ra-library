@@ -1,14 +1,14 @@
 # Release Plan
 
-`ra-library` is published to PyPI as a public runtime library. Service wrappers,
-scrapers, and deployment-specific projects stay GitHub-only.
+`ra-library` releases are retained on GitHub. The release workflow builds wheel
+and source artifacts but does not publish them to PyPI or another registry.
 
 ## Repository Cleanup Policy
 
 - Do not commit generated distributions from `dist/`.
 - Do not commit virtual environments, test caches, lint caches, or coverage files.
 - Keep only source files and intended runtime data under `src/ra_library/data/`.
-- Keep the README install command aligned with the current PyPI package name.
+- Keep the README install command aligned with the current GitHub tag.
 - Run the local checks before tagging a release.
 
 ## Local Checks
@@ -27,19 +27,6 @@ Install hooks once per checkout:
 uv run pre-commit install
 ```
 
-## PyPI Trusted Publishing Setup
-
-Configure a Trusted Publisher on PyPI before pushing the first release tag:
-
-- PyPI project: `ra-library`
-- GitHub owner: `Ameyanagi`
-- GitHub repository: `ra-library`
-- Workflow name: `publish.yml`
-- Environment name: `pypi`
-
-The workflow uses GitHub OIDC through `pypa/gh-action-pypi-publish`, so no PyPI
-API token is needed in GitHub secrets.
-
 ## Tag-Only Release Flow
 
 1. Update `project.version` in `pyproject.toml`.
@@ -49,10 +36,10 @@ API token is needed in GitHub secrets.
 5. Create and push a matching tag:
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+git tag -a v0.4.0 -m "ra-library v0.4.0"
+git push origin v0.4.0
 ```
 
-The publish workflow only runs on tags matching `v*`. It also verifies that the
+The release workflow only runs on tags matching `v*`. It verifies that the
 tag exactly matches `project.version`, runs tests, builds fresh distributions,
-checks them with Twine, and publishes to PyPI.
+checks them with Twine, and attaches them to a GitHub Release.

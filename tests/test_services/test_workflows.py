@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 
-from ra_library.assessment.result import AssessmentResult
 from ra_library.services import ServiceError, calculate_risk, get_recommendations, lookup_substances
 
 
@@ -28,21 +27,13 @@ def test_calculate_risk_raises_machine_readable_error_for_invalid_methodology():
     assert exc_info.value.code == "INVALID_METHODOLOGY_VERSION"
 
 
-def test_get_recommendations_returns_fallback_warning(monkeypatch):
-    """Recommendation fallback should still return a usable payload plus warning metadata."""
-
-    def _raise_recommendations(*args, **kwargs):
-        raise RuntimeError("forced recommendation failure")
-
-    monkeypatch.setattr(
-        AssessmentResult, "get_recommendations_for_substance", _raise_recommendations
-    )
-
+def test_get_recommendations_returns_verified_recalculations():
+    """Recommendation service should return auditable full recalculations."""
     result = get_recommendations(cas_number="7440-06-4", target_level="I")
 
-    warning_codes = {warning["code"] for warning in result.warnings}
-    assert "RECOMMENDATION_ANALYSIS_FALLBACK" in warning_codes
-    assert result.data["mode"] == "fallback"
+    assert result.data["mode"] == "verified_recalculation"
+    assert result.data["recommendation_analysis"]["calculation_basis"] == "full_recalculation"
+    assert all(path["calculation_status"] == "recalculated" for path in result.data["paths"])
 
 
 def test_calculate_risk_defaults_to_v321_methodology():

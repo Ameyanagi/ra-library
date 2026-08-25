@@ -1,0 +1,2621 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "workbook": "CREATE-SIMPLE_ver3.2.1.xlsm",
+    "sha256": "8d4b790a3ccc06b01dd21a41ed2321c63f9046c7077eb554ff5a662455691664",
+    "methodology_version": "v3.2.1"
+  },
+  "sheets": [
+    {
+      "name": "トップ",
+      "state": "visible"
+    },
+    {
+      "name": "リスクアセスメントシート",
+      "state": "visible"
+    },
+    {
+      "name": "実施レポート",
+      "state": "visible"
+    },
+    {
+      "name": "結果一覧",
+      "state": "visible"
+    },
+    {
+      "name": "製品DB",
+      "state": "visible"
+    },
+    {
+      "name": "GloveData",
+      "state": "veryHidden"
+    },
+    {
+      "name": "SubstanceList",
+      "state": "veryHidden"
+    },
+    {
+      "name": "SelectList",
+      "state": "veryHidden"
+    },
+    {
+      "name": "TranslationTable",
+      "state": "veryHidden"
+    }
+  ],
+  "option_lists": {
+    "Option_Fitting": [
+      {
+        "sheet": "SelectList",
+        "cell": "D195",
+        "value": "なし"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D196",
+        "value": "簡易法（シールチェック）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D197",
+        "value": "フィットテスト"
+      }
+    ],
+    "Option_RPE_Liquid": [
+      {
+        "sheet": "SelectList",
+        "cell": "D171",
+        "value": "防毒マスク（半面形面体）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D172",
+        "value": "防毒マスク（全面形面体）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D173",
+        "value": "電動ファン付き呼吸用保護具（ルーズフィット形）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D174",
+        "value": "電動ファン付き呼吸用保護具（半面形面体）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D175",
+        "value": "電動ファン付き呼吸用保護具（全面形面体）"
+      }
+    ],
+    "Option_RPE_Solid": [
+      {
+        "sheet": "SelectList",
+        "cell": "D176",
+        "value": "防じんマスク（全面形面体、RS3・RL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D177",
+        "value": "防じんマスク（全面形面体、RS2・RL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D178",
+        "value": "防じんマスク（全面形面体、RS1・RL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D179",
+        "value": "防じんマスク（半面形面体、RS3・RL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D180",
+        "value": "防じんマスク（半面形面体、RS2・RL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D181",
+        "value": "防じんマスク（半面形面体、RS1・RL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D182",
+        "value": "防じんマスク（使い捨て式、DS3・DL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D183",
+        "value": "防じんマスク（使い捨て式、DS2・DL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D184",
+        "value": "防じんマスク（使い捨て式、DS1・DL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D185",
+        "value": "電動ファン付き呼吸用保護具（ルーズフィット形、S級・A級・B級、PS1・PL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D186",
+        "value": "電動ファン付き呼吸用保護具（ルーズフィット形、A級、PS3・PL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D187",
+        "value": "電動ファン付き呼吸用保護具（ルーズフィット形、S級・A級、PS2・PL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D188",
+        "value": "電動ファン付き呼吸用保護具（ルーズフィット形、S級、PS3・PL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D189",
+        "value": "電動ファン付き呼吸用保護具（半面形面体、A級・B級、PS1・PL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D190",
+        "value": "電動ファン付き呼吸用保護具（全面形面体、A級・B級、PS1・PL1）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D191",
+        "value": "電動ファン付き呼吸用保護具（半面形面体、A級、PS2・PL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D192",
+        "value": "電動ファン付き呼吸用保護具（半面形面体、S級、PS3・PL3）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D193",
+        "value": "電動ファン付き呼吸用保護具（全面形面体、A級、PS2・PL2）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D194",
+        "value": "電動ファン付き呼吸用保護具（全面形面体、S級、PS3・PL3）"
+      }
+    ],
+    "Q10_Glove_edu": [
+      {
+        "sheet": "SelectList",
+        "cell": "D207",
+        "value": "教育や訓練を行っていない"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D208",
+        "value": "基本的な教育や訓練を行っている"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D209",
+        "value": "十分な教育や訓練を行っている"
+      }
+    ],
+    "Q11_process_temperature": [
+      {
+        "sheet": "SelectList",
+        "cell": "D210",
+        "value": "室温"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D211",
+        "value": "室温以上"
+      }
+    ],
+    "Q12_Ignition_source": [
+      {
+        "sheet": "SelectList",
+        "cell": "D212",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D213",
+        "value": "いいえ"
+      }
+    ],
+    "Q13_Explosive_atmosphere": [
+      {
+        "sheet": "SelectList",
+        "cell": "D214",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D215",
+        "value": "いいえ"
+      }
+    ],
+    "Q14_Organic_matter": [
+      {
+        "sheet": "SelectList",
+        "cell": "D216",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D217",
+        "value": "いいえ"
+      }
+    ],
+    "Q15_Air_water": [
+      {
+        "sheet": "SelectList",
+        "cell": "D218",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D219",
+        "value": "いいえ"
+      }
+    ],
+    "Q1_Gas": [
+      {
+        "sheet": "SelectList",
+        "cell": "D140",
+        "value": "大量 （1ｔ以上）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D141",
+        "value": "中量 （1kg以上～1000kg未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D142",
+        "value": "少量 （100g以上～1000g未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D143",
+        "value": "微量 （10g以上～100g未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D144",
+        "value": "極微量（10g未満）"
+      }
+    ],
+    "Q1_Liquid": [
+      {
+        "sheet": "SelectList",
+        "cell": "D130",
+        "value": "大量 （1kL以上）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D131",
+        "value": "中量 （1L以上～1000L未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D132",
+        "value": "少量 （100mL以上～1000mL未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D133",
+        "value": "微量 （10mL以上～100mL未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D134",
+        "value": "極微量（10mL未満）"
+      }
+    ],
+    "Q1_Solid": [
+      {
+        "sheet": "SelectList",
+        "cell": "D135",
+        "value": "大量 （1ｔ以上）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D136",
+        "value": "中量 （1kg以上～1000kg未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D137",
+        "value": "少量 （100g以上～1000g未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D138",
+        "value": "微量 （10g以上～100g未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D139",
+        "value": "極微量（10g未満）"
+      }
+    ],
+    "Q2_Spray": [
+      {
+        "sheet": "SelectList",
+        "cell": "D145",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D146",
+        "value": "いいえ"
+      }
+    ],
+    "Q3_Workingarea": [
+      {
+        "sheet": "SelectList",
+        "cell": "D147",
+        "value": "はい"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D148",
+        "value": "いいえ"
+      }
+    ],
+    "Q4_ControlVelocity": [
+      {
+        "sheet": "SelectList",
+        "cell": "D155",
+        "value": "制御風速を確認していない"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D156",
+        "value": "制御風速を確認している"
+      }
+    ],
+    "Q4_Ventilation": [
+      {
+        "sheet": "SelectList",
+        "cell": "D149",
+        "value": "換気レベルA（特に換気のない部屋）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D150",
+        "value": "換気レベルB（全体換気）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D151",
+        "value": "換気レベルC（工業的な全体換気、屋外作業）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D152",
+        "value": "換気レベルD（外付け式局所排気装置）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D153",
+        "value": "換気レベルE（囲い式局所排気装置）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D154",
+        "value": "換気レベルF（密閉容器内での取扱い）"
+      }
+    ],
+    "Q5_Time": [
+      {
+        "sheet": "SelectList",
+        "cell": "D157",
+        "value": "8時間超"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D158",
+        "value": "7時間超～8時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D159",
+        "value": "6時間超～7時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D160",
+        "value": "5時間超～6時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D161",
+        "value": "4時間超～5時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D162",
+        "value": "3時間超～4時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D163",
+        "value": "2時間超～3時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D164",
+        "value": "1時間超～2時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D165",
+        "value": "30分超～1時間以下"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D166",
+        "value": "30分以下"
+      }
+    ],
+    "Q6_Frequency": [
+      {
+        "sheet": "SelectList",
+        "cell": "D167",
+        "value": "週1回以上"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D168",
+        "value": "週1回未満"
+      }
+    ],
+    "Q7_ExposureVariation": [
+      {
+        "sheet": "SelectList",
+        "cell": "D169",
+        "value": "ばく露濃度の変動が小さい作業"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D170",
+        "value": "ばく露濃度の変動が大きい作業"
+      }
+    ],
+    "Q8_Exposure_area": [
+      {
+        "sheet": "SelectList",
+        "cell": "D198",
+        "value": "大きなコインのサイズ、小さな飛沫"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D199",
+        "value": "片手の手のひら付着"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D200",
+        "value": "両手の手のひらに付着"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D201",
+        "value": "両手全体に付着"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D202",
+        "value": "両手及び手首"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D203",
+        "value": "両手の肘から下全体"
+      }
+    ],
+    "Q9_Glove": [
+      {
+        "sheet": "SelectList",
+        "cell": "D204",
+        "value": "手袋を着用していない"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D205",
+        "value": "取扱物質に関する情報のない手袋を使用している"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D206",
+        "value": "耐透過性・耐浸透性の手袋の着用している"
+      }
+    ],
+    "listDustiness": [
+      {
+        "sheet": "SelectList",
+        "cell": "D123",
+        "value": "高飛散性（微細な軽い粉体）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D124",
+        "value": "中飛散性（結晶状・顆粒状）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D125",
+        "value": "低飛散性（壊れないペレット）"
+      }
+    ],
+    "listProductPropertyType": [
+      {
+        "sheet": "SelectList",
+        "cell": "D2",
+        "value": "液体"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D3",
+        "value": "粉体"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D4",
+        "value": "気体"
+      }
+    ],
+    "listVolatility": [
+      {
+        "sheet": "SelectList",
+        "cell": "D118",
+        "value": "高揮発性（沸点：50℃未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D119",
+        "value": "中揮発性（沸点：50℃以上～150℃未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D120",
+        "value": "低揮発性（沸点：150℃以上）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D121",
+        "value": "極低揮発性（蒸気圧：0.5 Pa未満）"
+      },
+      {
+        "sheet": "SelectList",
+        "cell": "D122",
+        "value": "わからない"
+      }
+    ]
+  },
+  "risk_descriptions": {
+    "aerosolRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E230",
+        "value": "引火するおそれがあるため、着火源の除去、爆発性雰囲気の形成防止対策の管理を引き続き実施しましょう。"
+      }
+    ],
+    "aerosolRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E229",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "aerosolRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E228",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "aerosolRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E227",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "dermalRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E295",
+        "value": "保護手袋を着用しましょう。"
+      }
+    ],
+    "dermalRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E294",
+        "value": "不浸透性の化学防護手袋の着用を推奨します。"
+      }
+    ],
+    "dermalRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E293",
+        "value": "不浸透性の化学防護手袋を着用しましょう。"
+      }
+    ],
+    "dermalRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E292",
+        "value": "不浸透性の化学防護手袋を着用しましょう。"
+      }
+    ],
+    "explosivesRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E222",
+        "value": "爆発のおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "flamGasRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E226",
+        "value": "引火するおそれがあるため、着火源の除去、爆発性雰囲気の形成防止対策の管理を引き続き実施しましょう。"
+      }
+    ],
+    "flamGasRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E225",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamGasRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E224",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamGasRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E223",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamLiqRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E239",
+        "value": "引火するおそれがあるため、着火源の除去、爆発性雰囲気の形成防止対策の管理を引き続き実施しましょう。"
+      }
+    ],
+    "flamLiqRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E238",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamLiqRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E237",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamLiqRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E236",
+        "value": "引火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、爆発性雰囲気の形成防止対策を徹底しましょう。"
+      }
+    ],
+    "flamSolRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E243",
+        "value": "着火するおそれがあるため、着火源の除去、飛散を防ぐ対応を引き続き実施しましょう。"
+      }
+    ],
+    "flamSolRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E242",
+        "value": "着火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、飛散を防ぐ対応を徹底しましょう。"
+      }
+    ],
+    "flamSolRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E241",
+        "value": "着火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、飛散を防ぐ対応を徹底しましょう。"
+      }
+    ],
+    "flamSolRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E240",
+        "value": "着火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、飛散を防ぐ対応を徹底しましょう。"
+      }
+    ],
+    "gasesUnderPressureRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E235",
+        "value": "圧力に応じて法令（高圧ガス保安法、安全衛生規則、ボイラー則など）を参照のうえ対応しましょう。"
+      }
+    ],
+    "inertExplosivesRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E271",
+        "value": "爆発のおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "inhalationRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E281",
+        "value": "濃度基準値設定物質以外の長時間（8時間）ばく露の評価結果は十分に良好です。"
+      }
+    ],
+    "inhalationRiskDescription2A": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E280",
+        "value": "濃度基準値設定物質以外の長時間（8時間）ばく露の評価結果は良好です。換気、機器や器具、作業手順などの管理に努めましょう。"
+      }
+    ],
+    "inhalationRiskDescription2B": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E279",
+        "value": "リスクアセスメントのための測定等を実施するか、リスクを下げる対策を実施を実施しましょう。"
+      }
+    ],
+    "inhalationRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E278",
+        "value": "リスクアセスメントのための測定等を実施するか、リスクを下げる対策を実施を実施しましょう。"
+      }
+    ],
+    "inhalationRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E277",
+        "value": "リスクアセスメントのための測定等を実施するか、リスクを下げる対策を実施を実施しましょう。"
+      }
+    ],
+    "metCorrRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E270",
+        "value": "貯蔵、使用時に容器や配管などを腐食し破損、割れのおそれがあるため、SDS等を確認し適切に取り扱いましょう。"
+      }
+    ],
+    "orgPeroxRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E269",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "orgPeroxRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E268",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "orgPeroxRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E267",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "orgPeroxRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E266",
+        "value": "熱すると火災や爆発のおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "oxGasRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E234",
+        "value": "火災等を引き起こすおそれがあるため、可燃物の管理を引き続き実施しましょう。"
+      }
+    ],
+    "oxGasRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E233",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。可燃物の管理などを徹底しましょう。カンリ"
+      }
+    ],
+    "oxGasRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E232",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。可燃物の管理などを徹底しましょう。カンリ"
+      }
+    ],
+    "oxGasRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E231",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。可燃物の管理などを徹底しましょう。カンリ"
+      }
+    ],
+    "oxLiqRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E261",
+        "value": "火災等を引き起こすおそれがあるため、有機物・金属の取扱いの回避を引き続き実施しましょう。"
+      }
+    ],
+    "oxLiqRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E260",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "oxLiqRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E259",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "oxLiqRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E258",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "oxSolRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E265",
+        "value": "火災等を引き起こすおそれがあるため、有機物・金属の取扱いの回避を引き続き実施しましょう。"
+      }
+    ],
+    "oxSolRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E264",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "oxSolRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E263",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "oxSolRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E262",
+        "value": "火災等を引き起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。有機物・金属の取扱いの回避を徹底しましょう。"
+      }
+    ],
+    "pyrLiqRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E248",
+        "value": "空気に触れると自然発火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "pyrSolRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E249",
+        "value": "空気に触れると自然発火するおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "selfHeatRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E253",
+        "value": "自己発熱を起こすおそれがあるため、空気・水との接触防止対策を引き続き実施しましょう。"
+      }
+    ],
+    "selfHeatRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E252",
+        "value": "自己発熱を起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "selfHeatRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E251",
+        "value": "自己発熱を起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "selfHeatRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E250",
+        "value": "自己発熱を起こすおそれがあるため、詳細なリスクアセスメントを実施しましょう。空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "selfReactRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E247",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "selfReactRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E246",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "selfReactRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E245",
+        "value": "取り扱い方によっては自己発熱分解などを起こすおそれがあるため、取り扱いには注意しましょう。"
+      }
+    ],
+    "selfReactRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E244",
+        "value": "熱すると火災や爆発のおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ],
+    "skinRiskDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E296",
+        "value": "皮膚障害等防止用保護具の選定マニュアルに従い、適切な皮膚障害等防止用保護具を着用しましょう。"
+      }
+    ],
+    "waterReactRiskDescription1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E257",
+        "value": "水と反応を起こし自然発火や引火性ガスなどが発生するおそれがあるため、着火源の除去、空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "waterReactRiskDescription2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E256",
+        "value": "水と反応を起こし自然発火や引火性ガスなどが発生するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "waterReactRiskDescription3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E255",
+        "value": "水と反応を起こし自然発火や引火性ガスなどが発生するおそれがあるため、詳細なリスクアセスメントを実施しましょう。着火源の除去、空気・水との接触防止対策を徹底しましょう。"
+      }
+    ],
+    "waterReactRiskDescription4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E254",
+        "value": "水と反応を起こし自然発火や引火性ガスなどが発生するおそれがあるため、詳細なリスクアセスメントを実施しましょう。専門家または購入元に取り扱い方等を確認・相談のうえSDS等に従い取り扱いましょう。"
+      }
+    ]
+  },
+  "labels_and_messages": {
+    "labelACGIHTLVC": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E392",
+        "value": "ACGIH TLV-C"
+      }
+    ],
+    "labelACGIHTLVSTEL": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E391",
+        "value": "ACGIH TLV-STEL"
+      }
+    ],
+    "labelACGIHTLVTWA": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E390",
+        "value": "ACGIH TLV-TWA"
+      }
+    ],
+    "labelAcuteToxDermal": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E453",
+        "value": "急性毒性（経皮）"
+      }
+    ],
+    "labelAcuteToxInhalationDustOrMist": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E456",
+        "value": "急性毒性（吸入：粉塵、ミスト）"
+      }
+    ],
+    "labelAcuteToxInhalationGases": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E454",
+        "value": "急性毒性（吸入：ガス）"
+      }
+    ],
+    "labelAcuteToxInhalationVapors": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E455",
+        "value": "急性毒性（吸入：蒸気）"
+      }
+    ],
+    "labelAcuteToxOral": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E452",
+        "value": "急性毒性（経口）"
+      }
+    ],
+    "labelAerosol": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E431",
+        "value": "エアゾール"
+      }
+    ],
+    "labelAspTox": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E466",
+        "value": "誤えん有害性"
+      }
+    ],
+    "labelBoilingPoint": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E398",
+        "value": "沸点"
+      }
+    ],
+    "labelCarc": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E462",
+        "value": "発がん性"
+      }
+    ],
+    "labelConcentrationStandard8Hour": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E386",
+        "value": "８時間濃度基準値"
+      }
+    ],
+    "labelConcentrationStandardShortTerm": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E387",
+        "value": "短時間濃度基準値"
+      }
+    ],
+    "labelDFGMAK": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E393",
+        "value": "DFG MAK"
+      }
+    ],
+    "labelDFGPeakLim": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E394",
+        "value": "DFG Peak lim"
+      }
+    ],
+    "labelEnterCASRN": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E491",
+        "value": "CAS番号を改行またはカンマ区切りで入力してください。"
+      }
+    ],
+    "labelExplosives": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E406",
+        "value": "爆発物"
+      }
+    ],
+    "labelEyeCorrOrIrrit": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E458",
+        "value": "眼に対する重篤な損傷性／眼刺激性"
+      }
+    ],
+    "labelFlamGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E430",
+        "value": "可燃性ガス"
+      }
+    ],
+    "labelFlamLiq": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E440",
+        "value": "引火性液体"
+      }
+    ],
+    "labelFlamSol": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E441",
+        "value": "可燃性固体"
+      }
+    ],
+    "labelFlashPoint": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E400",
+        "value": "引火点"
+      }
+    ],
+    "labelGasesUnderPressure": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E433",
+        "value": "高圧ガス"
+      }
+    ],
+    "labelInertExplosives": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E451",
+        "value": "鈍性化爆発物"
+      }
+    ],
+    "labelJSOHOEL": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E388",
+        "value": "日本産業衛生学会 許容濃度"
+      }
+    ],
+    "labelJSOHOELCeiling": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E389",
+        "value": "日本産業衛生学会 最大許容濃度"
+      }
+    ],
+    "labelLogKow": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E399",
+        "value": "オクタノール／水分配係数"
+      }
+    ],
+    "labelMetCorr": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E450",
+        "value": "金属腐食性化学品"
+      }
+    ],
+    "labelMolecularWeight": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E397",
+        "value": "分子量"
+      }
+    ],
+    "labelMuta": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E461",
+        "value": "生殖細胞変異原性"
+      }
+    ],
+    "labelOrgPerox": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E449",
+        "value": "有機過酸化物"
+      }
+    ],
+    "labelOther8Hour": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E395",
+        "value": "その他（８時間）"
+      }
+    ],
+    "labelOtherShortTerm": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E396",
+        "value": "その他（短時間）"
+      }
+    ],
+    "labelOxGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E432",
+        "value": "酸化性ガス"
+      }
+    ],
+    "labelOxLiq": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E447",
+        "value": "酸化性液体"
+      }
+    ],
+    "labelOxSol": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E448",
+        "value": "酸化性固体"
+      }
+    ],
+    "labelPyrLiq": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E443",
+        "value": "自然発火性液体"
+      }
+    ],
+    "labelPyrSol": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E444",
+        "value": "自然発火性固体"
+      }
+    ],
+    "labelRepr": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E463",
+        "value": "生殖毒性"
+      }
+    ],
+    "labelRespSens": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E459",
+        "value": "呼吸器感作性"
+      }
+    ],
+    "labelSTOTRE": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E465",
+        "value": "特定標的臓器毒性（反復暴露）"
+      }
+    ],
+    "labelSTOTSE": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E464",
+        "value": "特定標的臓器毒性（単回暴露）"
+      }
+    ],
+    "labelSelfHeat": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E445",
+        "value": "自己発熱性化学品"
+      }
+    ],
+    "labelSelfReact": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E442",
+        "value": "自己反応性化学品"
+      }
+    ],
+    "labelSkinCorrOrIrrit": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E457",
+        "value": "皮膚腐食性／刺激性"
+      }
+    ],
+    "labelSkinSens": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E460",
+        "value": "皮膚感作性"
+      }
+    ],
+    "labelSolubilityInWater": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E401",
+        "value": "水溶解度"
+      }
+    ],
+    "labelVaporPressure": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E402",
+        "value": "蒸気圧"
+      }
+    ],
+    "labelWaterReact": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E446",
+        "value": "水反応可燃性化学品"
+      }
+    ],
+    "msgDataMigrated": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E474",
+        "value": "旧バージョンからデータが移行されました。"
+      }
+    ],
+    "msgEnterConcentration": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E477",
+        "value": "含有率を入力してください｡"
+      }
+    ],
+    "msgIncompleteQs": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E475",
+        "value": "設問が全て入力されていません。"
+      }
+    ],
+    "msgIncompleteVolatilityOrDustiness": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E476",
+        "value": "揮発性／飛散性が入力されていません。"
+      }
+    ],
+    "msgInvalidChars": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E485",
+        "value": "入力に無効な文字が含まれています。"
+      }
+    ],
+    "msgInvalidProperties": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E478",
+        "value": "物化性状が正しく入力されていません。"
+      }
+    ],
+    "msgInvalidTextEmpty": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E484",
+        "value": "テキストボックスに何も入力されていません。"
+      }
+    ],
+    "msgLoadError": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E479",
+        "value": "データの読み込み中にエラーが発生しました。"
+      }
+    ],
+    "msgNoChemSelected": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E473",
+        "value": "化学物質が選択されていません。"
+      }
+    ],
+    "msgNotFound": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E482",
+        "value": "物質リストに見つかりません。"
+      }
+    ],
+    "msgProdInfoEntered": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E483",
+        "value": "製品DBより製品情報が入力されました。"
+      }
+    ],
+    "msgReportCreated": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E480",
+        "value": "レポートが作成されました。レポートに移動します。"
+      }
+    ],
+    "msgRiskResultsEntered": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E486",
+        "value": "リスクアセスメント結果が入力されました。"
+      }
+    ],
+    "msgSavePDF": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E472",
+        "value": "PDFファイルを保存しました: "
+      }
+    ],
+    "msgSaveResult": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E488",
+        "value": "結果が保存されました。"
+      }
+    ],
+    "msgSelectOutput": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E481",
+        "value": "出力する項目を選択してください。"
+      }
+    ],
+    "msgSubstanceInfoEntered": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E487",
+        "value": "物質名、GHS分類情報、ばく露限界値等の情報が入力されました。"
+      }
+    ],
+    "msgVaperPressureUnitNotEntered": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E489",
+        "value": "蒸気圧の単位が入力されていません。"
+      }
+    ],
+    "msgWorkCategoryNotSelected": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E490",
+        "value": "作業分類が選択されていません。"
+      }
+    ],
+    "textACGIH": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E383",
+        "value": "ACGIH"
+      }
+    ],
+    "textAboveRoomTemp": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E188",
+        "value": "室温以上"
+      }
+    ],
+    "textAfter": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E311",
+        "value": "対策後"
+      }
+    ],
+    "textAvailableGloveMaterials": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E340",
+        "value": "●使用可能な手袋材料の例"
+      }
+    ],
+    "textBasicInfo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E303",
+        "value": "基本情報"
+      }
+    ],
+    "textBefore": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E310",
+        "value": "現状"
+      }
+    ],
+    "textBelowRoomTemp": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E187",
+        "value": "室温"
+      }
+    ],
+    "textCASSearch": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E79",
+        "value": "CAS RNで検索"
+      }
+    ],
+    "textCancel": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E45",
+        "value": "キャンセル"
+      }
+    ],
+    "textCarcinogenicSubstances": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E212",
+        "value": "がん原性物質"
+      }
+    ],
+    "textCas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E83",
+        "value": "CAS RN"
+      }
+    ],
+    "textCat": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E403",
+        "value": "区分"
+      }
+    ],
+    "textCategory1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E421",
+        "value": "区分1"
+      }
+    ],
+    "textCategory1A": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E422",
+        "value": "区分1A"
+      }
+    ],
+    "textCategory1B": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E423",
+        "value": "区分1B"
+      }
+    ],
+    "textCategory1C": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E424",
+        "value": "区分1C"
+      }
+    ],
+    "textCategory2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E425",
+        "value": "区分2"
+      }
+    ],
+    "textCategory2A": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E426",
+        "value": "区分2A"
+      }
+    ],
+    "textCategory2B": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E427",
+        "value": "区分2B"
+      }
+    ],
+    "textCategory3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E428",
+        "value": "区分3"
+      }
+    ],
+    "textCategory4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E429",
+        "value": "区分4"
+      }
+    ],
+    "textChemicalList": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E80",
+        "value": "物質一覧から選択"
+      }
+    ],
+    "textClear": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E59",
+        "value": "入力内容クリア"
+      }
+    ],
+    "textClear2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E78",
+        "value": "クリア"
+      }
+    ],
+    "textCompInfo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E304",
+        "value": "成分情報"
+      }
+    ],
+    "textCompressedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E434",
+        "value": "圧縮ガス"
+      }
+    ],
+    "textConcentration": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E85",
+        "value": "含有率 [wt%]"
+      }
+    ],
+    "textConcentrationStandard": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E381",
+        "value": "濃度基準値"
+      }
+    ],
+    "textConcentrationStandardChemicals": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E213",
+        "value": "濃度基準値設定物質"
+      }
+    ],
+    "textControlVelocity": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E120",
+        "value": "制御風速の確認"
+      }
+    ],
+    "textControlVelocityNo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E121",
+        "value": "制御風速を確認していない"
+      }
+    ],
+    "textControlVelocityYes": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E122",
+        "value": "制御風速を確認している"
+      }
+    ],
+    "textDFG": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E384",
+        "value": "DFG"
+      }
+    ],
+    "textDate": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E56",
+        "value": "実施日"
+      }
+    ],
+    "textDaysPerMonth": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E139",
+        "value": "日／月"
+      }
+    ],
+    "textDaysPerWeek": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E138",
+        "value": "日／週"
+      }
+    ],
+    "textDermal": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E72",
+        "value": "経皮吸収"
+      }
+    ],
+    "textDetailedRiskAssessmentResults": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E350",
+        "value": "詳細なリスクアセスメントの実施結果"
+      }
+    ],
+    "textDisplay": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E86",
+        "value": "▼詳細表示"
+      }
+    ],
+    "textDissolvedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E439",
+        "value": "溶解ガス"
+      }
+    ],
+    "textDivision1.1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E408",
+        "value": "等級1.1"
+      }
+    ],
+    "textDivision1.2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E409",
+        "value": "等級1.2"
+      }
+    ],
+    "textDivision1.3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E410",
+        "value": "等級1.3"
+      }
+    ],
+    "textDivision1.4": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E411",
+        "value": "等級1.4"
+      }
+    ],
+    "textDivision1.5": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E412",
+        "value": "等級1.5"
+      }
+    ],
+    "textDivision1.6": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E413",
+        "value": "等級1.6"
+      }
+    ],
+    "textDustinessHigh": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E371",
+        "value": "高飛散性（微細な軽い粉体）"
+      }
+    ],
+    "textDustinessLow": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E373",
+        "value": "低飛散性（壊れないペレット）"
+      }
+    ],
+    "textDustinessMidium": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E372",
+        "value": "中飛散性（結晶状・顆粒状）"
+      }
+    ],
+    "textEditChemicalInfo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E82",
+        "value": "編集"
+      }
+    ],
+    "textExplosivesDivision": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E405",
+        "value": "等級"
+      }
+    ],
+    "textExplosivesUnstableExplosive": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E407",
+        "value": "不安定爆発物"
+      }
+    ],
+    "textExposureConcentration": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E202",
+        "value": "推定ばく露濃度"
+      }
+    ],
+    "textGHSclassification": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E88",
+        "value": "GHS分類"
+      }
+    ],
+    "textGases": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E70",
+        "value": "気体"
+      }
+    ],
+    "textGetResults": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E58",
+        "value": "結果呼出"
+      }
+    ],
+    "textHealthHazard": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E210",
+        "value": "有害性"
+      }
+    ],
+    "textHide": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E87",
+        "value": "▲非表示"
+      }
+    ],
+    "textHighPressureLiquefiedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E436",
+        "value": "高圧液化ガス"
+      }
+    ],
+    "textInhalation": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E71",
+        "value": "吸入"
+      }
+    ],
+    "textInhalation8hr": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E204",
+        "value": "吸入\n（8時間）"
+      }
+    ],
+    "textInhalationShort": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E205",
+        "value": "吸入\n（短時間）"
+      }
+    ],
+    "textInputFromText": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E81",
+        "value": "CAS RN一括入力"
+      }
+    ],
+    "textJSOH": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E382",
+        "value": "日本産業衛生学会"
+      }
+    ],
+    "textLead": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E220",
+        "value": "鉛等"
+      }
+    ],
+    "textLiquefiedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E435",
+        "value": "液化ガス"
+      }
+    ],
+    "textLiquid": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E68",
+        "value": "液体"
+      }
+    ],
+    "textLowPressureLiquefiedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E437",
+        "value": "低圧液化ガス"
+      }
+    ],
+    "textMethod": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E312",
+        "value": "手法"
+      }
+    ],
+    "textMultipleReplacement240": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E343",
+        "value": "●複数回交換が必要な手袋材料の例（240分以内に交換）"
+      }
+    ],
+    "textMultipleReplacement240Or60": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E342",
+        "value": "●複数回交換が必要な手袋材料の例（240分または60分以内に交換）"
+      }
+    ],
+    "textMultipleReplacementNoInfo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E341",
+        "value": "●複数回交換が必要な手袋材料の例（情報なし）"
+      }
+    ],
+    "textName": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E57",
+        "value": "実施者"
+      }
+    ],
+    "textNo": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E191",
+        "value": "いいえ"
+      }
+    ],
+    "textNoData": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E347",
+        "value": "情報なし"
+      }
+    ],
+    "textNumOfComp": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E75",
+        "value": "成分数"
+      }
+    ],
+    "textOEL": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E89",
+        "value": "ばく露限界値"
+      }
+    ],
+    "textOELInUse": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E469",
+        "value": "使用するばく露限界値"
+      }
+    ],
+    "textOELOrTargetConcentrationRange": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E201",
+        "value": "ばく露限界値（管理目標濃度）"
+      }
+    ],
+    "textOrganicSolventsClass1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E217",
+        "value": "有機則（第１種有機溶剤）"
+      }
+    ],
+    "textOrganicSolventsClass2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E218",
+        "value": "有機則（第２種有機溶剤）"
+      }
+    ],
+    "textOrganicSolventsClass3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E219",
+        "value": "有機則（第３種有機溶剤）"
+      }
+    ],
+    "textOther": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E385",
+        "value": "その他"
+      }
+    ],
+    "textOutputToReport": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E200",
+        "value": "実施レポートに出力"
+      }
+    ],
+    "textOutputToRiskAssessment": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E471",
+        "value": "リスクアセスメントシートに出力"
+      }
+    ],
+    "textPhysicalHazards": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E73",
+        "value": "危険性（爆発・火災等）"
+      }
+    ],
+    "textPhysicalHazards2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E207",
+        "value": "危険性\n（爆発・火災等）"
+      }
+    ],
+    "textPhysicalHazardsShort": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E74",
+        "value": "危険性"
+      }
+    ],
+    "textPhysicochemicalProperties": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E90",
+        "value": "物理化学的性状"
+      }
+    ],
+    "textPlace": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E63",
+        "value": "実施場所"
+      }
+    ],
+    "textProcessTemp": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E186",
+        "value": "取扱温度"
+      }
+    ],
+    "textProductDB": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E61",
+        "value": "製品DBから入力"
+      }
+    ],
+    "textProductGHS": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E47",
+        "value": "製品のGHS分類"
+      }
+    ],
+    "textProductID": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E40",
+        "value": "製品ID等"
+      }
+    ],
+    "textProductName": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E41",
+        "value": "製品名等"
+      }
+    ],
+    "textProperty": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E66",
+        "value": "性状"
+      }
+    ],
+    "textPropertyType": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E353",
+        "value": "性状"
+      }
+    ],
+    "textQuestion": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E302",
+        "value": "設問"
+      }
+    ],
+    "textRAtarget": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E65",
+        "value": "リスクアセスメント対象"
+      }
+    ],
+    "textRefrigeratedLiquefiedGas": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E438",
+        "value": "深冷液化ガス"
+      }
+    ],
+    "textRegisterOrEdit": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E36",
+        "value": "登録・修正"
+      }
+    ],
+    "textRegistrationDate": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E38",
+        "value": "登録日"
+      }
+    ],
+    "textRemarks": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E43",
+        "value": "備考"
+      }
+    ],
+    "textReplaceWithin240": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E345",
+        "value": "（240分以内に交換）"
+      }
+    ],
+    "textReplaceWithin60": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E346",
+        "value": "（60分以内に交換）"
+      }
+    ],
+    "textReset": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E349",
+        "value": "リセット"
+      }
+    ],
+    "textResultDescription": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E209",
+        "value": "判定結果"
+      }
+    ],
+    "textRiskLevelS": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E208",
+        "value": "リスクレベルS"
+      }
+    ],
+    "textRiskMitigationContentsTiming": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E352",
+        "value": "検討したリスク低減措置の内容、実施時期等"
+      }
+    ],
+    "textRiskMitigationMeasures": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E308",
+        "value": "リスク低減対策の検討"
+      }
+    ],
+    "textRiskMitigationReviewResults": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E351",
+        "value": "リスク低減措置の検討結果"
+      }
+    ],
+    "textRisklevel": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E203",
+        "value": "リスクレベル"
+      }
+    ],
+    "textRunRA": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E199",
+        "value": "リスクを判定"
+      }
+    ],
+    "textRunReRA": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E309",
+        "value": "リスクの再判定"
+      }
+    ],
+    "textSave": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E197",
+        "value": "保存"
+      }
+    ],
+    "textSavePDF": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E301",
+        "value": "PDFに保存"
+      }
+    ],
+    "textSearch": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E77",
+        "value": "検索"
+      }
+    ],
+    "textSelectGlove": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E348",
+        "value": "手袋候補の表示"
+      }
+    ],
+    "textSelectOELDefault": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E380",
+        "value": "デフォルト"
+      }
+    ],
+    "textSelectionCriteria": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E344",
+        "value": "※選定条件"
+      }
+    ],
+    "textSkinEffectSubstances": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E211",
+        "value": "皮膚等障害化学物質"
+      }
+    ],
+    "textSolid": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E69",
+        "value": "粉体"
+      }
+    ],
+    "textSpecifiedChemicalSubstancesClass1": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E214",
+        "value": "特化則（第１類物質）"
+      }
+    ],
+    "textSpecifiedChemicalSubstancesClass2": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E215",
+        "value": "特化則（第２類物質）"
+      }
+    ],
+    "textSpecifiedChemicalSubstancesClass3": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E216",
+        "value": "特化則（第３類物質）"
+      }
+    ],
+    "textSubmit": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E44",
+        "value": "入力"
+      }
+    ],
+    "textSubstanceName": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E84",
+        "value": "物質名"
+      }
+    ],
+    "textSupplierName": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E42",
+        "value": "サプライヤー名"
+      }
+    ],
+    "textTetraalkylLead": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E221",
+        "value": "四アルキル鉛等"
+      }
+    ],
+    "textTitle": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E62",
+        "value": "タイトル"
+      }
+    ],
+    "textTotalInhalationDermal": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E206",
+        "value": "合計\n（吸入＋経皮）"
+      }
+    ],
+    "textType": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E404",
+        "value": "タイプ"
+      }
+    ],
+    "textTypeA": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E414",
+        "value": "タイプA"
+      }
+    ],
+    "textTypeB": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E415",
+        "value": "タイプB"
+      }
+    ],
+    "textTypeC": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E416",
+        "value": "タイプC"
+      }
+    ],
+    "textTypeD": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E417",
+        "value": "タイプD"
+      }
+    ],
+    "textTypeE": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E418",
+        "value": "タイプE"
+      }
+    ],
+    "textTypeF": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E419",
+        "value": "タイプF"
+      }
+    ],
+    "textTypeG": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E420",
+        "value": "タイプG"
+      }
+    ],
+    "textUnit": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E468",
+        "value": "単位"
+      }
+    ],
+    "textUpdateDate": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E39",
+        "value": "更新日"
+      }
+    ],
+    "textValue": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E467",
+        "value": "値"
+      }
+    ],
+    "textValueTemp": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E189",
+        "value": "値 [℃]"
+      }
+    ],
+    "textVentiA": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E114",
+        "value": "換気レベルA（特に換気のない部屋）"
+      }
+    ],
+    "textVentiB": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E115",
+        "value": "換気レベルB（全体換気）"
+      }
+    ],
+    "textVentiC": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E116",
+        "value": "換気レベルC（工業的な全体換気、屋外作業）"
+      }
+    ],
+    "textVentiD": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E117",
+        "value": "換気レベルD（外付け式局所排気装置）"
+      }
+    ],
+    "textVentiE": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E118",
+        "value": "換気レベルE（囲い式局所排気装置）"
+      }
+    ],
+    "textVentiF": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E119",
+        "value": "換気レベルF（密閉容器内での取扱い）"
+      }
+    ],
+    "textVentilationlevel": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E113",
+        "value": "換気レベル"
+      }
+    ],
+    "textVolatilityHigh": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E366",
+        "value": "高揮発性（沸点：50℃未満）"
+      }
+    ],
+    "textVolatilityLow": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E368",
+        "value": "低揮発性（沸点：150℃以上）"
+      }
+    ],
+    "textVolatilityMidium": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E367",
+        "value": "中揮発性（沸点：50℃以上～150℃未満）"
+      }
+    ],
+    "textVolatilityOrDustiness": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E91",
+        "value": "揮発性／飛散性"
+      }
+    ],
+    "textVolatilityUnknown": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E370",
+        "value": "わからない"
+      }
+    ],
+    "textVolatilityVeryLow": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E369",
+        "value": "極低揮発性（蒸気圧：0.5 Pa未満）"
+      }
+    ],
+    "textWork": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E64",
+        "value": "作業内容等"
+      }
+    ],
+    "textWorkFrequency": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E135",
+        "value": "作業頻度"
+      }
+    ],
+    "textYes": [
+      {
+        "sheet": "TranslationTable",
+        "cell": "E190",
+        "value": "はい"
+      }
+    ]
+  }
+}

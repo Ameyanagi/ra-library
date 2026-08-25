@@ -321,6 +321,7 @@ def calculate_risk(
     assess_physical: bool = True,
     target_level: str = "II-A",
     include_recommendations: str = "auto",
+    recommendation_scope: dict[str, Any] | None = None,
     include_explanation: bool = False,
     include_v2_comparison: bool = False,
     methodology_version: str = LATEST_METHODOLOGY_VERSION,
@@ -335,6 +336,13 @@ def calculate_risk(
         raise ServiceError(
             "INVALID_METHODOLOGY_VERSION",
             f"Invalid methodology_version. Must be one of: {valid_versions}",
+        )
+
+    valid_recommendation_modes = {"auto", "always", "never", "verified"}
+    if include_recommendations not in valid_recommendation_modes:
+        raise ServiceError(
+            "INVALID_RECOMMENDATION_MODE",
+            "include_recommendations must be auto, always, never, or verified",
         )
 
     use_v302 = methodology_version == "v3.0.2"
@@ -419,15 +427,80 @@ def calculate_risk(
     payload = _format_result(
         result,
         language,
-        include_recommendations=include_recommendations,
+        # Verified recommendations are attached below from full recalculations.
+        include_recommendations="never",
         include_explanation=include_explanation,
         include_v2_comparison=include_v2_comparison,
         target_level=target_level,
         methodology_version=methodology_version,
         floor_manually_disabled=floor_manually_disabled,
     )
+    current_level_int = _parse_risk_level(result.overall_risk_level)
+    target_level_int = _parse_risk_level(target_level)
+    should_calculate_recommendations = include_recommendations in {"always", "verified"} or (
+        include_recommendations == "auto" and current_level_int > target_level_int
+    )
+    if should_calculate_recommendations:
+        from .scenarios import calculate_scenarios_from_result, verified_recommendations
+
+        analysis = calculate_scenarios_from_result(
+            result,
+            target_level=target_level,
+            recommendation_scope=recommendation_scope,
+        )
+        payload["recommendation_analysis"] = analysis
+        payload["recommendations"] = verified_recommendations(analysis, language=language)
+        payload["recommendations_meta"] = {
+            "target_level": target_level,
+            "current_level": result.overall_risk_label,
+            "calculation_basis": "full_recalculation",
+            "baseline_fingerprint": analysis["baseline_fingerprint"],
+            "coverage": analysis["coverage"],
+        }
     warnings = payload.pop("warnings", [])
     return ServiceResult(data=payload, warnings=warnings)
+
+
+def calculate_control_scenarios(
+    substances: list[dict[str, Any]],
+    scenarios: list[dict[str, Any]],
+    preset: str | None = None,
+    conditions: dict[str, Any] | None = None,
+    duration: dict[str, Any] | None = None,
+    protection: dict[str, Any] | None = None,
+    assess_inhalation: bool = True,
+    assess_dermal: bool = True,
+    assess_physical: bool = True,
+    target_level: str = "II-A",
+    methodology_version: str = LATEST_METHODOLOGY_VERSION,
+    language: str = "en",
+) -> ServiceResult:
+    """Recalculate an explicit batch of control scenarios against one baseline."""
+    if not scenarios:
+        raise ServiceError("MISSING_SCENARIOS", "At least one scenario is required")
+    result = calculate_risk(
+        substances=substances,
+        preset=preset,
+        conditions=conditions,
+        duration=duration,
+        protection=protection,
+        assess_inhalation=assess_inhalation,
+        assess_dermal=assess_dermal,
+        assess_physical=assess_physical,
+        target_level=target_level,
+        include_recommendations="verified",
+        recommendation_scope={
+            "scenarios": scenarios,
+            "max_combination_size": 1,
+            "max_scenarios": min(max(len(scenarios), 1), 200),
+        },
+        methodology_version=methodology_version,
+        language=language,
+    )
+    return ServiceResult(
+        data=result.data["recommendation_analysis"],
+        warnings=result.warnings,
+    )
 
 
 def _extract_conditions_info(

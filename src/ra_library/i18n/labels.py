@@ -1,10 +1,13 @@
-"""
-Human-readable labels for CREATE-SIMPLE assessment options.
+"""Human-readable CREATE-SIMPLE assessment option labels.
 
-Based on VBA SelectList.csv and CREATE-SIMPLE Design v3.1.1.
+Japanese display values are transcribed from the named ranges in the official
+CREATE-SIMPLE v3.2.1 workbook.  The complete cell-level provenance is bundled
+in :mod:`ra_library.i18n.official`.
 """
 
 from typing import Optional, Literal
+
+from .official import get_terminology_source
 
 Language = Literal["ja", "en"]
 PropertyType = Literal["liquid", "solid", "gas"]
@@ -14,85 +17,85 @@ PropertyType = Literal["liquid", "solid", "gas"]
 AMOUNT_LABELS = {
     "large": {
         "liquid": {
-            "ja": "大量 (1kL以上)",
+            "ja": "大量 （1kL以上）",
             "en": "Large (≥1kL)",
             "range": "≥1000L",
         },
         "solid": {
-            "ja": "大量 (1t以上)",
+            "ja": "大量 （1ｔ以上）",
             "en": "Large (≥1ton)",
             "range": "≥1000kg",
         },
         "gas": {
-            "ja": "大量 (1t以上)",
+            "ja": "大量 （1ｔ以上）",
             "en": "Large (≥1ton gas mass)",
             "range": "≥1000kg",
         },
     },
     "medium": {
         "liquid": {
-            "ja": "中量 (1L～1kL)",
+            "ja": "中量 （1L以上～1000L未満）",
             "en": "Medium (1L-1kL)",
             "range": "1-1000L",
         },
         "solid": {
-            "ja": "中量 (1kg～1t)",
+            "ja": "中量 （1kg以上～1000kg未満）",
             "en": "Medium (1kg-1ton)",
             "range": "1-1000kg",
         },
         "gas": {
-            "ja": "中量 (1kg～1t)",
+            "ja": "中量 （1kg以上～1000kg未満）",
             "en": "Medium (1kg-1ton gas mass)",
             "range": "1-1000kg",
         },
     },
     "small": {
         "liquid": {
-            "ja": "少量 (100mL～1L)",
+            "ja": "少量 （100mL以上～1000mL未満）",
             "en": "Small (100mL-1L)",
             "range": "100-1000mL",
         },
         "solid": {
-            "ja": "少量 (100g～1kg)",
+            "ja": "少量 （100g以上～1000g未満）",
             "en": "Small (100g-1kg)",
             "range": "100-1000g",
         },
         "gas": {
-            "ja": "少量 (100g～1kg)",
+            "ja": "少量 （100g以上～1000g未満）",
             "en": "Small (100g-1kg gas mass)",
             "range": "100-1000g",
         },
     },
     "minute": {
         "liquid": {
-            "ja": "微量 (10mL～100mL)",
+            "ja": "微量 （10mL以上～100mL未満）",
             "en": "Minute (10-100mL)",
             "range": "10-100mL",
         },
         "solid": {
-            "ja": "微量 (10g～100g)",
+            "ja": "微量 （10g以上～100g未満）",
             "en": "Minute (10-100g)",
             "range": "10-100g",
         },
         "gas": {
-            "ja": "微量 (10g～100g)",
+            "ja": "微量 （10g以上～100g未満）",
             "en": "Minute (10-100g gas mass)",
             "range": "10-100g",
         },
     },
     "trace": {
         "liquid": {
-            "ja": "極微量 (10mL未満)",
+            "ja": "極微量（10mL未満）",
             "en": "Trace (<10mL)",
             "range": "<10mL",
         },
         "solid": {
-            "ja": "極微量 (10g未満)",
+            "ja": "極微量（10g未満）",
             "en": "Trace (<10g)",
             "range": "<10g",
         },
         "gas": {
-            "ja": "極微量 (10g未満)",
+            "ja": "極微量（10g未満）",
             "en": "Trace (<10g gas mass)",
             "range": "<10g",
         },
@@ -257,12 +260,12 @@ GLOVE_LABELS = {
         "coefficient": 1.0,
     },
     "non_resistant": {
-        "ja": "取扱物質に関する情報のない手袋を使用",
+        "ja": "取扱物質に関する情報のない手袋を使用している",
         "en": "Gloves without permeation data",
         "coefficient": 1.0,
     },
     "resistant": {
-        "ja": "耐透過性・耐浸透性の手袋を着用",
+        "ja": "耐透過性・耐浸透性の手袋の着用している",
         "en": "Chemical-resistant gloves",
         "coefficient": 0.2,
     },
@@ -620,6 +623,31 @@ LABELS = {
 }
 
 
+# Exact v3.2.1 workbook choices which do not map one-to-one to an enum.
+DURATION_LABELS = [
+    "8時間超",
+    "7時間超～8時間以下",
+    "6時間超～7時間以下",
+    "5時間超～6時間以下",
+    "4時間超～5時間以下",
+    "3時間超～4時間以下",
+    "2時間超～3時間以下",
+    "1時間超～2時間以下",
+    "30分超～1時間以下",
+    "30分以下",
+]
+FREQUENCY_LABELS = ["週1回以上", "週1回未満"]
+CONTROL_VELOCITY_LABELS = ["制御風速を確認していない", "制御風速を確認している"]
+GLOVE_TRAINING_LABELS = [
+    "教育や訓練を行っていない",
+    "基本的な教育や訓練を行っている",
+    "十分な教育や訓練を行っている",
+]
+FITTING_LABELS = ["なし", "簡易法（シールチェック）", "フィットテスト"]
+
+OFFICIAL_TERMINOLOGY_SOURCE = get_terminology_source()
+
+
 def get_label(
     category: str,
     key: str,
@@ -688,11 +716,13 @@ def get_labels(
             "key": key,
             "label": data.get(language, key),
             "range": data.get("range"),
+            "official_terminology_source": OFFICIAL_TERMINOLOGY_SOURCE,
         }
 
     result = {
         "key": key,
         "label": label_data.get(language, key),
+        "official_terminology_source": OFFICIAL_TERMINOLOGY_SOURCE,
     }
 
     # Add optional fields based on language

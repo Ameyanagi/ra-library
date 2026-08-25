@@ -1,13 +1,9 @@
-"""
-Format assessment conditions with human-readable labels for LLM understanding.
-
-Based on CREATE-SIMPLE Design v3.1.1 and VBA SelectList.csv.
-"""
+"""Format conditions using CREATE-SIMPLE v3.2.1 workbook terminology."""
 
 from math import isfinite
 from typing import Any, Literal
 
-from ra_library.i18n import get_labels
+from ra_library.i18n import get_labels, get_terminology_source
 from ra_library.models.assessment import AssessmentInput
 
 Language = Literal["ja", "en"]
@@ -20,6 +16,29 @@ GAS_AMOUNT_KG_RANGES = {
     "minute": {"min_kg": 0.01, "max_kg": 0.1},
     "trace": {"min_kg": None, "max_kg": 0.01},
 }
+
+
+def _official_duration_label(hours: float) -> str:
+    """Map a numeric duration to the workbook's exact Q5 display band."""
+    if hours > 8:
+        return "8時間超"
+    if hours > 7:
+        return "7時間超～8時間以下"
+    if hours > 6:
+        return "6時間超～7時間以下"
+    if hours > 5:
+        return "5時間超～6時間以下"
+    if hours > 4:
+        return "4時間超～5時間以下"
+    if hours > 3:
+        return "3時間超～4時間以下"
+    if hours > 2:
+        return "2時間超～3時間以下"
+    if hours > 1:
+        return "1時間超～2時間以下"
+    if hours > 0.5:
+        return "30分超～1時間以下"
+    return "30分以下"
 
 
 def get_gas_amount_metadata(
@@ -116,21 +135,15 @@ def format_conditions_used(
     prop_type = inp.product_property.value
 
     result: dict[str, Any] = {
+        "official_terminology_source": get_terminology_source(),
         "property_type": {
             "key": prop_type,
             "label": (
-                "液体"
-                if prop_type == "liquid"
-                else "粉体"
-                if prop_type == "solid"
-                else "気体"
+                {"liquid": "液体", "solid": "粉体", "gas": "気体"}[prop_type]
                 if language == "ja"
-                else "Liquid"
-                if prop_type == "liquid"
-                else "Solid"
-                if prop_type == "solid"
-                else "Gas"
+                else {"liquid": "Liquid", "solid": "Solid", "gas": "Gas"}[prop_type]
             ),
+            "official_label_ja": {"liquid": "液体", "solid": "粉体", "gas": "気体"}[prop_type],
         },
     }
 
@@ -168,6 +181,11 @@ def format_conditions_used(
         else:
             vent_labels["coefficient"] = vent_labels.get("coefficient_unverified")
             vent_labels["control_velocity_verified"] = False
+        vent_labels["control_velocity_official_label"] = (
+            "制御風速を確認している"
+            if inp.control_velocity_verified
+            else "制御風速を確認していない"
+        )
     result["ventilation"] = vent_labels
 
     # Work area size (liquids only)
@@ -188,6 +206,10 @@ def format_conditions_used(
         "hours_per_day": inp.working_hours_per_day,
         "frequency_type": inp.frequency_type,
         "frequency_value": inp.frequency_value,
+        "official_hours_label": _official_duration_label(inp.working_hours_per_day),
+        "official_frequency_label": (
+            "週1回以上" if inp.frequency_type == "weekly" else "週1回未満"
+        ),
     }
     if inp.frequency_type == "weekly":
         freq_label = (

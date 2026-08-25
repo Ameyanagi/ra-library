@@ -739,6 +739,7 @@ class RiskAssessment:
             glove_type=self._glove_type,
             glove_training=self._glove_training,
             exposed_skin_area=self._skin_area,
+            assess_inhalation=self._assess_inhalation,
             assess_dermal=self._assess_dermal,
             assess_physical=self._assess_physical,
             process_temperature=self._process_temperature,
@@ -957,6 +958,8 @@ def _parse_ventilation(value: str) -> VentilationLevel:
 def _parse_exposure_variation(value: str) -> ExposureVariation:
     """Parse exposure variation from string."""
     mapping = {
+        "small": ExposureVariation.SMALL,
+        "large": ExposureVariation.LARGE,
         "constant": ExposureVariation.CONSTANT,
         "intermittent": ExposureVariation.INTERMITTENT,
         "brief": ExposureVariation.BRIEF,

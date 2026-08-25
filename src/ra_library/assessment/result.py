@@ -1332,14 +1332,52 @@ class AssessmentResult:
             new_builder.with_conditions(is_spray=changes["is_spray"])
         if "dustiness" in changes:
             new_builder.with_conditions(dustiness=changes["dustiness"])
+        if "property_type" in changes:
+            new_builder.with_conditions(property_type=changes["property_type"])
+        if "exposure_variation" in changes:
+            new_builder.with_conditions(exposure_variation=changes["exposure_variation"])
+        if "work_area_size" in changes:
+            new_builder.with_conditions(work_area_size=changes["work_area_size"])
+        if "ignore_minimum_floor" in changes:
+            new_builder.with_conditions(ignore_minimum_floor=changes["ignore_minimum_floor"])
         if "hours" in changes:
             new_builder.with_duration(hours=changes["hours"])
         if "days_per_week" in changes:
             new_builder.with_duration(days_per_week=changes["days_per_week"])
+        if "days_per_month" in changes:
+            new_builder.with_duration(days_per_month=changes["days_per_month"])
         if "rpe" in changes:
             new_builder.with_protection(rpe=changes["rpe"])
+            # CREATE-SIMPLE applies RPE only in the implementation report path.
+            if str(changes["rpe"]).lower() not in ("none", "rpetype.none"):
+                new_builder.with_mode("report")
+        if "rpe_fit_tested" in changes:
+            new_builder.with_protection(rpe_fit_tested=changes["rpe_fit_tested"])
         if "gloves" in changes:
             new_builder.with_protection(gloves=changes["gloves"])
+        if "glove_training" in changes:
+            new_builder.with_protection(glove_training=changes["glove_training"])
+        if "skin_area" in changes:
+            new_builder.with_protection(skin_area=changes["skin_area"])
+
+        physical_change_keys = {
+            "process_temperature",
+            "has_ignition_sources",
+            "has_explosive_atmosphere",
+            "has_organic_matter",
+            "has_air_water_contact",
+        }
+        if any(key in changes for key in physical_change_keys):
+            new_builder.with_physical_conditions(
+                process_temperature=changes.get("process_temperature"),
+                has_ignition_sources=changes.get("has_ignition_sources"),
+                has_explosive_atmosphere=changes.get("has_explosive_atmosphere"),
+                has_organic_matter=changes.get("has_organic_matter"),
+                has_air_water_contact=changes.get("has_air_water_contact"),
+            )
+
+        if "mode" in changes:
+            new_builder.with_mode(changes["mode"])
 
         return new_builder.calculate()
 
@@ -1507,9 +1545,11 @@ class AssessmentResult:
         new_builder = Builder()
         new_builder._substances = self.builder._substances.copy()
         new_builder._property_type = self.builder._property_type
+        new_builder._property_type_explicit = self.builder._property_type_explicit
         new_builder._amount_level = self.builder._amount_level
         new_builder._ventilation = self.builder._ventilation
         new_builder._control_velocity_verified = self.builder._control_velocity_verified
+        new_builder._control_velocity_auto_enabled = self.builder._control_velocity_auto_enabled
         new_builder._is_spray = self.builder._is_spray
         new_builder._work_area_size = self.builder._work_area_size
         new_builder._dustiness = self.builder._dustiness
@@ -1534,6 +1574,13 @@ class AssessmentResult:
         new_builder._process_temperature = self.builder._process_temperature
         new_builder._has_ignition_sources = self.builder._has_ignition_sources
         new_builder._has_explosive_atmosphere = self.builder._has_explosive_atmosphere
+        new_builder._has_organic_matter = self.builder._has_organic_matter
+        new_builder._has_air_water_contact = self.builder._has_air_water_contact
+        new_builder._constraints = self.builder._constraints
+        new_builder._preset_name = self.builder._preset_name
+        new_builder._ignore_minimum_floor = self.builder._ignore_minimum_floor
+        new_builder._language = self.builder._language
+        new_builder._methodology_version = self.builder._methodology_version
         return new_builder
 
     def _generate_recommendations(self) -> list[Recommendation]:

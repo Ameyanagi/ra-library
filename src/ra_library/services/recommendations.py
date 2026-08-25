@@ -4,123 +4,101 @@ from __future__ import annotations
 
 from typing import Any
 
-from .. import RiskAssessment, get_database
-from .common import ServiceError, ServiceResult, warning_item
+from .. import get_database
+from .common import ServiceError, ServiceResult
 
 
 def get_recommendations(
-    cas_number: str,
+    cas_number: str | None = None,
     current_rcr: float | None = None,
+    substances: list[dict[str, Any]] | None = None,
     preset: str | None = None,
+    conditions: dict[str, Any] | None = None,
+    duration: dict[str, Any] | None = None,
+    protection: dict[str, Any] | None = None,
+    assess_inhalation: bool = True,
+    assess_dermal: bool = True,
+    assess_physical: bool = True,
     target_level: str = "II-A",
     engineering_only: bool = False,
+    recommendation_scope: dict[str, Any] | None = None,
+    methodology_version: str = "v3.2.1",
     language: str = "en",
 ) -> ServiceResult:
-    """Get control measure suggestions for reducing risk."""
-    db = get_database()
-    substance_data = db.lookup(cas_number)
-    if not substance_data:
-        raise ServiceError(
-            "SUBSTANCE_NOT_FOUND",
-            f"Substance not found: {cas_number}",
-            details={"cas_number": cas_number},
-        )
+    """Return controls whose numeric effects were fully recalculated.
 
-    assessment = RiskAssessment()
-    if preset:
-        try:
-            assessment = assessment.use_preset(preset)
-        except ValueError as exc:
-            raise ServiceError("INVALID_PRESET", str(exc)) from exc
+    ``cas_number`` is retained for compatibility. New callers should provide the
+    complete ``substances`` mixture and baseline conditions so scenario results
+    cannot silently fall back to a 100% single-substance assessment.
+    """
+    from .calculate import calculate_risk
 
-    try:
-        assessment = (
-            assessment.add_substance(cas_number, content=100.0)
-            .with_target_levels(inhalation=target_level)
-            .with_language(language)
-        )
-    except ValueError as exc:
-        raise ServiceError("ASSESSMENT_SETUP_FAILED", f"Assessment setup failed: {exc}") from exc
-
-    if engineering_only:
-        assessment = assessment.with_constraints(no_ppe=True)
-
-    try:
-        result = assessment.calculate()
-    except ValueError as exc:
-        raise ServiceError("CALCULATION_FAILED", f"Calculation failed: {exc}") from exc
-
-    component = result.components.get(cas_number)
-    if not component:
-        raise ServiceError("MISSING_COMPONENT_RESULT", "Failed to calculate recommendations")
-
-    warnings: list[dict[str, Any]] = []
-    for warning in getattr(result, "warnings", []):
-        warnings.append(warning_item("ASSESSMENT_PARTIAL_FAILURE", warning))
-
-    current_level = component.risk_label
-    computed_rcr = round(component.inhalation.rcr, 4) if component.inhalation else None
-    current_rcr_value = current_rcr if current_rcr is not None else computed_rcr
-
-    try:
-        recommendations = result.get_recommendations_for_substance(cas_number)
-        paths = [
-            _recommendation_path(rec, idx, language)
-            for idx, rec in enumerate(recommendations[:5], start=1)
-        ]
-        target_level_int = _level_to_int(target_level)
-        achievable = any(
-            _level_to_int(path["predicted_level"]) <= target_level_int
-            for path in paths
-            if path.get("predicted_level")
-        )
-
-        data = {
-            "mode": "analysis",
-            "substance": {
-                "cas_number": cas_number,
-                "name": substance_data.name_en if language == "en" else substance_data.name_ja,
-            },
-            "current": {
-                "rcr": current_rcr_value,
-                "level": current_level,
-            },
-            "target": {
-                "level": target_level,
-            },
-            "achievable": achievable,
-            "summary": _summary_from_paths(paths, target_level, achievable, language),
-            "paths": paths,
-        }
-        return ServiceResult(data=data, warnings=warnings)
-    except Exception as exc:
-        warnings.append(
-            warning_item(
-                "RECOMMENDATION_ANALYSIS_FALLBACK",
-                "Detailed recommendation analysis unavailable; using basic fallback"
-                if language == "en"
-                else "詳細な推奨分析を生成できないため、基本推奨にフォールバックしました",
-                details={"error_type": type(exc).__name__, "error": str(exc)},
+    if substances is None:
+        if not cas_number:
+            raise ServiceError(
+                "MISSING_SUBSTANCES",
+                "Provide substances or the legacy cas_number argument",
             )
-        )
-        data = {
-            "mode": "fallback",
-            "substance": {
-                "cas_number": cas_number,
-                "name": substance_data.name_en if language == "en" else substance_data.name_ja,
-            },
-            "current": {
-                "rcr": current_rcr_value,
-                "level": current_level,
-            },
-            "target": {
-                "level": target_level,
-            },
-            "achievable": _level_to_int(current_level) <= _level_to_int(target_level),
-            "summary": _generate_basic_recommendations(component, target_level, language),
-            "paths": [],
+        db = get_database()
+        if not db.lookup(cas_number):
+            raise ServiceError(
+                "SUBSTANCE_NOT_FOUND",
+                f"Substance not found: {cas_number}",
+                details={"cas_number": cas_number},
+            )
+        substances = [{"cas_number": cas_number, "content_percent": 100.0}]
+
+    scope = dict(recommendation_scope or {})
+    if engineering_only and not recommendation_scope:
+        scope = {
+            "ventilation": ["local_external", "local_enclosed", "sealed"],
+            "amount": ["small", "minute", "trace"],
+            "hours": [4, 2, 1, 0.5],
+            "days_per_week": [3, 1],
+            "max_combination_size": 2,
+            "max_scenarios": 50,
         }
-        return ServiceResult(data=data, warnings=warnings)
+
+    calculated = calculate_risk(
+        substances=substances,
+        preset=preset,
+        conditions=conditions,
+        duration=duration,
+        protection=protection,
+        assess_inhalation=assess_inhalation,
+        assess_dermal=assess_dermal,
+        assess_physical=assess_physical,
+        target_level=target_level,
+        include_recommendations="verified",
+        recommendation_scope=scope or None,
+        methodology_version=methodology_version,
+        language=language,
+    )
+    analysis = calculated.data["recommendation_analysis"]
+    paths = calculated.data.get("recommendations", [])
+    achievable = any(path.get("achieves_target") is True for path in paths)
+    baseline = analysis["baseline"]
+    data = {
+        "mode": "verified_recalculation",
+        "substances": [
+            {
+                "cas_number": component["cas_number"],
+                "name": component["name"],
+                "content_percent": component["content_percent"],
+            }
+            for component in baseline["components"].values()
+        ],
+        "current": {
+            "provided_rcr": current_rcr,
+            "calculated": baseline,
+        },
+        "target": {"level": target_level},
+        "achievable": achievable,
+        "summary": _summary_from_paths(paths, target_level, achievable, language),
+        "paths": paths,
+        "recommendation_analysis": analysis,
+    }
+    return ServiceResult(data=data, warnings=calculated.warnings)
 
 
 def _level_to_int(level: str) -> int:

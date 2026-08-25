@@ -13,18 +13,15 @@ This library implements an independent risk assessment workflow with detailed ex
 ## Features
 
 - **Verbose Calculations**: Every step is explained with references
-- **What-If Analysis**: Simulate different control measures
-- **Recommendation Engine**: Prioritized risk reduction actions
+- **Verified Scenario Analysis**: Recalculate bounded control ranges and explicit batches
+- **Auditable Recommendations**: Preserve mixture, method version, risk domains, and baseline fingerprint
 - **Limitation Transparency**: Explains when Level I is impossible
+- **Official Japanese Terminology**: v3.2.1 workbook labels with sheet/cell and SHA-256 provenance
 
 ## Installation
 
 ```bash
-pip install ra-library
-```
-
-```bash
-uv add ra-library
+uv add "ra-library @ https://github.com/Ameyanagi/ra-library/archive/refs/tags/v0.4.0.zip"
 ```
 
 ## Usage
@@ -47,6 +44,26 @@ print(f"Risk Level: {result.risk_level.name}")
 print(f"RCR: {result.rcr:.4f}")
 ```
 
+Verified control ranges are available from the service layer:
+
+```python
+from ra_library.services import calculate_risk
+
+result = calculate_risk(
+    substances=[{"cas_number": "108-88-3", "content_percent": 100}],
+    preset="lab_organic",
+    include_recommendations="verified",
+    recommendation_scope={
+        "ventilation": ["local_enclosed", "sealed"],
+        "hours": [4, 2, 1],
+        "max_combination_size": 2,
+        "max_scenarios": 30,
+    },
+    language="ja",
+)
+print(result.data["recommendation_analysis"])
+```
+
 ## Development
 
 ```bash
@@ -58,13 +75,12 @@ uv run pytest -q
 
 ## Release
 
-PyPI publishing is handled by GitHub Actions only when a matching `v*` tag is
-pushed. See [docs/release.md](docs/release.md) for the cleanup and release
-checklist.
+A matching `v*` tag builds and attaches distributions to a GitHub Release.
+The workflow does not publish to PyPI or another package registry.
 
 ## Notes
 
-- The packaged reference data is bundled as SQLite databases, not the original source workbook files.
+- The package includes extracted terminology and provenance, not the original XLSM workbook.
 - This is an independent implementation and is not an official MHLW distribution.
 - Public methodology documents may be cited for interoperability and validation, but official workbook assets are not redistributed here.
 
