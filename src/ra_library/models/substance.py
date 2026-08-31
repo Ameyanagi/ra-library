@@ -87,17 +87,29 @@ class GHSClassification(BaseModel):
     corrosive_to_metals: Optional[str] = None  # 金属腐食性
     explosives: Optional[str] = None  # 爆発物
 
-    def _is_cat_1(self, val: Optional[str]) -> bool:
-        """Helper to check category 1 variants."""
+    @staticmethod
+    def _category(val: Optional[str]) -> Optional[str]:
+        """Normalize workbook and API category spellings."""
         if val is None:
-            return False
-        return val in ["1", "1A", "1B", "Category 1", "Category 1A", "Category 1B"]
+            return None
+        category = val.strip().upper()
+        if not category or category == "-9999":
+            return None
+        if category.startswith("CATEGORY "):
+            category = category.removeprefix("CATEGORY ").strip()
+        if category.startswith("区分"):
+            category = category.removeprefix("区分").strip()
+        return category
 
-    def _is_cat_2(self, val: Optional[str]) -> bool:
-        """Helper to check category 2 variants."""
-        if val is None:
-            return False
-        return val in ["2", "2A", "2B", "Category 2", "Category 2A", "Category 2B"]
+    @classmethod
+    def _is_category(cls, val: Optional[str], *categories: str) -> bool:
+        """Return whether *val* is one of the normalized GHS categories."""
+        return cls._category(val) in categories
+
+    @classmethod
+    def _is_unavailable(cls, val: Optional[str]) -> bool:
+        """Match CREATE-SIMPLE's ``-9999`` unavailable-route sentinel."""
+        return cls._category(val) is None
 
     def get_hazard_level(self) -> str:
         """
@@ -106,78 +118,59 @@ class GHSClassification(BaseModel):
         Reference: CREATE-SIMPLE Design v3.1.1, Section 2.2
         VBA Reference: modCalc.bas lines 231-277 (CalculateACRMax)
         """
-        # Acute toxicity categories for inhalation check
+        # Acute-toxicity inhalation routes are checked exactly as in the workbook.  Oral
+        # toxicity is used only when at least one inhalation route is unavailable.  Acute
+        # dermal toxicity is deliberately not part of CalculateACRMax in CREATE-SIMPLE v3.
         acute_inhal = [
             self.acute_toxicity_inhalation_gas,
             self.acute_toxicity_inhalation_vapor,
             self.acute_toxicity_inhalation_dust,
         ]
+        any_inhalation_unavailable = any(self._is_unavailable(cat) for cat in acute_inhal)
 
-        # HL5: Carcinogen 1A/1B, Mutagen 1A/1B, or Acute tox 1
-        # VBA: carcinogenicity = 1/1A/1B OR mutagenicity = 1/1A/1B OR acute inhal = 1
-        if self._is_cat_1(self.carcinogenicity):
-            return "HL5"
-        if self._is_cat_1(self.germ_cell_mutagenicity):
-            return "HL5"
-        # Acute tox oral = 1 when inhalation unavailable, or acute tox inhal = 1
-        if any(self._is_cat_1(cat) for cat in acute_inhal):
-            return "HL5"
-        if self._is_cat_1(self.acute_toxicity_oral) and all(cat is None for cat in acute_inhal):
+        # HL5
+        if (
+            (self._is_category(self.acute_toxicity_oral, "1") and any_inhalation_unavailable)
+            or any(self._is_category(cat, "1") for cat in acute_inhal)
+            or self._is_category(self.germ_cell_mutagenicity, "1", "1A", "1B")
+            or self._is_category(self.carcinogenicity, "1", "1A", "1B")
+        ):
             return "HL5"
 
-        # HL4: Carcinogen 2, Mutagen 2, Reproductive 1A/1B, STOT-RE 1,
-        #      Respiratory sensitizer 1, Skin corrosion 1A, Acute tox 2
-        # VBA: Multiple conditions for HL4
-        if self._is_cat_2(self.carcinogenicity):
-            return "HL4"
-        if self._is_cat_2(self.germ_cell_mutagenicity):
-            return "HL4"
-        if self._is_cat_1(self.reproductive_toxicity):
-            return "HL4"
-        if self._is_cat_1(self.stot_repeated):
-            return "HL4"
-        if self._is_cat_1(self.respiratory_sensitization):
-            return "HL4"
-        if self.skin_corrosion in ["1A", "Category 1A"]:
-            return "HL4"
-        # Acute tox 2
-        if any(self._is_cat_2(cat) for cat in acute_inhal):
-            return "HL4"
-        if self._is_cat_2(self.acute_toxicity_oral) and all(cat is None for cat in acute_inhal):
+        # HL4
+        if (
+            (self._is_category(self.acute_toxicity_oral, "2") and any_inhalation_unavailable)
+            or any(self._is_category(cat, "2") for cat in acute_inhal)
+            or self._is_category(self.skin_corrosion, "1A")
+            or self._is_category(self.respiratory_sensitization, "1", "1A", "1B")
+            or self._is_category(self.germ_cell_mutagenicity, "2", "2A", "2B")
+            or self._is_category(self.carcinogenicity, "2", "2A", "2B")
+            or self._is_category(self.reproductive_toxicity, "1", "1A", "1B")
+            or self._is_category(self.stot_repeated, "1")
+        ):
             return "HL4"
 
-        # HL3: Acute tox 3, Skin corrosion 1/1B/1C, Eye damage 1,
-        #      Skin sensitizer 1, Reproductive 2, STOT-SE 1, STOT-RE 2
-        acute_categories = [
-            self.acute_toxicity_oral,
-            self.acute_toxicity_dermal,
-            self.acute_toxicity_inhalation_gas,
-            self.acute_toxicity_inhalation_vapor,
-            self.acute_toxicity_inhalation_dust,
-        ]
-        if any(cat in ["3", "Category 3"] for cat in acute_categories if cat):
-            return "HL3"
-        if self.skin_corrosion in ["1", "1B", "1C", "Category 1", "Category 1B", "Category 1C"]:
-            return "HL3"
-        if self._is_cat_1(self.eye_damage):
-            return "HL3"
-        if self._is_cat_1(self.skin_sensitization):
-            return "HL3"
-        if self._is_cat_2(self.reproductive_toxicity):
-            return "HL3"
-        if self._is_cat_1(self.stot_single):
-            return "HL3"
-        if self._is_cat_2(self.stot_repeated):
+        # HL3
+        if (
+            (self._is_category(self.acute_toxicity_oral, "3") and any_inhalation_unavailable)
+            or any(self._is_category(cat, "3") for cat in acute_inhal)
+            or self._is_category(self.skin_corrosion, "1", "1B", "1C")
+            or self._is_category(self.eye_damage, "1")
+            or self._is_category(self.skin_sensitization, "1", "1A", "1B")
+            or self._is_category(self.reproductive_toxicity, "2")
+            or self._is_category(self.stot_single, "1")
+            or self._is_category(self.stot_repeated, "2")
+        ):
             return "HL3"
 
-        # HL2: Acute tox 4, Skin irritation 2, Eye irritation 2, STOT-SE 2/3
-        if any(cat in ["4", "Category 4"] for cat in acute_categories if cat):
-            return "HL2"
-        if self.skin_corrosion in ["2", "Category 2"]:
-            return "HL2"
-        if self._is_cat_2(self.eye_damage):
-            return "HL2"
-        if self.stot_single in ["2", "3", "Category 2", "Category 3"]:
+        # HL2
+        if (
+            (self._is_category(self.acute_toxicity_oral, "4") and any_inhalation_unavailable)
+            or any(self._is_category(cat, "4") for cat in acute_inhal)
+            or self._is_category(self.skin_corrosion, "2")
+            or self._is_category(self.eye_damage, "2")
+            or self._is_category(self.stot_single, "2", "3")
+        ):
             return "HL2"
 
         # HL1: No significant health hazards
@@ -187,52 +180,26 @@ class GHSClassification(BaseModel):
         """
         Determine if ACRmax should be applied for this substance.
 
-        ACRmax (Management Target Concentration) should ONLY apply to:
-        - Carcinogens (Category 1A, 1B, or 2)
-        - Mutagens (Category 1A, 1B, or 2)
-
-        ACRmax should NOT apply to:
-        - Reproductive toxicants (even though they contribute to HL4/HL5)
-        - Other health hazards
+        CREATE-SIMPLE derives an ACRmax for every HL1-HL5 classification and uses it
+        whenever an occupational exposure limit is unavailable.
 
         Reference: CREATE-SIMPLE Design v3.1.1, Section 5.3.3
 
         Returns:
             True if ACRmax should be applied, False otherwise
         """
-        # Apply ACRmax for any carcinogen category (1A, 1B, or 2)
-        if self.carcinogenicity is not None:
-            return True
-
-        # Apply ACRmax for any mutagen category (1A, 1B, or 2)
-        if self.germ_cell_mutagenicity is not None:
-            return True
-
-        return False
+        return True
 
     def get_acrmax_hazard_level(self) -> Optional[str]:
         """
         Get the hazard level to use for ACRmax lookup, if applicable.
 
-        This returns the hazard level ONLY based on carcinogenicity/mutagenicity,
-        ignoring reproductive toxicity.
+        Compatibility alias for the full CREATE-SIMPLE GHS hazard level.
 
         Returns:
-            Hazard level string ("HL4" or "HL5") for ACRmax lookup,
-            or None if ACRmax should not be applied
+            Hazard level string ("HL1" through "HL5") for ACRmax lookup
         """
-        if not self.should_apply_acrmax():
-            return None
-
-        # HL5: Carcinogen 1A/1B or Mutagen 1A/1B
-        if self._is_cat_1(self.carcinogenicity) or self._is_cat_1(self.germ_cell_mutagenicity):
-            return "HL5"
-
-        # HL4: Carcinogen 2 or Mutagen 2
-        if self._is_cat_2(self.carcinogenicity) or self._is_cat_2(self.germ_cell_mutagenicity):
-            return "HL4"
-
-        return None
+        return self.get_hazard_level()
 
 
 class OccupationalExposureLimits(BaseModel):

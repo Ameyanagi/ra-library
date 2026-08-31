@@ -13,10 +13,10 @@ from ..models.assessment import AssessmentInput, AssessmentMode, VentilationLeve
 from ..models.substance import Substance, PropertyType
 from ..models.risk import RiskLevel
 from ..models.explanation import Limitation, MinimumAchievableResult
+from ..calculators.acr import get_acrmax
 from ..calculators.constants import (
     MIN_EXPOSURE_LIQUID,
     MIN_EXPOSURE_SOLID,
-    ACRMAX_VALUES,
 )
 from ..references.catalog import get_reference
 
@@ -50,7 +50,7 @@ def explain_limitations(
     if floor_limitation:
         limitations.append(floor_limitation)
 
-    # Check ACRmax limitation for carcinogens/mutagens
+    # Check the GHS-derived management-target fallback.
     acrmax_limitation = _check_acrmax_limitation(substance, target_level, language)
     if acrmax_limitation:
         limitations.append(acrmax_limitation)
@@ -139,15 +139,18 @@ def _check_acrmax_limitation(
     target_level: RiskLevel,
     language: str,
 ) -> Optional[Limitation]:
-    """Check if ACRmax for carcinogens limits achieving target level."""
-    # Determine hazard level from GHS classification
-    hazard_level = _get_hazard_level(substance)
-    if hazard_level not in ACRMAX_VALUES:
+    """Check whether the no-OEL management target limits the target level."""
+    if substance.oel.get_best_oel() is not None:
         return None
 
-    acrmax = ACRMAX_VALUES[hazard_level]
+    hazard_level = substance.get_hazard_level()
     is_liquid = substance.property_type == PropertyType.LIQUID
+    property_type = "liquid" if is_liquid else "solid"
+    acrmax = get_acrmax(hazard_level, property_type)
+    if acrmax is None:
+        return None
     min_floor = MIN_EXPOSURE_LIQUID if is_liquid else MIN_EXPOSURE_SOLID
+    unit = "ppm" if is_liquid else "mg/m³"
 
     # Calculate minimum RCR with ACRmax
     min_rcr = min_floor / acrmax
@@ -160,23 +163,18 @@ def _check_acrmax_limitation(
     }[target_level]
 
     if min_rcr > target_threshold:
-        hazard_names = {
-            "HL5": "Carcinogen 1A/1B",
-            "HL4": "Carcinogen 2 / Mutagen 1A/1B/2",
-            "HL3": "Respiratory sensitizer / STOT RE 1",
-        }
-
         if language == "ja":
-            hazard_names_ja = {
-                "HL5": "発がん性1A/1B",
-                "HL4": "発がん性2 / 変異原性1A/1B/2",
-                "HL3": "呼吸器感作性 / 特定標的臓器毒性(反復)1",
-            }
             return Limitation(
                 factor_name="管理目標濃度 (ACRmax)",
                 factor_name_ja="管理目標濃度 (ACRmax)",
-                description=f"この物質は{hazard_names_ja.get(hazard_level, hazard_level)}に分類され、ACRmax={acrmax} ppmが適用されます",
-                description_ja=f"この物質は{hazard_names_ja.get(hazard_level, hazard_level)}に分類され、ACRmax={acrmax} ppmが適用されます",
+                description=(
+                    f"OELがないため、{hazard_level}から導出した"
+                    f"管理目標濃度={acrmax} {unit}を適用します"
+                ),
+                description_ja=(
+                    f"OELがないため、{hazard_level}から導出した"
+                    f"管理目標濃度={acrmax} {unit}を適用します"
+                ),
                 current_value=acrmax,
                 limiting_value=min_floor / target_threshold,
                 impact=f"最小RCRは{min_rcr:.4f}となり、レベル{target_level.name}は達成できません",
@@ -192,8 +190,14 @@ def _check_acrmax_limitation(
             return Limitation(
                 factor_name="Management Target Concentration (ACRmax)",
                 factor_name_ja="管理目標濃度 (ACRmax)",
-                description=f"Classified as {hazard_names.get(hazard_level, hazard_level)}, ACRmax of {acrmax} ppm applies",
-                description_ja=f"この物質は{hazard_level}に分類され、ACRmax={acrmax} ppmが適用されます",
+                description=(
+                    f"No OEL is registered; the {hazard_level} management target of "
+                    f"{acrmax} {unit} applies"
+                ),
+                description_ja=(
+                    f"OELがないため、{hazard_level}から導出した"
+                    f"管理目標濃度={acrmax} {unit}を適用します"
+                ),
                 current_value=acrmax,
                 limiting_value=min_floor / target_threshold,
                 impact=f"Minimum RCR is {min_rcr:.4f}, Level {target_level.name} cannot be achieved",
@@ -327,36 +331,6 @@ def _check_rpe_availability(
         )
 
 
-def _get_hazard_level(substance: Substance) -> Optional[str]:
-    """Determine hazard level from GHS classification."""
-    ghs = substance.ghs
-
-    # HL5: Carcinogen 1A/1B
-    if ghs.carcinogenicity in ["1A", "1B", "Category 1A", "Category 1B"]:
-        return "HL5"
-
-    # HL4: Carcinogen 2, Mutagen 1A/1B/2
-    if ghs.carcinogenicity in ["2", "Category 2"]:
-        return "HL4"
-    if ghs.germ_cell_mutagenicity in ["1A", "1B", "2", "Category 1A", "Category 1B", "Category 2"]:
-        return "HL4"
-
-    # HL3: Respiratory sensitizer, STOT RE 1
-    if ghs.respiratory_sensitization in [
-        "1",
-        "1A",
-        "1B",
-        "Category 1",
-        "Category 1A",
-        "Category 1B",
-    ]:
-        return "HL3"
-    if ghs.stot_repeated in ["1", "Category 1"]:
-        return "HL3"
-
-    return None
-
-
 def find_minimum_achievable(
     assessment_input: AssessmentInput,
     substance: Substance,
@@ -382,9 +356,11 @@ def find_minimum_achievable(
 
     # Get effective OEL or ACRmax
     oel = substance.oel.get_best_oel()
-    hazard_level = _get_hazard_level(substance)
-    acrmax = ACRMAX_VALUES.get(hazard_level) if hazard_level else None
-    effective_oel = min(oel, acrmax) if acrmax and oel else (oel or acrmax)
+    hazard_level = substance.get_hazard_level()
+    property_type = "liquid" if is_liquid else "solid"
+    acrmax = get_acrmax(hazard_level, property_type)
+    # CREATE-SIMPLE uses an OEL whenever one exists; ACRmax is only the no-OEL fallback.
+    effective_oel = oel if oel is not None and oel > 0 else acrmax
 
     if effective_oel is None:
         if language == "ja":

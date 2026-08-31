@@ -1,14 +1,7 @@
 """
 Tests for hazard level calculator.
 
-Based on CREATE-SIMPLE hazard level (HL) determination.
-
-Hazard levels:
-- HL5: Carcinogenicity 1A/1B, Mutagenicity 1A/1B, Reproductive 1A/1B
-- HL4: Carcinogenicity 2, Mutagenicity 2, Reproductive 2
-- HL3: STOT-RE 1/2, Respiratory sensitization 1
-- HL2: Other health hazards (acute toxicity, skin irritation, etc.)
-- HL1: No significant health hazards
+Based on CREATE-SIMPLE v3.2.1 CalculateACRMax hazard-level determination.
 """
 
 from ra_library.data.hazard_level import (
@@ -270,25 +263,25 @@ class TestHazardLevel:
         )
         assert get_hazard_level(substance) == "HL5"
 
-    def test_hl5_reproductive_1a(self):
-        """Reproductive toxicity 1A → HL5."""
+    def test_hl4_reproductive_1a(self):
+        """Reproductive toxicity 1A → HL4."""
         substance = SubstanceData(
             cas_number="test-054",
             name_ja="生殖毒性物質1A",
             name_en="Reproductive toxicant 1A",
             ghs_reproductive="1A",
         )
-        assert get_hazard_level(substance) == "HL5"
+        assert get_hazard_level(substance) == "HL4"
 
-    def test_hl5_reproductive_1b(self):
-        """Reproductive toxicity 1B → HL5."""
+    def test_hl4_reproductive_1b(self):
+        """Reproductive toxicity 1B → HL4."""
         substance = SubstanceData(
             cas_number="test-055",
             name_ja="生殖毒性物質1B",
             name_en="Reproductive toxicant 1B",
             ghs_reproductive="1B",
         )
-        assert get_hazard_level(substance) == "HL5"
+        assert get_hazard_level(substance) == "HL4"
 
     def test_hl4_carcinogen_2(self):
         """Carcinogenicity 2 → HL4."""
@@ -310,25 +303,25 @@ class TestHazardLevel:
         )
         assert get_hazard_level(substance) == "HL4"
 
-    def test_hl4_reproductive_2(self):
-        """Reproductive toxicity 2 → HL4."""
+    def test_hl3_reproductive_2(self):
+        """Reproductive toxicity 2 → HL3."""
         substance = SubstanceData(
             cas_number="test-062",
             name_ja="生殖毒性物質2",
             name_en="Reproductive toxicant 2",
             ghs_reproductive="2",
         )
-        assert get_hazard_level(substance) == "HL4"
+        assert get_hazard_level(substance) == "HL3"
 
-    def test_hl3_stot_re_1(self):
-        """STOT-RE 1 → HL3."""
+    def test_hl4_stot_re_1(self):
+        """STOT-RE 1 → HL4."""
         substance = SubstanceData(
             cas_number="test-070",
             name_ja="STOT-RE1物質",
             name_en="STOT-RE 1",
             ghs_stot_re="1",
         )
-        assert get_hazard_level(substance) == "HL3"
+        assert get_hazard_level(substance) == "HL4"
 
     def test_hl3_stot_re_2(self):
         """STOT-RE 2 → HL3."""
@@ -340,75 +333,75 @@ class TestHazardLevel:
         )
         assert get_hazard_level(substance) == "HL3"
 
-    def test_hl3_respiratory_sensitization(self):
-        """Respiratory sensitization → HL3."""
+    def test_hl4_respiratory_sensitization(self):
+        """Respiratory sensitization → HL4."""
         substance = SubstanceData(
             cas_number="test-072",
             name_ja="呼吸器感作性物質",
             name_en="Respiratory sensitizer",
             ghs_resp_sens="1",
         )
-        assert get_hazard_level(substance) == "HL3"
+        assert get_hazard_level(substance) == "HL4"
 
-    def test_hl2_acute_toxicity(self):
-        """Acute toxicity → HL2."""
+    def test_hl3_acute_toxicity_category_3(self):
+        """Oral acute toxicity category 3 with unavailable inhalation routes → HL3."""
         substance = SubstanceData(
             cas_number="test-080",
             name_ja="急性毒性物質",
             name_en="Acutely toxic",
             ghs_acute_oral="3",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL3"
 
-    def test_hl2_skin_corrosion(self):
-        """Skin corrosion/irritation → HL2."""
+    def test_hl4_skin_corrosion_1a(self):
+        """Skin corrosion 1A → HL4."""
         substance = SubstanceData(
             cas_number="test-081",
             name_ja="皮膚腐食性物質",
             name_en="Skin corrosive",
             ghs_skin_corr="1A",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL4"
 
-    def test_hl2_eye_damage(self):
-        """Eye damage → HL2."""
+    def test_hl3_eye_damage(self):
+        """Eye damage category 1 → HL3."""
         substance = SubstanceData(
             cas_number="test-082",
             name_ja="眼損傷物質",
             name_en="Eye damage",
             ghs_eye_damage="1",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL3"
 
-    def test_hl2_skin_sensitization(self):
-        """Skin sensitization → HL2."""
+    def test_hl3_skin_sensitization(self):
+        """Skin sensitization category 1 → HL3."""
         substance = SubstanceData(
             cas_number="test-083",
             name_ja="皮膚感作性物質",
             name_en="Skin sensitizer",
             ghs_skin_sens="1",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL3"
 
-    def test_hl2_stot_se(self):
-        """STOT-SE → HL2."""
+    def test_hl3_stot_se_category_1(self):
+        """STOT-SE category 1 → HL3."""
         substance = SubstanceData(
             cas_number="test-084",
             name_ja="STOT-SE物質",
             name_en="STOT-SE",
             ghs_stot_se="1",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL3"
 
-    def test_hl2_aspiration(self):
-        """Aspiration hazard → HL2."""
+    def test_hl1_aspiration_not_used_by_acrmax(self):
+        """Aspiration hazard does not enter v3 CalculateACRMax."""
         substance = SubstanceData(
             cas_number="test-085",
             name_ja="吸引性呼吸器有害性",
             name_en="Aspiration hazard",
             ghs_aspiration="1",
         )
-        assert get_hazard_level(substance) == "HL2"
+        assert get_hazard_level(substance) == "HL1"
 
     def test_hl1_no_hazards(self):
         """No health hazards → HL1."""
@@ -444,16 +437,16 @@ class TestHazardLevelPriority:
         )
         assert get_hazard_level(substance) == "HL5"
 
-    def test_hl5_takes_priority_over_hl3(self):
-        """HL5 takes priority over HL3."""
+    def test_reproductive_1b_and_stot_re_1_are_hl4(self):
+        """Both reproductive 1B and STOT-RE 1 map to HL4."""
         substance = SubstanceData(
             cas_number="test-101",
             name_ja="複合有害物質",
             name_en="Multiple hazards",
-            ghs_reproductive="1B",  # HL5
-            ghs_stot_re="1",  # HL3
+            ghs_reproductive="1B",  # HL4
+            ghs_stot_re="1",  # HL4
         )
-        assert get_hazard_level(substance) == "HL5"
+        assert get_hazard_level(substance) == "HL4"
 
     def test_hl4_takes_priority_over_hl3(self):
         """HL4 takes priority over HL3."""
@@ -466,16 +459,16 @@ class TestHazardLevelPriority:
         )
         assert get_hazard_level(substance) == "HL4"
 
-    def test_hl3_takes_priority_over_hl2(self):
-        """HL3 takes priority over HL2."""
+    def test_stot_re_1_takes_priority_over_oral_acute_3(self):
+        """STOT-RE 1 (HL4) takes priority over oral acute toxicity 3 (HL3)."""
         substance = SubstanceData(
             cas_number="test-103",
             name_ja="複合有害物質",
             name_en="Multiple hazards",
-            ghs_stot_re="1",  # HL3
-            ghs_acute_oral="3",  # HL2
+            ghs_stot_re="1",  # HL4
+            ghs_acute_oral="3",  # HL3
         )
-        assert get_hazard_level(substance) == "HL3"
+        assert get_hazard_level(substance) == "HL4"
 
 
 class TestRealSubstancesHazardLevel:

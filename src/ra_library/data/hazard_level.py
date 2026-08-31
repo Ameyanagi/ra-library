@@ -1,14 +1,8 @@
 """
 Hazard level calculator module.
 
-Determines hazard level (HL1-HL5) from GHS classification data.
-
-Based on CREATE-SIMPLE hazard level determination:
-- HL5: Carcinogenicity 1A/1B, Mutagenicity 1A/1B, Reproductive 1A/1B
-- HL4: Carcinogenicity 2, Mutagenicity 2, Reproductive 2
-- HL3: STOT-RE 1/2, Respiratory sensitization 1
-- HL2: Other health hazards (acute toxicity, skin irritation, etc.)
-- HL1: No significant health hazards
+Determines hazard level (HL1-HL5) from GHS classification data using the
+CREATE-SIMPLE v3.0.2-v3.2.1 ``CalculateACRMax`` rules.
 """
 
 from typing import Literal
@@ -181,12 +175,9 @@ def get_hazard_level(substance: SubstanceData) -> HazardLevel:
     """
     Determine the hazard level for a substance.
 
-    Priority (highest wins):
-    - HL5: Carcinogenicity 1A/1B, Mutagenicity 1A/1B, Reproductive 1A/1B
-    - HL4: Carcinogenicity 2, Mutagenicity 2, Reproductive 2
-    - HL3: STOT-RE 1/2, Respiratory sensitization 1
-    - HL2: Other health hazards
-    - HL1: No significant health hazards
+    This raw-database API delegates to the same classification model used by
+    the assessment calculator so database lookups and actual calculations
+    cannot drift apart.
 
     Args:
         substance: SubstanceData from database
@@ -194,34 +185,9 @@ def get_hazard_level(substance: SubstanceData) -> HazardLevel:
     Returns:
         Hazard level string ("HL1" to "HL5")
     """
-    # Check HL5 conditions (Category 1A/1B for CMR)
-    carc_cat = _get_category(substance.ghs_carcinogenicity)
-    muta_cat = _get_category(substance.ghs_mutagenicity)
-    repr_cat = _get_category(substance.ghs_reproductive)
+    from .converter import to_ghs_classification
 
-    if _is_category_1(carc_cat) or _is_category_1(muta_cat) or _is_category_1(repr_cat):
-        return "HL5"
-
-    # Also check is_carcinogen flag (may indicate cat 1 even if GHS not specified)
-    # Only elevate to HL5 if no category is specified (flag might be more conservative)
-    if substance.is_carcinogen and carc_cat is None:
-        # If flag is set but category unknown, assume worst case (HL5)
-        return "HL5"
-
-    # Check HL4 conditions (Category 2 for CMR)
-    if _is_category_2(carc_cat) or _is_category_2(muta_cat) or _is_category_2(repr_cat):
-        return "HL4"
-
-    # Check HL3 conditions (STOT-RE 1/2, Respiratory sensitization)
-    if is_stot_re(substance) or is_respiratory_sensitizer(substance):
-        return "HL3"
-
-    # Check HL2 conditions (other health hazards)
-    if has_health_hazards(substance):
-        return "HL2"
-
-    # Default to HL1 (no significant health hazards)
-    return "HL1"
+    return to_ghs_classification(substance).get_hazard_level()  # type: ignore[return-value]
 
 
 def get_hazard_level_numeric(substance: SubstanceData) -> int:
@@ -242,18 +208,8 @@ def should_apply_acrmax(substance: SubstanceData) -> bool:
     """
     Determine if ACRmax should be applied for this substance.
 
-    ACRmax (Management Target Concentration) should ONLY apply to:
-    - Carcinogens (Category 1A, 1B, or 2)
-    - Mutagens (Category 1A, 1B, or 2)
-
-    ACRmax should NOT apply to:
-    - Reproductive toxicants (even though they contribute to HL4/HL5)
-    - Other health hazards
-
-    Reference: CREATE-SIMPLE Design v3.1.1, Section 5.3.3
-    The ACRmax table specifies values for "Carcinogen 1A/1B" (HL5)
-    and "Carcinogen 2, Mutagen 1A/1B/2" (HL4), but does NOT include
-    reproductive toxicity.
+    CREATE-SIMPLE always derives an ACRmax from HL1-HL5.  It becomes the
+    assessment standard when an occupational exposure limit is unavailable.
 
     Args:
         substance: SubstanceData from database
@@ -261,55 +217,19 @@ def should_apply_acrmax(substance: SubstanceData) -> bool:
     Returns:
         True if ACRmax should be applied, False otherwise
     """
-    carc_cat = _get_category(substance.ghs_carcinogenicity)
-    muta_cat = _get_category(substance.ghs_mutagenicity)
-
-    # Apply ACRmax for any carcinogen category (1A, 1B, or 2)
-    if carc_cat is not None:
-        return True
-
-    # Apply ACRmax for any mutagen category (1A, 1B, or 2)
-    if muta_cat is not None:
-        return True
-
-    # Check is_carcinogen flag (may indicate carcinogenicity even if GHS not specified)
-    if substance.is_carcinogen:
-        return True
-
-    return False
+    return True
 
 
 def get_acrmax_hazard_level(substance: SubstanceData) -> HazardLevel | None:
     """
     Get the hazard level to use for ACRmax lookup, if applicable.
 
-    This returns the hazard level ONLY based on carcinogenicity/mutagenicity,
-    ignoring reproductive toxicity. This is used to determine the correct
-    ACRmax value from the lookup table.
+    Compatibility alias for the full CREATE-SIMPLE GHS hazard level.
 
     Args:
         substance: SubstanceData from database
 
     Returns:
-        Hazard level string ("HL4" or "HL5") for ACRmax lookup,
-        or None if ACRmax should not be applied
+        Hazard level string ("HL1" through "HL5") for ACRmax lookup
     """
-    if not should_apply_acrmax(substance):
-        return None
-
-    carc_cat = _get_category(substance.ghs_carcinogenicity)
-    muta_cat = _get_category(substance.ghs_mutagenicity)
-
-    # HL5: Carcinogen 1A/1B or Mutagen 1A/1B
-    if _is_category_1(carc_cat) or _is_category_1(muta_cat):
-        return "HL5"
-
-    # Check is_carcinogen flag - assume worst case (HL5) if no category specified
-    if substance.is_carcinogen and carc_cat is None:
-        return "HL5"
-
-    # HL4: Carcinogen 2 or Mutagen 2
-    if _is_category_2(carc_cat) or _is_category_2(muta_cat):
-        return "HL4"
-
-    return None
+    return get_hazard_level(substance)

@@ -70,7 +70,7 @@ def calculate_inhalation_risk(
     This function:
     1. Calculates exposure concentration
     2. Selects appropriate OEL
-    3. Applies ACRmax if applicable (carcinogens)
+    3. Derives the GHS management target used when no OEL is registered
     4. Applies RPE coefficient (Report mode only)
     5. Calculates RCR and determines risk level
     6. Identifies limitations (why Level I may not be achievable)
@@ -86,8 +86,9 @@ def calculate_inhalation_risk(
     Returns:
         InhalationRisk result with all calculations and explanations
     """
-    # Determine volatility or dustiness
-    if substance.property_type == PropertyType.LIQUID:
+    # STEP 1 product form controls the workbook calculation; it can differ from the pure
+    # substance form stored in the database (for example, a solid supplied in solution).
+    if assessment_input.product_property == PropertyType.LIQUID:
         volatility = substance.properties.get_volatility_level().value
         property_type = "liquid"
         unit = "ppm"
@@ -104,17 +105,30 @@ def calculate_inhalation_risk(
         verbose=verbose,
     )
 
-    # Step 2: Select OEL
+    # Step 2: Select OEL, or construct CREATE-SIMPLE's management target from GHS.
+    #
+    # The official workbook always calculates ACRmax (HL1-HL5). When SelectOEL8Hour
+    # returns -9999, DetermineRiskLevelInhalation8Hour uses ACRmax as the evaluation
+    # standard. A missing OEL is therefore a normal, assessable case.
     oel_value, oel_unit, oel_source = select_oel(substance.oel)
-
-    if oel_value is None:
-        raise ValueError(f"No OEL available for substance {substance.cas_number}")
-
-    # Step 3: Get ACRmax if applicable (carcinogens/mutagens ONLY, not reproductive toxicity)
-    # Note: hazard_level is used for display/reporting, but ACRmax uses a separate check
     hazard_level = substance.get_hazard_level()
-    acrmax_hazard_level = substance.ghs.get_acrmax_hazard_level()
-    acrmax = get_acrmax(acrmax_hazard_level, property_type)
+    acrmax = get_acrmax(hazard_level, property_type)
+    if oel_value is None and acrmax is None:
+        raise ValueError(
+            f"No OEL or GHS management target available for substance {substance.cas_number}"
+        )
+
+    if oel_value is not None:
+        evaluation_standard = oel_value
+        evaluation_standard_unit = oel_unit or unit
+        evaluation_standard_source = oel_source or "OEL"
+        evaluation_standard_kind = "oel"
+    else:
+        assert acrmax is not None
+        evaluation_standard = acrmax
+        evaluation_standard_unit = unit
+        evaluation_standard_source = f"管理目標濃度（GHS {hazard_level}）"
+        evaluation_standard_kind = "ghs_management_target"
 
     # Step 4: Apply RPE coefficient (Report mode only)
     rpe_coeff = calculate_apf_coefficient_for_mode(
@@ -171,23 +185,23 @@ def calculate_inhalation_risk(
             )
         )
 
-    if acrmax is not None:
+    if oel_value is None and acrmax is not None:
         limitations.append(
             Limitation(
                 factor_name="ACRmax (Management target)",
                 factor_name_ja="ACRmax（管理目標濃度）",
                 description=(
-                    f"This substance has hazard level {hazard_level}. "
-                    f"ACRmax = {acrmax} {unit} is used instead of OEL."
+                    f"No OEL is registered. This substance has hazard level {hazard_level}, "
+                    f"so ACRmax = {acrmax} {unit} is used as the management target."
                 ),
                 description_ja=(
-                    f"この物質はハザードレベル{hazard_level}です。"
-                    f"OELの代わりにACRmax = {acrmax} {unit}が使用されます。"
+                    f"OELが登録されていないため、ハザードレベル{hazard_level}から導出した"
+                    f"管理目標濃度 = {acrmax} {unit}を使用します。"
                 ),
                 current_value=acrmax,
                 limiting_value=acrmax,
-                impact="More stringent target for carcinogens/mutagens",
-                impact_ja="発がん性・変異原性物質に対するより厳しい目標",
+                impact="Supplies the assessment standard when no OEL is registered",
+                impact_ja="OEL未登録物質に対する評価基準を補完",
                 reference=REFERENCES["create_simple_design_5_3_acrmax"],
             )
         )
@@ -275,9 +289,16 @@ def calculate_inhalation_risk(
         exposure_stel=exposure_stel_after_rpe,
         exposure_stel_min=exposure_stel_min,
         exposure_stel_unit=unit,
-        oel=oel_value,
-        oel_unit=oel_unit,
-        oel_source=oel_source,
+        # Legacy OEL fields contain the effective standard for compatibility. New callers
+        # can distinguish a registered OEL from the fallback with the canonical fields.
+        oel=evaluation_standard,
+        oel_unit=evaluation_standard_unit,
+        oel_source=evaluation_standard_source,
+        registered_oel=oel_value,
+        evaluation_standard=evaluation_standard,
+        evaluation_standard_unit=evaluation_standard_unit,
+        evaluation_standard_source=evaluation_standard_source,
+        evaluation_standard_kind=evaluation_standard_kind,
         acrmax=acrmax,
         acrmax_unit=unit if acrmax else None,
         rcr=rcr,

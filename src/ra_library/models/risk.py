@@ -5,8 +5,8 @@ References:
 - CREATE-SIMPLE Design Document v3.1.1, Section 5
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel, Field, model_validator
+from typing import Optional, List, Self
 from enum import IntEnum
 
 from .explanation import CalculationExplanation, Limitation
@@ -232,9 +232,22 @@ class InhalationRisk(BaseModel):
     )
     exposure_stel_unit: Optional[str] = None
 
-    oel: float = Field(..., description="Occupational Exposure Limit used")
+    # ``oel`` remains the legacy effective-standard field. When no registered OEL exists,
+    # CREATE-SIMPLE judges against the GHS-derived management target and this field contains
+    # that target. New callers should use the explicit evaluation-standard fields.
+    oel: float = Field(..., description="Effective assessment standard (legacy field)")
     oel_unit: str = Field(default="ppm")
-    oel_source: str = Field(default="", description="Source of OEL value")
+    oel_source: str = Field(default="", description="Source of effective assessment standard")
+
+    registered_oel: Optional[float] = Field(
+        None, description="Selected occupational exposure limit, if one was registered"
+    )
+    evaluation_standard: Optional[float] = Field(
+        None, description="Denominator used for the 8-hour RCR"
+    )
+    evaluation_standard_unit: Optional[str] = None
+    evaluation_standard_source: Optional[str] = None
+    evaluation_standard_kind: str = Field(default="oel", description="oel or ghs_management_target")
 
     acrmax: Optional[float] = Field(None, description="Management target concentration")
     acrmax_unit: Optional[str] = None
@@ -273,6 +286,19 @@ class InhalationRisk(BaseModel):
     would_achieve_target_without_floor: bool = Field(
         default=False, description="True if target level would be achieved without floor"
     )
+
+    @model_validator(mode="after")
+    def default_evaluation_standard_from_legacy_oel(self) -> Self:
+        """Keep direct construction with the pre-0.4.1 fields backwards compatible."""
+        if self.evaluation_standard is None:
+            self.evaluation_standard = self.oel
+        if self.evaluation_standard_unit is None:
+            self.evaluation_standard_unit = self.oel_unit
+        if self.evaluation_standard_source is None:
+            self.evaluation_standard_source = self.oel_source
+        if self.registered_oel is None and self.evaluation_standard_kind == "oel":
+            self.registered_oel = self.oel
+        return self
 
 
 class DermalRisk(BaseModel):

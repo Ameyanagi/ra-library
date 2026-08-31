@@ -63,11 +63,10 @@ class TestACRmaxEdgeCases:
         assert get_acrmax("HL99", "liquid") is None
         assert get_acrmax("HL99", "solid") is None
 
-    def test_acrmax_invalid_property_type(self):
-        """Invalid property type should raise or return None."""
-        # The function should handle invalid property types gracefully
+    def test_acrmax_gas_uses_ppm_table(self):
+        """VBA property type 3 (gas) uses the liquid/ppm table."""
         result = get_acrmax("HL5", "gas")
-        assert result is None
+        assert result == 0.05
 
     def test_acrmax_none_inputs(self):
         """None inputs should return None."""

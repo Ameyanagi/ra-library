@@ -354,8 +354,9 @@ def calculate_dermal_risk(
     steps = []
     step_num = 1
 
-    # Determine property type for retention time calculation
-    property_type = substance.property_type.value
+    # STEP 1 product form controls the workbook calculation; it can differ from the pure
+    # substance form stored in the database (for example, a solid supplied in solution).
+    property_type = assessment_input.product_property.value
 
     if use_vba_method:
         # VBA Method: Detailed Kp formula with retention time
@@ -617,9 +618,11 @@ def calculate_dermal_risk(
     from .acr import get_acrmax
 
     oel_value, oel_unit, oel_source = select_oel(substance.oel)
-    # Get ACRmax only for carcinogens/mutagens, not reproductive toxicity
-    acrmax_hazard_level = substance.ghs.get_acrmax_hazard_level()
-    acrmax = get_acrmax(acrmax_hazard_level, property_type)
+    # With no OEL, the workbook derives the dermal standard from the same HL1-HL5
+    # management target used for inhalation.
+    hazard_level = substance.get_hazard_level()
+    acrmax = get_acrmax(hazard_level, property_type)
+    evaluation_source = oel_source or f"GHS {hazard_level} management target"
 
     dermal_oel = None
     try:
@@ -642,13 +645,18 @@ def calculate_dermal_risk(
                     input_values={
                         "total_absorption": total_absorption,
                         "dermal_oel": dermal_oel,
-                        "oel_source": oel_source,
+                        "evaluation_standard_source": evaluation_source,
                         "acrmax": acrmax,
                     },
                     output_value=rcr,
                     output_unit="",
-                    explanation=f"Dermal OEL = {dermal_oel:.2f} mg derived from {oel_source}",
-                    explanation_ja=f"経皮OEL = {dermal_oel:.2f} mg（{oel_source}から算出）",
+                    explanation=(
+                        f"Dermal assessment standard = {dermal_oel:.2f} mg "
+                        f"derived from {evaluation_source}"
+                    ),
+                    explanation_ja=(
+                        f"経皮評価基準 = {dermal_oel:.2f} mg（{evaluation_source}から算出）"
+                    ),
                 )
             )
             step_num += 1

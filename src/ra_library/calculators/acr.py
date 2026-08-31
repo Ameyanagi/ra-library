@@ -18,24 +18,23 @@ def get_acrmax(
     """
     Get ACRmax value for a hazard level and property type.
 
-    ACRmax is the management target concentration for highly hazardous
-    substances (carcinogens, mutagens). When present, it is used instead
-    of OEL as the denominator for RCR calculation.
+    ACRmax is CREATE-SIMPLE's management target concentration derived from
+    the GHS hazard level. It is the RCR denominator when no OEL is registered.
 
     Reference: CREATE-SIMPLE Design v3.1.1, Section 5.3.3
     VBA Reference: modCalc.bas lines 231-277
 
     Args:
         hazard_level: Hazard level (HL1-HL5), or None
-        property_type: "liquid" or "solid", or None
+        property_type: "liquid", "solid", or "gas", or None
 
     Returns:
-        ACRmax value (ppm for liquid, mg/m³ for solid), or None if not applicable
+        ACRmax value (ppm for liquid/gas, mg/m³ for solid), or None if unavailable
     """
     if hazard_level is None or property_type is None:
         return None
 
-    if property_type == "liquid":
+    if property_type in {"liquid", "gas"}:
         return ACRMAX_VALUES_LIQUID.get(hazard_level)
     elif property_type == "solid":
         return ACRMAX_VALUES_SOLID.get(hazard_level)
@@ -58,8 +57,8 @@ def calculate_rcr(
     - If OEL doesn't exist, use ACRmax as fallback
 
     Note: ACRmax is NOT used when OEL is available, even if ACRmax < OEL.
-    ACRmax serves as a separate management target for carcinogens, displayed
-    for information but not used in risk level calculation when OEL exists.
+    ACRmax is retained for provenance/display, but is not used in the risk-level
+    calculation when an OEL exists.
 
     Args:
         exposure: Estimated exposure concentration
@@ -103,7 +102,7 @@ def get_risk_level_from_rcr(rcr: float) -> RiskLevel:
 
 def calculate_minimum_achievable_rcr(
     property_type: str,
-    oel: float,
+    oel: Optional[float],
     acrmax: Optional[float] = None,
 ) -> tuple[float, RiskLevel, str]:
     """
@@ -131,7 +130,7 @@ def calculate_minimum_achievable_rcr(
 
 def calculate_engineering_limit(
     property_type: str,
-    oel: float,
+    oel: Optional[float],
     acrmax: Optional[float] = None,
     max_ventilation: Optional[str] = None,
 ) -> tuple[float, RiskLevel, str, str, str]:

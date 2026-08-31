@@ -472,6 +472,11 @@ class ComponentResult:
             "oel_unit": self.inhalation.oel_unit,
             "oel_source": self.inhalation.oel_source,
             "acrmax": self.inhalation.acrmax,
+            "registered_oel": self.inhalation.registered_oel,
+            "evaluation_standard": self.inhalation.evaluation_standard,
+            "evaluation_standard_unit": self.inhalation.evaluation_standard_unit,
+            "evaluation_standard_source": self.inhalation.evaluation_standard_source,
+            "evaluation_standard_kind": self.inhalation.evaluation_standard_kind,
             "rcr": self.inhalation.rcr,
             "risk_level": int(self.inhalation.risk_level),
             "risk_label": RiskLevel.get_detailed_label(self.inhalation.rcr),
@@ -2258,10 +2263,14 @@ class AssessmentResult:
                     lines.append(
                         f"  暴露範囲: {inh.exposure_8hr_min:.4f} - {inh.exposure_8hr:.4f} {inh.exposure_8hr_unit}"
                     )
-                lines.append(f"  OEL: {inh.oel} {inh.oel_unit} ({inh.oel_source})")
-                if inh.acrmax:
-                    lines.append(f"  ACRmax: {inh.acrmax} {inh.acrmax_unit} (管理目標濃度)")
-                lines.append(f"  {self._rcr_basis_ja(inh.oel, inh.acrmax, inh.oel_unit)}")
+                lines.append(
+                    f"  評価基準: {inh.evaluation_standard} "
+                    f"{inh.evaluation_standard_unit} ({inh.evaluation_standard_source})"
+                )
+                if inh.registered_oel is None:
+                    lines.append("  RCR基準: GHSハザードレベルから導出した管理目標濃度")
+                else:
+                    lines.append("  RCR基準: 登録ばく露限界値")
                 lines.append(f"  RCR: {inh.rcr:.4f}")
                 # 8-hour TWA uses detailed level (I, II-A, II-B, III, IV)
                 detailed_level = RiskLevel.get_detailed_label(inh.rcr)
@@ -2477,9 +2486,14 @@ class AssessmentResult:
                 lines.append("[Inhalation Risk (8-hour TWA)]")
                 lines.append("-" * 40)
                 lines.append(f"  Exposure estimate: {inh.exposure_8hr:.4f} {inh.exposure_8hr_unit}")
-                lines.append(f"  OEL: {inh.oel} {inh.oel_unit} ({inh.oel_source})")
-                if inh.acrmax:
-                    lines.append(f"  ACRmax: {inh.acrmax} {inh.acrmax_unit}")
+                lines.append(
+                    f"  Assessment standard: {inh.evaluation_standard} "
+                    f"{inh.evaluation_standard_unit} ({inh.evaluation_standard_source})"
+                )
+                if inh.registered_oel is None:
+                    lines.append("  RCR basis: GHS-derived management target")
+                else:
+                    lines.append("  RCR basis: registered occupational exposure limit")
                 lines.append(f"  RCR: {inh.rcr:.4f}")
                 lines.append(f"  Risk Level: {inh.risk_level.name}")
                 lines.append(f"  Judgment: {self._risk_judgment_en(inh.risk_level)}")
@@ -2771,15 +2785,6 @@ class AssessmentResult:
             return f"{reduction:.0f}%"
         else:
             return f"{reduction:.1f}%"
-
-    def _rcr_basis_ja(self, oel: float, acrmax: float | None, oel_unit: str) -> str:
-        """Explain which value is used for RCR calculation."""
-        if acrmax is None:
-            return f"RCR基準: OEL ({oel} {oel_unit})"
-        elif acrmax < oel:
-            return f"RCR基準: ACRmax（OEL {oel}より低いため）"
-        else:
-            return f"RCR基準: OEL（ACRmax {acrmax}より低いため）"
 
     def _dustiness_label_ja(self, dustiness: str) -> str:
         """Get Japanese dustiness label."""

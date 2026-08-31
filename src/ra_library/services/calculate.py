@@ -692,6 +692,12 @@ def _format_result(
                 "exposure_unit": comp.inhalation.exposure_8hr_unit,
                 "oel": comp.inhalation.oel,
                 "oel_source": comp.inhalation.oel_source,
+                "registered_oel": comp.inhalation.registered_oel,
+                "acrmax": comp.inhalation.acrmax,
+                "evaluation_standard": comp.inhalation.evaluation_standard,
+                "evaluation_standard_unit": comp.inhalation.evaluation_standard_unit,
+                "evaluation_standard_source": comp.inhalation.evaluation_standard_source,
+                "evaluation_standard_kind": comp.inhalation.evaluation_standard_kind,
             }
             # Add STEL if available
             if comp.inhalation.stel_rcr is not None:

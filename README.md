@@ -21,8 +21,10 @@ This library implements an independent risk assessment workflow with detailed ex
 ## Installation
 
 ```bash
-uv add "ra-library @ https://github.com/Ameyanagi/ra-library/archive/refs/tags/v0.4.0.zip"
+uv add ra-library
 ```
+
+Or with pip: `pip install ra-library`.
 
 ## Usage
 
@@ -75,8 +77,8 @@ uv run pytest -q
 
 ## Release
 
-A matching `v*` tag builds and attaches distributions to a GitHub Release.
-The workflow does not publish to PyPI or another package registry.
+A matching `v*` tag tests and publishes distributions to PyPI, then attaches
+the same artifacts to a GitHub Release.
 
 ## Notes
 
